@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#090d16">
     <title>تطبيق الدايت - عمرو</title>
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23090d16%22/><text y=%22.88em%22 x=%2210%22 font-size=%2280%22>💪</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23090d16%22/><text y=%2276%22 x=%2212%22 font-size=%2274%22>💪</text></svg>">
+    <link id="appFavicon" rel="icon" type="image/png" href="">
+    <link id="appleTouchIcon" rel="apple-touch-icon" sizes="512x512" href="">
     <link id="pwaManifest" rel="manifest" href="">
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -100,7 +100,7 @@
             width: 100%;
             background: transparent;
             border: none;
-            border-bottom: 2px dashed rgba(147, 197, 253, 0.6);
+            border-bottom: 2px dashed rgba(147, 197, 233, 0.6);
             color: white;
             text-align: center;
             font-size: 1.25rem;
@@ -844,7 +844,7 @@
                 </div>
                 <div class="header-btn-group" style="flex-wrap:wrap; justify-content:flex-end;">
                     <button class="theme-btn" id="openSyncModalBtn" style="background:rgba(16,185,129,0.28); border-color:rgba(52,211,153,0.5);" title="نقل البيانات بين الموبايل واللاب">☁️ مزامنة</button>
-                    <button class="theme-btn" id="installAppBtn" style="background:rgba(37,99,235,0.35); border-color:rgba(96,165,250,0.6);" title="تثبيت البرنامج">📲 تثبيت</button>
+                    <button class="theme-btn" id="installAppBtn" style="background:rgba(37,99,235,0.35); border-color:rgba(96,165,250,0.6);" title="تثبيت البرنامج واللوجو">📲 اللوجو والتثبيت</button>
                     <button class="theme-btn" id="openSetupBtn" title="تعديل الهدف والوزن">⚙️ الخطة</button>
                     <button class="theme-btn" id="themeToggle">🌓</button>
                     <button class="theme-btn" id="logoutBtn" style="background:rgba(220,38,38,0.25); border-color:rgba(248,113,113,0.4);" title="تسجيل الخروج">🚪 خروج</button>
@@ -1023,26 +1023,82 @@
         </div>
     </div>
 
-    <!-- Install App Guide Modal -->
+    <!-- Install App & Custom Logo Modal -->
     <div class="modal-overlay" id="installModal">
-        <div class="modal-box" style="text-align:center; gap:14px;">
+        <div class="modal-box" style="text-align:center; gap:12px;">
             <div class="modal-header" style="margin-bottom:0;">
-                <div class="modal-title">تثبيت التطبيق كبرنامج 📲</div>
+                <div class="modal-title">تغيير اللوجو وتثبيت التطبيق 📲</div>
                 <button class="close-modal" id="closeInstallModalBtn">✕</button>
             </div>
-            <div style="font-size:2.8rem;">💪</div>
-            <div style="font-weight:900; font-size:1.05rem;">نزّل تطبيق الدايت على شاشتك الرئيسية</div>
-            <div style="font-size:0.85rem; opacity:0.88; font-weight:700; line-height:1.7; text-align:right; background:rgba(37,99,235,0.08); padding:14px; border-radius:16px; border:1px solid rgba(37,99,235,0.2);">
-                <div style="margin-bottom:8px;"><b>🍏 للآيفون (Safari):</b><br>اضغط زر المشاركة <b>(⬆️)</b> بالأسفل ثم اختر <b>"إضافة إلى الشاشة الرئيسية"</b>.</div>
-                <div><b>💻 للكمبيوتر / الأندرويد (Chrome):</b><br>اضغط أيقونة التثبيت في شريط العنوان بالأعلى ثم اختر <b>"Install"</b>.</div>
+            
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                <img id="logoPreviewImg" src="" alt="App Logo" style="width:84px; height:84px; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.35); border:2px solid #3b82f6; object-fit:cover;">
+                <div style="font-size:0.78rem; font-weight:800; opacity:0.8;">اختر شكل اللوجو أو ارفع صورة من جهازك:</div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+                    <button type="button" class="mini-btn outline" style="padding:6px 10px;" onclick="setPresetLogo('💪')">💪 عضلة</button>
+                    <button type="button" class="mini-btn outline" style="padding:6px 10px;" onclick="setPresetLogo('🏋️')">🏋️ دامبل</button>
+                    <button type="button" class="mini-btn outline" style="padding:6px 10px;" onclick="setPresetLogo('🔥')">🔥 نار</button>
+                    <button type="button" class="mini-btn outline" style="padding:6px 10px;" onclick="setPresetLogo('🥗')">🥗 دايت</button>
+                    <label class="mini-btn" style="padding:6px 10px; cursor:pointer; display:inline-block;">
+                        🖼️ صورة من جهازي
+                        <input type="file" id="customLogoUpload" accept="image/*" style="display:none;">
+                    </label>
+                </div>
+            </div>
+
+            <div style="font-size:0.82rem; opacity:0.9; font-weight:700; line-height:1.65; text-align:right; background:rgba(37,99,235,0.08); padding:12px; border-radius:16px; border:1px solid rgba(37,99,235,0.2);">
+                <div style="margin-bottom:6px;"><b>🍏 لتحديث اللوجو على الآيفون:</b><br>افتح الرابط في متصفح <b>Safari</b> (وليس من الأيقونة البيضاء القديمة) ⬅️ اضغط مشاركة <b>(⬆️)</b> ⬅️ <b>"إضافة إلى الشاشة الرئيسية"</b> وستظهر الأيقونة الجديدة فوراً!</div>
+                <div><b>💻 للكمبيوتر (Chrome):</b><br>اضغط الثلاث نقاط <b>(⋮)</b> ⬅️ <b>Cast, save, and share</b> ⬅️ <b>Install page as app</b>.</div>
             </div>
             <button type="button" id="triggerNativeInstallBtn" class="btn-primary" style="display:none; margin-top:0;">تثبيت البرنامج الآن 🚀</button>
         </div>
     </div>
 
     <script>
-        // إعداد ملف Manifest ديناميكي لدعم التثبيت كبرنامج مستقل (PWA)
-        (function setupPWA() {
+        const CUSTOM_LOGO_KEY = 'amrDiet_custom_logo_png_v1';
+
+        // توليد أيقونة PNG عالية الدقة (512x512) متوافقة مع الآيفون (iOS) والكمبيوتر
+        function generatePngIconDataUrl(emojiText = '💪') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // خلفية متدرجة فخمة داكنة
+            const grad = ctx.createLinearGradient(0, 0, 512, 512);
+            grad.addColorStop(0, '#0f172a');
+            grad.addColorStop(0.5, '#1e3a8a');
+            grad.addColorStop(1, '#090d16');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // إطار داخلي مضيء خفيف
+            ctx.strokeStyle = 'rgba(96, 165, 250, 0.45)';
+            ctx.lineWidth = 14;
+            ctx.strokeRect(24, 24, 464, 464);
+
+            // رسم الإيموجي في المنتصف
+            ctx.font = '250px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emojiText, 256, 245);
+
+            // نص سفلي أنيق
+            ctx.fillStyle = '#93c5fd';
+            ctx.font = '900 44px Cairo, sans-serif';
+            ctx.fillText('DIET PRO', 256, 435);
+
+            return canvas.toDataURL('image/png');
+        }
+
+        function applyAppLogo(pngDataUrl) {
+            const appleIcon = document.getElementById('appleTouchIcon');
+            const favIcon = document.getElementById('appFavicon');
+            const previewImg = document.getElementById('logoPreviewImg');
+            if (appleIcon) appleIcon.setAttribute('href', pngDataUrl);
+            if (favIcon) favIcon.setAttribute('href', pngDataUrl);
+            if (previewImg) previewImg.src = pngDataUrl;
+
             const manifestObj = {
                 name: "تطبيق الدايت - بوابة الأبطال",
                 short_name: "دايت الأبطال",
@@ -1053,9 +1109,9 @@
                 orientation: "portrait",
                 icons: [
                     {
-                        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%23090d16'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='340'>💪</text></svg>",
+                        src: pngDataUrl,
                         sizes: "512x512",
-                        type: "image/svg+xml",
+                        type: "image/png",
                         purpose: "any maskable"
                     }
                 ]
@@ -1064,6 +1120,50 @@
             const manifestUrl = URL.createObjectURL(manifestBlob);
             const manifestLink = document.getElementById('pwaManifest');
             if (manifestLink) manifestLink.setAttribute('href', manifestUrl);
+        }
+
+        window.setPresetLogo = function(emoji) {
+            const pngUrl = generatePngIconDataUrl(emoji);
+            localStorage.setItem(CUSTOM_LOGO_KEY, pngUrl);
+            applyAppLogo(pngUrl);
+            showToast(`✅ تم تغيير اللوجو إلى ${emoji}! أضفه للشاشة الرئيسية الآن`);
+        };
+
+        document.getElementById('customLogoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 512;
+                    const ctx = canvas.getContext('2d');
+                    // قص الصورة مربعة في المنتصف (Center Crop)
+                    const minSide = Math.min(img.width, img.height);
+                    const sx = (img.width - minSide) / 2;
+                    const sy = (img.height - minSide) / 2;
+                    ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, 512, 512);
+                    const pngUrl = canvas.toDataURL('image/png');
+                    localStorage.setItem(CUSTOM_LOGO_KEY, pngUrl);
+                    applyAppLogo(pngUrl);
+                    showToast('🖼️ تم تعيين صورتك كلوجو للتطبيق بنجاح!');
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // تفعيل اللوجو المحفوظ أو الافتراضي فور فتح الصفحة
+        (function initLogo() {
+            const savedLogo = localStorage.getItem(CUSTOM_LOGO_KEY);
+            if (savedLogo) {
+                applyAppLogo(savedLogo);
+            } else {
+                const defaultPng = generatePngIconDataUrl('💪');
+                applyAppLogo(defaultPng);
+            }
         })();
 
         let deferredInstallPrompt = null;
@@ -1264,7 +1364,6 @@
             loadData();
         };
 
-        // إنشاء وقراءة كود المزامنة لنقل الحساب وكل الوجبات بين الموبايل واللاب توب
         function generateSyncCode() {
             if (!currentUser) return '';
             const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
