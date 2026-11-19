@@ -67,10 +67,10 @@
         .theme-btn, .date-badge {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 50px;
             color: #e2e8f0;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
             cursor: pointer;
         }
@@ -326,12 +326,11 @@
             border-radius: 14px;
             font-weight: 800;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            z-index: 1000;
+            z-index: 3000;
             font-size: 0.95rem;
             border: 1px solid rgba(255,255,255,0.2);
             white-space: nowrap;
         }
-        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -425,10 +424,6 @@
             border-color: #21262d;
             color: #f8fafc;
         }
-        body.dark-mode .alt-option:hover, body.dark-mode .alt-option:active {
-            border-color: #3b82f6;
-            background: rgba(59, 130, 246, 0.15);
-        }
         .alt-name {
             font-weight: 800;
             font-size: 0.92rem;
@@ -461,7 +456,6 @@
             font-weight: 900;
             white-space: nowrap;
         }
-        /* Live Macros Grid */
         .macros-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -501,7 +495,6 @@
         body.dark-mode .macro-pill-val {
             color: #60a5fa;
         }
-        /* Water & Timer Tools */
         .tools-grid {
             display: block;
             margin-bottom: 16px;
@@ -595,7 +588,6 @@
             font-weight: 800;
             cursor: pointer;
         }
-        /* Setup Screen / Wizard Styles */
         .setup-screen {
             position: fixed;
             inset: 0;
@@ -790,15 +782,16 @@
         </div>
     </div>
 
-    <!-- User Authentication Screen (Login / Register) -->
+    <!-- User Authentication Screen (Login / Register / Sync) -->
     <div class="setup-screen active" id="authScreen" style="z-index: 2500;">
         <div class="setup-card">
             <div class="setup-title">بوابة الأبطال 💪</div>
-            <div class="setup-subtitle">سجل دخولك أو أنشئ حساباً جديداً لحفظ خطتك ووجباتك بشكل مستقل</div>
+            <div class="setup-subtitle">سجل دخولك أو انقل حسابك بين الموبايل واللاب توب في ثانية</div>
 
-            <div style="display:flex; gap:8px; margin-bottom:16px; background:#161b22; padding:6px; border-radius:16px; border:1px solid #30363d;">
-                <button type="button" id="tabLoginBtn" class="mini-btn" style="padding:10px; font-size:0.9rem;">تسجيل الدخول</button>
-                <button type="button" id="tabRegisterBtn" class="mini-btn outline" style="padding:10px; font-size:0.9rem;">حساب جديد</button>
+            <div style="display:flex; gap:6px; margin-bottom:16px; background:#161b22; padding:6px; border-radius:16px; border:1px solid #30363d;">
+                <button type="button" id="tabLoginBtn" class="mini-btn" style="padding:9px 4px; font-size:0.82rem;">دخول</button>
+                <button type="button" id="tabRegisterBtn" class="mini-btn outline" style="padding:9px 4px; font-size:0.82rem;">حساب جديد</button>
+                <button type="button" id="tabImportBtn" class="mini-btn outline" style="padding:9px 4px; font-size:0.82rem;">📲 استيراد من جهاز آخر</button>
             </div>
 
             <!-- Login Form -->
@@ -817,18 +810,27 @@
             <!-- Register Form -->
             <div id="registerFormBox" style="display:none; flex-direction:column; gap:12px;">
                 <div>
-                    <label class="setup-label">الاسم (يجب ألا يتكرر):</label>
-                    <input type="text" id="regName" class="setup-input" style="font-size:1rem;" placeholder="مثلاً: عمرو أحمد">
+                    <label class="setup-label">الاسم:</label>
+                    <input type="text" id="regName" class="setup-input" style="font-size:1rem;" placeholder="مثلاً: عمرو">
                 </div>
                 <div>
-                    <label class="setup-label">رقم أو كود الـ ID (فريد وغير مكرر):</label>
-                    <input type="text" id="regId" class="setup-input" style="font-size:1rem;" placeholder="مثلاً: AMR100">
+                    <label class="setup-label">رقم أو كود الـ ID:</label>
+                    <input type="text" id="regId" class="setup-input" style="font-size:1rem;" placeholder="مثلاً: 3iid@001">
                 </div>
                 <div>
                     <label class="setup-label">كلمة السر:</label>
-                    <input type="password" id="regPassword" class="setup-input" style="font-size:1rem;" placeholder="اختر كلمة سر قوية">
+                    <input type="password" id="regPassword" class="setup-input" style="font-size:1rem;" placeholder="اختر كلمة سر">
                 </div>
                 <button type="button" id="doRegisterBtn" class="btn-primary">إنشاء الحساب والبدء ✨</button>
+            </div>
+
+            <!-- Import Sync Code Box -->
+            <div id="importFormBox" style="display:none; flex-direction:column; gap:12px;">
+                <div style="font-size:0.8rem; color:#93c5fd; font-weight:700; text-align:center; line-height:1.6;">
+                    افتح التطبيق على جهازك الآخر واضغط زرار <b>(☁️ مزامنة)</b> في الأعلى لنسخ الكود، ثم الصقه هنا:
+                </div>
+                <textarea id="authSyncCodeInput" rows="3" class="setup-input" style="font-size:0.85rem; text-align:left; direction:ltr;" placeholder="الصق كود المزامنة هنا..."></textarea>
+                <button type="button" id="doAuthImportBtn" class="btn-primary">استيراد الحساب والبيانات 📲</button>
             </div>
         </div>
     </div>
@@ -841,7 +843,8 @@
                     <div id="userHeaderTag" style="font-size:0.75rem; color:#93c5fd; font-weight:800; margin-top:2px;">مرحباً يا بطل</div>
                 </div>
                 <div class="header-btn-group" style="flex-wrap:wrap; justify-content:flex-end;">
-                    <button class="theme-btn" id="installAppBtn" style="background:rgba(37,99,235,0.35); border-color:rgba(96,165,250,0.6);" title="تثبيت البرنامج على الموبايل">📲 تثبيت</button>
+                    <button class="theme-btn" id="openSyncModalBtn" style="background:rgba(16,185,129,0.28); border-color:rgba(52,211,153,0.5);" title="نقل البيانات بين الموبايل واللاب">☁️ مزامنة</button>
+                    <button class="theme-btn" id="installAppBtn" style="background:rgba(37,99,235,0.35); border-color:rgba(96,165,250,0.6);" title="تثبيت البرنامج">📲 تثبيت</button>
                     <button class="theme-btn" id="openSetupBtn" title="تعديل الهدف والوزن">⚙️ الخطة</button>
                     <button class="theme-btn" id="themeToggle">🌓</button>
                     <button class="theme-btn" id="logoutBtn" style="background:rgba(220,38,38,0.25); border-color:rgba(248,113,113,0.4);" title="تسجيل الخروج">🚪 خروج</button>
@@ -873,7 +876,6 @@
                 <div id="progressBar" class="progress-bar-fill"></div>
             </div>
             
-            <!-- Live Consumed Macros -->
             <div class="macros-grid">
                 <div class="macro-pill">
                     <div class="macro-pill-title">🔥 السعرات</div>
@@ -894,9 +896,8 @@
             </div>
         </div>
 
-        <!-- Gym & Hydration Tools -->
+        <!-- Water Tracker -->
         <div class="tools-grid">
-            <!-- Water Tracker -->
             <div class="tool-card">
                 <div class="tool-title">💧 متتبع شرب المياه اليومي</div>
                 <div class="tool-display"><span id="waterCount">0.0</span> <span style="font-size:0.75rem;">لتر</span></div>
@@ -949,6 +950,25 @@
         </div>
     </div>
 
+    <!-- Sync Between Devices Modal -->
+    <div class="modal-overlay" id="syncModal">
+        <div class="modal-box" style="gap:12px;">
+            <div class="modal-header" style="margin-bottom:0;">
+                <div class="modal-title">☁️ مزامنة بين الموبايل واللاب</div>
+                <button class="close-modal" id="closeSyncModalBtn">✕</button>
+            </div>
+            <div style="font-size:0.82rem; line-height:1.6; opacity:0.9; font-weight:700;">
+                <b>1. لنقل بيانات هذا الجهاز لجهاز آخر:</b> اضغط نسخ الكود وابعته واتساب للجهاز التاني.<br>
+                <b>2. لاستقبال البيانات من جهاز آخر:</b> الصق الكود في المربع بالأسفل واضغط استيراد.
+            </div>
+            <textarea id="syncCodeArea" rows="3" class="form-input" style="font-size:0.78rem; direction:ltr; text-align:left;" placeholder="كود المزامنة يظهر هنا..."></textarea>
+            <div style="display:flex; gap:8px;">
+                <button type="button" id="copySyncCodeBtn" class="btn-primary" style="margin-top:0; padding:12px; font-size:0.9rem;">📋 نسخ كود بياناتي</button>
+                <button type="button" id="applySyncCodeBtn" class="btn-secondary" style="margin-top:0; padding:12px; font-size:0.9rem;">📥 استيراد الكود</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Alternatives Modal -->
     <div class="modal-overlay" id="altModal">
         <div class="modal-box">
@@ -967,69 +987,61 @@
     <div class="modal-overlay" id="extraModal">
         <div class="modal-box">
             <div class="modal-header">
-                <div class="modal-title">إضافة أكلة لليوم ➕</div>
+                <div class="modal-title">إضافة أكلة خارجية ➕</div>
                 <button class="close-modal" id="closeExtraModalBtn">✕</button>
             </div>
             <div class="extra-food-form">
-                <label style="font-size:0.82rem; font-weight:800; opacity:0.85;">اختر من الأكلات المتاحة أو (إدخال يدوي):</label>
-                <select id="extraFoodSelect" class="form-input" style="cursor:pointer;">
-                    <option value="custom">✍️ إدخال يدوي حر (أكلة خارج القائمة)</option>
-                </select>
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:800; margin-bottom:6px;">اختر أكلة من القائمة أو أدخل أكلة مخصصة:</label>
+                    <select id="extraFoodSelect" class="form-input" style="cursor:pointer;">
+                        <option value="custom">✍️ إدخال أكلة مخصصة يدوياً...</option>
+                    </select>
+                </div>
 
-                <!-- Quick DB Food Mode -->
-                <div id="dbExtraSection" style="display:none; flex-direction:column; gap:8px;">
+                <div id="dbExtraSection" style="display:none; flex-direction:column; gap:10px;">
                     <div style="display:flex; align-items:center; gap:8px;">
                         <input type="number" id="extraDbQty" class="form-input" placeholder="الكمية" value="100" min="1">
-                        <span id="extraDbUnit" style="font-weight:900; font-size:0.9rem; color:#2563eb; white-space:nowrap;">جم</span>
+                        <span id="extraDbUnit" style="font-weight:900; font-size:0.95rem; min-width:55px; text-align:center;">جم</span>
                     </div>
-                    <div id="extraDbPreview" style="background:rgba(37,99,235,0.08); padding:10px; border-radius:12px; text-align:center; font-size:0.78rem; font-weight:800; color:#2563eb;">
-                        🔥 0 سعرة | 💪 0جم بروتين | 🍚 0جم كارب | 🥑 0جم دهون
+                    <div id="extraDbPreview" style="text-align:center; font-size:0.82rem; font-weight:800; color:#2563eb; background:rgba(37,99,235,0.08); padding:8px; border-radius:10px;">
+                        🔥 0 سعرة | 💪 0ج بروتين | 🍚 0ج كارب | 🥑 0ج دهون
                     </div>
                 </div>
 
-                <!-- Custom Manual Mode -->
-                <div id="customExtraSection" style="display:flex; flex-direction:column; gap:8px;">
-                    <input type="text" id="extraName" class="form-input" placeholder="اسم الأكلة (مثلاً: سكوب واي بروتين / تفاحة)">
+                <div id="customExtraSection" style="display:flex; flex-direction:column; gap:10px;">
+                    <input type="text" id="extraName" class="form-input" placeholder="اسم الأكلة (مثلاً: سكوب واي بروتين)">
                     <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
-                        <input type="number" id="extraCal" class="form-input" placeholder="السعرات (kcal)">
+                        <input type="number" id="extraCal" class="form-input" placeholder="السعرات">
                         <input type="number" id="extraProt" class="form-input" placeholder="البروتين (جم)">
                         <input type="number" id="extraCarb" class="form-input" placeholder="الكارب (جم)">
                         <input type="number" id="extraFat" class="form-input" placeholder="الدهون (جم)">
                     </div>
                 </div>
 
-                <button type="button" id="confirmAddExtraBtn" class="btn-primary" style="margin-top:4px; padding:12px;">إضافة لوجبات اليوم</button>
+                <button type="button" id="confirmAddExtraBtn" class="btn-primary" style="margin-top:4px;">إضافة لوجبات اليوم ✓</button>
             </div>
         </div>
     </div>
 
     <!-- Install App Guide Modal -->
     <div class="modal-overlay" id="installModal">
-        <div class="modal-box" style="gap:14px;">
+        <div class="modal-box" style="text-align:center; gap:14px;">
             <div class="modal-header" style="margin-bottom:0;">
-                <div class="modal-title">📲 تثبيت التطبيق على الموبايل</div>
-                <button type="button" class="close-modal" id="closeInstallModalBtn">✕</button>
+                <div class="modal-title">تثبيت التطبيق كبرنامج 📲</div>
+                <button class="close-modal" id="closeInstallModalBtn">✕</button>
             </div>
-            <div style="font-size:0.86rem; line-height:1.7; font-weight:700;">
-                <div style="background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.25); padding:12px; border-radius:14px; margin-bottom:10px;">
-                    <div style="color:#2563eb; font-weight:900; margin-bottom:4px;">📱 على الآيفون (Safari):</div>
-                    1. تأكد أنك فاتح الصفحة في متصفح <b>Safari</b>.<br>
-                    2. اضغط على زر <b>المشاركة (Share ⬆️)</b> بالأسفل.<br>
-                    3. اختر <b>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</b>.<br>
-                    4. افتح التطبيق من الأيقونة على شاشتك وهيعمل كبرنامج كامل ويحفظ كل بياناتك للأبد!
-                </div>
-                <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); padding:12px; border-radius:14px;">
-                    <div style="color:#10b981; font-weight:900; margin-bottom:4px;">🤖 على الأندرويد (Chrome):</div>
-                    1. اضغط على <b>الثلاث نقاط (⋮)</b> أعلى المتصفح.<br>
-                    2. اختر <b>"تثبيت التطبيق" (Install App)</b> أو <b>"إضافة إلى الشاشة الرئيسية"</b>.
-                </div>
-                <button type="button" id="triggerNativeInstallBtn" class="btn-primary" style="display:none; margin-top:12px; padding:12px;">تثبيت مباشر الآن 🚀</button>
+            <div style="font-size:2.8rem;">💪</div>
+            <div style="font-weight:900; font-size:1.05rem;">نزّل تطبيق الدايت على شاشتك الرئيسية</div>
+            <div style="font-size:0.85rem; opacity:0.88; font-weight:700; line-height:1.7; text-align:right; background:rgba(37,99,235,0.08); padding:14px; border-radius:16px; border:1px solid rgba(37,99,235,0.2);">
+                <div style="margin-bottom:8px;"><b>🍏 للآيفون (Safari):</b><br>اضغط زر المشاركة <b>(⬆️)</b> بالأسفل ثم اختر <b>"إضافة إلى الشاشة الرئيسية"</b>.</div>
+                <div><b>💻 للكمبيوتر / الأندرويد (Chrome):</b><br>اضغط أيقونة التثبيت في شريط العنوان بالأعلى ثم اختر <b>"Install"</b>.</div>
             </div>
+            <button type="button" id="triggerNativeInstallBtn" class="btn-primary" style="display:none; margin-top:0;">تثبيت البرنامج الآن 🚀</button>
         </div>
     </div>
 
     <script>
-        // إعداد ملف Manifest ديناميكي لدعم التثبيت كبرنامج مستقل (PWA) على الموبايل
+        // إعداد ملف Manifest ديناميكي لدعم التثبيت كبرنامج مستقل (PWA)
         (function setupPWA() {
             const manifestObj = {
                 name: "تطبيق الدايت - بوابة الأبطال",
@@ -1063,22 +1075,16 @@
         });
 
         const installModal = document.getElementById('installModal');
-        document.getElementById('installAppBtn').onclick = () => {
-            installModal.classList.add('active');
-        };
-        document.getElementById('closeInstallModalBtn').onclick = () => {
-            installModal.classList.remove('active');
-        };
-        installModal.onclick = (e) => {
-            if (e.target === installModal) installModal.classList.remove('active');
-        };
+        document.getElementById('installAppBtn').onclick = () => installModal.classList.add('active');
+        document.getElementById('closeInstallModalBtn').onclick = () => installModal.classList.remove('active');
+        installModal.onclick = (e) => { if (e.target === installModal) installModal.classList.remove('active'); };
         document.getElementById('triggerNativeInstallBtn').onclick = async () => {
             if (deferredInstallPrompt) {
                 deferredInstallPrompt.prompt();
                 const { outcome } = await deferredInstallPrompt.userChoice;
                 if (outcome === 'accepted') {
                     installModal.classList.remove('active');
-                    showToast('🎉 جاري تثبيت البرنامج على هاتفك!');
+                    showToast('🎉 جاري تثبيت البرنامج على جهازك!');
                 }
                 deferredInstallPrompt = null;
             }
@@ -1086,16 +1092,17 @@
 
         const USERS_DB_KEY = 'amrDiet_users_db_v1';
         const ACTIVE_USER_KEY = 'amrDiet_active_user_v1';
-
         let currentUser = JSON.parse(localStorage.getItem(ACTIVE_USER_KEY)) || null;
 
-        // مفاتيح تخزين ديناميكية مرتبطة بكل مستخدم على حدة لمنع تداخل البيانات
         function getUserKey(base) {
             const uid = currentUser ? currentUser.id : 'guest';
             return `amrDiet_u_${uid}_${base}`;
         }
 
-        // قاعدة بيانات البدائل بالسعرات الحرارية والبروتين والكارب والدهون لكل 100 جرام (أو بالوحدة للبيض)
+        function getUserKeyByUid(uid, base) {
+            return `amrDiet_u_${uid}_${base}`;
+        }
+
         const FOOD_DB = {
             protein: [
                 { id: 'chicken_breast', name: 'صدور دجاج مطبوخة', cal: 165, p: 31, c: 0, f: 3.6, unit: 'جم' },
@@ -1144,20 +1151,16 @@
             ]
         };
 
-        // هيكل الوجبات الأساسية
         const MEAL_TEMPLATE = [
             { id: 'm1', meal: 'breakfast', category: 'protein', baseFoodId: 'whole_eggs', role: 'protein', share: 0.16 },
             { id: 'm2', meal: 'breakfast', category: 'carbs', baseFoodId: 'baladi_bread', role: 'carb', share: 0.25 },
-            
             { id: 'm3', meal: 'lunch', category: 'carbs', baseFoodId: 'cooked_rice', role: 'carb', share: 0.30 },
             { id: 'm4', meal: 'lunch', category: 'protein', baseFoodId: 'chicken_breast', role: 'protein', share: 0.34 },
             { id: 'm5', meal: 'lunch', category: 'carbs', baseFoodId: 'rice_flour', role: 'carb', share: 0.12 },
-            
             { id: 'm6', meal: 'snack', category: 'carbs', baseFoodId: 'oats', role: 'carb', share: 0.22 },
             { id: 'm7', meal: 'snack', category: 'dairy', baseFoodId: 'whole_milk', role: 'dairy', share: 1.0 },
             { id: 'm8', meal: 'snack', category: 'fruits', baseFoodId: 'banana', role: 'fruit', share: 0.5 },
             { id: 'm9', meal: 'snack', category: 'fats', baseFoodId: 'peanuts', role: 'fat', share: 1.0 },
-            
             { id: 'm10', meal: 'dinner', category: 'carbs', baseFoodId: 'cooked_rice', role: 'carb', share: 0.23 },
             { id: 'm11', meal: 'dinner', category: 'protein', baseFoodId: 'chicken_breast', role: 'protein', share: 0.34 },
             { id: 'm12', meal: 'dinner', category: 'fruits', baseFoodId: 'banana', role: 'fruit', share: 0.5 }
@@ -1176,75 +1179,61 @@
         const liveCarbsEl = document.getElementById('liveCarbs');
         const liveFatsEl = document.getElementById('liveFats');
         const historyContainer = document.getElementById('historyContainer');
-        const dateDisplay = document.getElementById('currentDate');
         const body = document.body;
-
         const altModal = document.getElementById('altModal');
         const altListContainer = document.getElementById('altListContainer');
         const modalSubtitle = document.getElementById('modalSubtitle');
         const waterCountEl = document.getElementById('waterCount');
-
-        // Setup & Auth Screen elements
-        const authScreen = document.getElementById('authScreen');
         const setupScreen = document.getElementById('setupScreen');
         const setupWeightInput = document.getElementById('setupWeight');
         const setupHeightInput = document.getElementById('setupHeight');
         const setupAgeInput = document.getElementById('setupAge');
         const setupPreviewText = document.getElementById('setupPreviewText');
+
+        let selectedActivity = '1.55';
         let selectedGoal = 'bulk';
         let selectedProt = '2.0';
-        let selectedActivity = '1.55';
-        const currentDateStr = new Date().toLocaleDateString('en-CA');
-        dateDisplay.innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', month: 'short', day: 'numeric' });
 
-        // إدارة التبويب بين تسجيل الدخول وإنشاء حساب جديد
+        const currentDateStr = new Date().toLocaleDateString('en-CA');
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', month: 'short', day: 'numeric' });
+
+        // Auth Screen Tabs
+        const authScreen = document.getElementById('authScreen');
         const tabLoginBtn = document.getElementById('tabLoginBtn');
         const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+        const tabImportBtn = document.getElementById('tabImportBtn');
         const loginFormBox = document.getElementById('loginFormBox');
         const registerFormBox = document.getElementById('registerFormBox');
+        const importFormBox = document.getElementById('importFormBox');
 
-        tabLoginBtn.onclick = () => {
-            tabLoginBtn.classList.remove('outline');
-            tabRegisterBtn.classList.add('outline');
-            loginFormBox.style.display = 'flex';
-            registerFormBox.style.display = 'none';
-        };
+        function switchAuthTab(tab) {
+            tabLoginBtn.className = tab === 'login' ? 'mini-btn' : 'mini-btn outline';
+            tabRegisterBtn.className = tab === 'register' ? 'mini-btn' : 'mini-btn outline';
+            tabImportBtn.className = tab === 'import' ? 'mini-btn' : 'mini-btn outline';
+            loginFormBox.style.display = tab === 'login' ? 'flex' : 'none';
+            registerFormBox.style.display = tab === 'register' ? 'flex' : 'none';
+            importFormBox.style.display = tab === 'import' ? 'flex' : 'none';
+        }
 
-        tabRegisterBtn.onclick = () => {
-            tabRegisterBtn.classList.remove('outline');
-            tabLoginBtn.classList.add('outline');
-            registerFormBox.style.display = 'flex';
-            loginFormBox.style.display = 'none';
-        };
+        tabLoginBtn.onclick = () => switchAuthTab('login');
+        tabRegisterBtn.onclick = () => switchAuthTab('register');
+        tabImportBtn.onclick = () => switchAuthTab('import');
 
-        // إنشاء حساب جديد مع التحقق الصارم من عدم تكرار الاسم أو الـ ID
         document.getElementById('doRegisterBtn').onclick = () => {
             const name = document.getElementById('regName').value.trim();
             const id = document.getElementById('regId').value.trim();
             const password = document.getElementById('regPassword').value.trim();
-
             if (!name || !id || !password) {
-                showToast('⚠️ من فضلك املأ الاسم والـ ID وكلمة السر');
+                showToast('⚠️ من فضلك املأ جميع البيانات');
                 return;
             }
-
             const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
-            const nameExists = users.some(u => u.name.toLowerCase() === name.toLowerCase());
-            const idExists = users.some(u => u.id.toLowerCase() === id.toLowerCase());
-
-            if (nameExists) {
-                showToast('❌ هذا الاسم مسجل بالفعل لشخص آخر، اختر اسماً مختلفاً');
+            if (users.some(u => u.id.toLowerCase() === id.toLowerCase())) {
+                showToast('❌ هذا الـ ID مسجل بالفعل، سجل الدخول');
                 return;
             }
-            if (idExists) {
-                showToast('❌ هذا الـ ID مستخدم بالفعل، اختر ID آخر فريد');
-                return;
-            }
-
-            const newUser = { name, id, password };
-            users.push(newUser);
+            users.push({ name, id, password });
             localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-            
             currentUser = { name, id };
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
             authScreen.classList.remove('active');
@@ -1252,27 +1241,22 @@
             loadData();
         };
 
-        // تسجيل الدخول بحساب موجود
         document.getElementById('doLoginBtn').onclick = () => {
             const identifier = document.getElementById('loginIdentifier').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
-
             if (!identifier || !password) {
-                showToast('⚠️ اكتب الاسم أو الـ ID وكلمة السر');
+                showToast('⚠️ اكتب الـ ID أو الاسم وكلمة السر');
                 return;
             }
-
             const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
             const matchedUser = users.find(u => 
                 (u.id.toLowerCase() === identifier.toLowerCase() || u.name.toLowerCase() === identifier.toLowerCase()) 
                 && u.password === password
             );
-
             if (!matchedUser) {
-                showToast('❌ بيانات الدخول غير صحيحة أو الحساب غير موجود');
+                showToast('❌ غير مسجل على هذا الجهاز، اضغط "استيراد من جهاز آخر" أو "حساب جديد"');
                 return;
             }
-
             currentUser = { name: matchedUser.name, id: matchedUser.id };
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
             authScreen.classList.remove('active');
@@ -1280,20 +1264,107 @@
             loadData();
         };
 
-        // تسجيل الخروج
+        // إنشاء وقراءة كود المزامنة لنقل الحساب وكل الوجبات بين الموبايل واللاب توب
+        function generateSyncCode() {
+            if (!currentUser) return '';
+            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+            const fullUser = users.find(u => u.id === currentUser.id) || { ...currentUser, password: '123' };
+            const payload = {
+                u: fullUser,
+                p: JSON.parse(localStorage.getItem(getUserKey('profile'))) || null,
+                w: localStorage.getItem(getUserKey('weight')) || '',
+                c: JSON.parse(localStorage.getItem(getUserKey('checks'))) || {},
+                s: JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {},
+                a: JSON.parse(localStorage.getItem(getUserKey('amounts'))) || {},
+                e: JSON.parse(localStorage.getItem(getUserKey('extra'))) || [],
+                wt: localStorage.getItem(getUserKey('water')) || '0',
+                h: JSON.parse(localStorage.getItem(getUserKey('hist'))) || {}
+            };
+            const jsonStr = JSON.stringify(payload);
+            return btoa(unescape(encodeURIComponent(jsonStr)));
+        }
+
+        function importSyncCode(codeStr) {
+            try {
+                const clean = codeStr.trim();
+                const jsonStr = decodeURIComponent(escape(atob(clean)));
+                const payload = JSON.parse(jsonStr);
+                if (!payload || !payload.u || !payload.u.id) throw new Error('Invalid code');
+
+                const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+                const idx = users.findIndex(u => u.id.toLowerCase() === payload.u.id.toLowerCase());
+                if (idx >= 0) users[idx] = payload.u;
+                else users.push(payload.u);
+                localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+
+                const uid = payload.u.id;
+                if (payload.p) localStorage.setItem(getUserKeyByUid(uid, 'profile'), JSON.stringify(payload.p));
+                if (payload.w !== undefined) localStorage.setItem(getUserKeyByUid(uid, 'weight'), payload.w);
+                if (payload.c) localStorage.setItem(getUserKeyByUid(uid, 'checks'), JSON.stringify(payload.c));
+                if (payload.s) localStorage.setItem(getUserKeyByUid(uid, 'swaps'), JSON.stringify(payload.s));
+                if (payload.a) localStorage.setItem(getUserKeyByUid(uid, 'amounts'), JSON.stringify(payload.a));
+                if (payload.e) localStorage.setItem(getUserKeyByUid(uid, 'extra'), JSON.stringify(payload.e));
+                if (payload.wt !== undefined) localStorage.setItem(getUserKeyByUid(uid, 'water'), payload.wt);
+                if (payload.h) localStorage.setItem(getUserKeyByUid(uid, 'hist'), JSON.stringify(payload.h));
+
+                currentUser = { name: payload.u.name, id: payload.u.id };
+                localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
+                authScreen.classList.remove('active');
+                loadData();
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        const syncModal = document.getElementById('syncModal');
+        const syncCodeArea = document.getElementById('syncCodeArea');
+
+        document.getElementById('openSyncModalBtn').onclick = () => {
+            syncCodeArea.value = generateSyncCode();
+            syncModal.classList.add('active');
+        };
+        document.getElementById('closeSyncModalBtn').onclick = () => syncModal.classList.remove('active');
+        syncModal.onclick = (e) => { if (e.target === syncModal) syncModal.classList.remove('active'); };
+
+        document.getElementById('copySyncCodeBtn').onclick = async () => {
+            const code = generateSyncCode();
+            syncCodeArea.value = code;
+            try {
+                await navigator.clipboard.writeText(code);
+                showToast('📋 تم نسخ الكود! ابعته لنفسك والصقه في الجهاز التاني');
+            } catch (e) {
+                syncCodeArea.select();
+                document.execCommand('copy');
+                showToast('📋 تم نسخ كود المزامنة!');
+            }
+        };
+
+        document.getElementById('applySyncCodeBtn').onclick = () => {
+            if (importSyncCode(syncCodeArea.value)) {
+                syncModal.classList.remove('active');
+                showToast('🎉 تم استيراد ومزامنة جميع بياناتك بنجاح!');
+            } else {
+                showToast('❌ كود المزامنة غير صحيح، تأكد من نسخه بالكامل');
+            }
+        };
+
+        document.getElementById('doAuthImportBtn').onclick = () => {
+            const codeVal = document.getElementById('authSyncCodeInput').value;
+            if (importSyncCode(codeVal)) {
+                showToast(`🎉 تم استيراد حسابك (${currentUser.name}) وجميع وجباتك!`);
+            } else {
+                showToast('❌ الكود غير صحيح، انسخ الكود من زرار (☁️ مزامنة) في جهازك الآخر');
+            }
+        };
+
         document.getElementById('logoutBtn').onclick = () => {
             localStorage.removeItem(ACTIVE_USER_KEY);
             currentUser = null;
             userProfile = null;
-            document.getElementById('loginIdentifier').value = '';
-            document.getElementById('loginPassword').value = '';
             authScreen.classList.add('active');
             showToast('🚪 تم تسجيل الخروج بنجاح');
         };
-
-        if (localStorage.getItem(getUserKey('theme')) === 'dark' || localStorage.getItem('amrDiet_v7_theme') === 'dark') {
-            body.classList.add('dark-mode');
-        }
 
         function calculateTargets(weight, height, age, activity, goal, protFactor) {
             const w = parseFloat(weight) || 75;
@@ -1302,10 +1373,8 @@
             const act = parseFloat(activity) || 1.55;
             const pFactor = parseFloat(protFactor) || 2.0;
 
-            // معادلة Mifflin-St Jeor لحساب معدل الحرق الأساسي (BMR) وإجمالي الطاقة اليومية (TDEE)
             const bmr = (10 * w) + (6.25 * h) - (5 * a) + 5;
             let baseCal = Math.round(bmr * act);
-
             if (goal === 'bulk') baseCal += 450;
             else if (goal === 'cut') baseCal -= 450;
             baseCal = Math.max(1400, baseCal);
@@ -1365,42 +1434,22 @@
                 showToast('⚠️ من فضلك أدخل وزن صحيح بالكيلوجرام');
                 return;
             }
-            if (h < 100 || h > 240 || a < 12 || a > 90) {
-                showToast('⚠️ تأكد من إدخال الطول والعمر بشكل صحيح');
-                return;
-            }
-            userProfile = {
-                weight: w,
-                height: h,
-                age: a,
-                activity: selectedActivity,
-                goal: selectedGoal,
-                protFactor: selectedProt
-            };
-            // مسح أي تعديلات أو كميات قديمة مخصصة لهذا المستخدم ليتم تطبيق الخطة الجديدة بدقة 100%
+            userProfile = { weight: w, height: h, age: a, activity: selectedActivity, goal: selectedGoal, protFactor: selectedProt };
             localStorage.setItem(getUserKey('profile'), JSON.stringify(userProfile));
             localStorage.setItem(getUserKey('weight'), w.toString());
             localStorage.removeItem(getUserKey('swaps'));
             localStorage.removeItem(getUserKey('amounts'));
             setupScreen.classList.remove('active');
             loadData();
-            showToast('🚀 تم تصميم خطتك الغذائية وتطابق السعرات 100%!');
+            showToast('🚀 تم تصميم خطتك الغذائية بدقة!');
         };
 
         function buildMealsFromProfile(profile) {
-            const targets = calculateTargets(
-                profile.weight,
-                profile.height || 175,
-                profile.age || 25,
-                profile.activity || '1.55',
-                profile.goal,
-                profile.protFactor
-            );
+            const targets = calculateTargets(profile.weight, profile.height || 175, profile.age || 25, profile.activity || '1.55', profile.goal, profile.protFactor);
             targetCaloriesHeader.innerText = targets.targetCal;
             const goalNames = { bulk: 'زيادة وزن 🔥', maintain: 'ثبات الوزن ⚖️', cut: 'خسارة وزن ✂️' };
             goalBadgeLabel.innerText = goalNames[profile.goal] || 'الهدف اليومي';
 
-            // 1. حساب كميات الألبان والفواكه الأساسية أولاً
             const amountsMap = {};
             const milkFood = FOOD_DB.dairy.find(f => f.id === 'whole_milk');
             amountsMap['m7'] = targets.targetCal >= 2500 ? 250 : 150;
@@ -1410,7 +1459,6 @@
             amountsMap['m8'] = bananaEach;
             amountsMap['m12'] = bananaEach;
 
-            // 2. حساب كميات الكاربوهيدرات بناءً على الكارب المتبقي بعد خصم الفواكه والألبان
             const usedCarbsFromFruitDairy = getMacros(milkFood, amountsMap['m7']).c + (getMacros(bananaFood, bananaEach).c * 2);
             const remainingCarbs = Math.max(80, targets.targetCarbs - usedCarbsFromFruitDairy);
 
@@ -1429,7 +1477,6 @@
                 carbsFatContribution += m.f;
             });
 
-            // 3. حساب الدهون الصحية (الفول السوداني) بدقة ليتطابق إجمالي الدهون مع التارجت المحسوب
             const peanutsFood = FOOD_DB.fats.find(f => f.id === 'peanuts');
             const dairyFat = getMacros(milkFood, amountsMap['m7']).f;
             const estEggsCount = Math.max(2, Math.min(5, Math.round((targets.targetProtein * 0.14) / 6.3)));
@@ -1437,10 +1484,7 @@
             const remainingFat = Math.max(10, targets.targetFats - carbsFatContribution - dairyFat - eggsFat - 8);
             amountsMap['m9'] = Math.max(15, Math.round(((remainingFat / peanutsFood.f) * 100) / 5) * 5);
 
-            // 4. حساب مصادر البروتين الصافية بعد خصم البروتين القادم من الكارب والألبان والفول السوداني
-            const indirectProtein = carbsProteinContribution
-                + getMacros(milkFood, amountsMap['m7']).p
-                + getMacros(peanutsFood, amountsMap['m9']).p;
+            const indirectProtein = carbsProteinContribution + getMacros(milkFood, amountsMap['m7']).p + getMacros(peanutsFood, amountsMap['m9']).p;
             const netProteinNeeded = Math.max(40, targets.targetProtein - indirectProtein);
 
             const protItems = MEAL_TEMPLATE.filter(t => t.role === 'protein');
@@ -1449,13 +1493,10 @@
             protItems.forEach(tmpl => {
                 const food = FOOD_DB[tmpl.category].find(f => f.id === tmpl.baseFoodId);
                 const neededP = netProteinNeeded * (tmpl.share / totalProtShare);
-                const amt = food.isUnit
-                    ? Math.max(1, Math.round(neededP / food.p))
-                    : Math.max(30, Math.round(((neededP / food.p) * 100) / 5) * 5);
+                const amt = food.isUnit ? Math.max(1, Math.round(neededP / food.p)) : Math.max(30, Math.round(((neededP / food.p) * 100) / 5) * 5);
                 amountsMap[tmpl.id] = amt;
             });
 
-            // 5. ضبط دقيق أخير لكمية الأرز لتطابق السعرات الكلية بنسبة 100% مع التارجت المحسوب
             let currentTotalCal = 0;
             MEAL_TEMPLATE.forEach(tmpl => {
                 const food = FOOD_DB[tmpl.category].find(f => f.id === tmpl.baseFoodId);
@@ -1471,47 +1512,8 @@
                 amountsMap['m10'] = Math.max(30, amountsMap['m10'] + (riceGramsDiff - halfDiff));
             }
 
-            GENERATED_MEALS = MEAL_TEMPLATE.map(tmpl => ({
-                ...tmpl,
-                baseAmount: amountsMap[tmpl.id]
-            }));
+            GENERATED_MEALS = MEAL_TEMPLATE.map(tmpl => ({ ...tmpl, baseAmount: amountsMap[tmpl.id] }));
         }
-
-        window.openSwapModal = function(mealItemId) {
-            const item = GENERATED_MEALS.find(m => m.id === mealItemId);
-            if (!item) return;
-            const categoryList = FOOD_DB[item.category];
-            const baseFood = categoryList.find(f => f.id === item.baseFoodId);
-            const savedSwaps = JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {};
-            const currentId = savedSwaps[item.id] || item.baseFoodId;
-
-            modalSubtitle.innerText = `بدائل متكافئة السعرات لـ: ${formatFoodLabel(baseFood, item.baseAmount)}`;
-            altListContainer.innerHTML = '';
-
-            categoryList.forEach(altFood => {
-                const eqAmount = (altFood.id === baseFood.id)
-                    ? item.baseAmount
-                    : calculateEquivalentAmount(baseFood, item.baseAmount, altFood);
-                const macros = getMacros(altFood, eqAmount);
-                const isSelected = altFood.id === currentId;
-
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'alt-option';
-                if (isSelected) btn.style.borderColor = '#2563eb';
-                btn.innerHTML = `
-                    <div>
-                        <div class="alt-name">${altFood.name} ${isSelected ? '✓' : ''}</div>
-                        <div class="alt-macros">🔥 ${macros.cal} سعرة | 💪 ${macros.p}جم | 🍚 ${macros.c}جم | 🥑 ${macros.f}جم</div>
-                    </div>
-                    <div class="alt-amount">${eqAmount} ${altFood.unit}</div>
-                `;
-                btn.onclick = () => selectAlternative(item.id, altFood.id, baseFood.id);
-                altListContainer.appendChild(btn);
-            });
-
-            altModal.classList.add('active');
-        };
 
         document.getElementById('openSetupBtn').onclick = () => {
             if (userProfile) {
@@ -1521,15 +1523,9 @@
                 selectedActivity = userProfile.activity || '1.55';
                 selectedGoal = userProfile.goal;
                 selectedProt = userProfile.protFactor;
-                document.querySelectorAll('#activityOptions .choice-pill').forEach(p => {
-                    p.classList.toggle('selected', p.dataset.act === selectedActivity);
-                });
-                document.querySelectorAll('#goalOptions .choice-pill').forEach(p => {
-                    p.classList.toggle('selected', p.dataset.goal === selectedGoal);
-                });
-                document.querySelectorAll('#proteinOptions .choice-pill').forEach(p => {
-                    p.classList.toggle('selected', p.dataset.prot === selectedProt);
-                });
+                document.querySelectorAll('#activityOptions .choice-pill').forEach(p => p.classList.toggle('selected', p.dataset.act === selectedActivity));
+                document.querySelectorAll('#goalOptions .choice-pill').forEach(p => p.classList.toggle('selected', p.dataset.goal === selectedGoal));
+                document.querySelectorAll('#proteinOptions .choice-pill').forEach(p => p.classList.toggle('selected', p.dataset.prot === selectedProt));
             }
             updateSetupPreview();
             setupScreen.classList.add('active');
@@ -1540,22 +1536,13 @@
             localStorage.setItem(getUserKey('theme'), body.classList.contains('dark-mode') ? 'dark' : 'light');
         };
 
-        // حساب الكمية المكافئة بناءً على السعرات الحرارية المتكافئة
         function calculateEquivalentAmount(baseFood, baseAmount, targetFood) {
-            const totalCalories = baseFood.isUnit 
-                ? (baseAmount * baseFood.cal) 
-                : ((baseAmount / 100) * baseFood.cal);
-
-            let targetAmount = targetFood.isUnit 
-                ? (totalCalories / targetFood.cal) 
-                : ((totalCalories / targetFood.cal) * 100);
-
-            if (targetFood.isUnit) {
-                return Math.max(1, Math.round(targetAmount));
-            }
+            const totalCalories = baseFood.isUnit ? (baseAmount * baseFood.cal) : ((baseAmount / 100) * baseFood.cal);
+            let targetAmount = targetFood.isUnit ? (totalCalories / targetFood.cal) : ((totalCalories / targetFood.cal) * 100);
+            if (targetFood.isUnit) return Math.max(1, Math.round(targetAmount));
             return Math.round(targetAmount / 5) * 5 || Math.round(targetAmount);
         }
-        // حساب السعرات والبروتين والكارب والدهون للكمية المحددة
+
         function getMacros(food, amount) {
             const factor = food.isUnit ? amount : (amount / 100);
             return {
@@ -1580,7 +1567,6 @@
                 snack: document.getElementById('meal-snack'),
                 dinner: document.getElementById('meal-dinner')
             };
-
             Object.values(containers).forEach(c => c.innerHTML = '');
 
             const savedState = JSON.parse(localStorage.getItem(getUserKey('checks'))) || {};
@@ -1590,14 +1576,9 @@
             GENERATED_MEALS.forEach(item => {
                 const categoryList = FOOD_DB[item.category];
                 const baseFood = categoryList.find(f => f.id === item.baseFoodId);
-                
                 const activeFoodId = savedSwaps[item.id] || item.baseFoodId;
                 const activeFood = categoryList.find(f => f.id === activeFoodId) || baseFood;
-                
-                const defaultAmount = (activeFood.id === baseFood.id) 
-                    ? item.baseAmount 
-                    : calculateEquivalentAmount(baseFood, item.baseAmount, activeFood);
-
+                const defaultAmount = (activeFood.id === baseFood.id) ? item.baseAmount : calculateEquivalentAmount(baseFood, item.baseAmount, activeFood);
                 const activeAmount = savedAmounts[item.id] !== undefined ? savedAmounts[item.id] : defaultAmount;
 
                 const macros = getMacros(activeFood, activeAmount);
@@ -1620,14 +1601,18 @@
                         <button type="button" class="swap-btn" onclick="openSwapModal('${item.id}')">🔄 بديل</button>
                     </div>
                 `;
-
                 containers[item.meal].appendChild(row);
             });
 
             renderExtraMeals(savedState);
 
             document.querySelectorAll('.meal-checkbox').forEach(cb => {
-                cb.onchange = calcPercentage;
+                cb.onchange = () => {
+                    calcPercentage();
+                    const state = {};
+                    document.querySelectorAll('.meal-checkbox').forEach(box => state[box.dataset.id] = box.checked);
+                    localStorage.setItem(getUserKey('checks'), JSON.stringify(state));
+                };
             });
 
             calcPercentage();
@@ -1667,15 +1652,45 @@
             renderMeals();
         };
 
+        window.openSwapModal = function(mealItemId) {
+            const item = GENERATED_MEALS.find(m => m.id === mealItemId);
+            if (!item) return;
+            const categoryList = FOOD_DB[item.category];
+            const baseFood = categoryList.find(f => f.id === item.baseFoodId);
+            const savedSwaps = JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {};
+            const currentId = savedSwaps[item.id] || item.baseFoodId;
+
+            modalSubtitle.innerText = `بدائل متكافئة السعرات لـ: ${formatFoodLabel(baseFood, item.baseAmount)}`;
+            altListContainer.innerHTML = '';
+
+            categoryList.forEach(altFood => {
+                const eqAmount = (altFood.id === baseFood.id) ? item.baseAmount : calculateEquivalentAmount(baseFood, item.baseAmount, altFood);
+                const macros = getMacros(altFood, eqAmount);
+                const isSelected = altFood.id === currentId;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'alt-option';
+                if (isSelected) btn.style.borderColor = '#2563eb';
+                btn.innerHTML = `
+                    <div>
+                        <div class="alt-name">${altFood.name} ${isSelected ? '✓' : ''}</div>
+                        <div class="alt-macros">🔥 ${macros.cal} سعرة | 💪 ${macros.p}جم | 🍚 ${macros.c}جم | 🥑 ${macros.f}جم</div>
+                    </div>
+                    <div class="alt-amount">${eqAmount} ${altFood.unit}</div>
+                `;
+                btn.onclick = () => selectAlternative(item.id, altFood.id, baseFood.id);
+                altListContainer.appendChild(btn);
+            });
+
+            altModal.classList.add('active');
+        };
+
         function selectAlternative(mealItemId, selectedFoodId, baseFoodId) {
             const savedSwaps = JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {};
             const savedAmounts = JSON.parse(localStorage.getItem(getUserKey('amounts'))) || {};
-            if (selectedFoodId === baseFoodId) {
-                delete savedSwaps[mealItemId];
-            } else {
-                savedSwaps[mealItemId] = selectedFoodId;
-            }
-            // مسح الكمية المخصصة القديمة ليتم حساب الكمية المكافئة للبديل الجديد تلقائياً
+            if (selectedFoodId === baseFoodId) delete savedSwaps[mealItemId];
+            else savedSwaps[mealItemId] = selectedFoodId;
             delete savedAmounts[mealItemId];
             localStorage.setItem(getUserKey('swaps'), JSON.stringify(savedSwaps));
             localStorage.setItem(getUserKey('amounts'), JSON.stringify(savedAmounts));
@@ -1684,7 +1699,6 @@
             showToast('🔄 تم تبديل الأكلة وحساب الكمية تلقائياً!');
         }
 
-        // نافذة تعديل الكمية يدوياً لكل أكلة
         window.openQtyModal = function(mealItemId) {
             const item = GENERATED_MEALS.find(m => m.id === mealItemId);
             if (!item) return;
@@ -1695,9 +1709,7 @@
 
             const activeFoodId = savedSwaps[item.id] || item.baseFoodId;
             const activeFood = categoryList.find(f => f.id === activeFoodId) || baseFood;
-            const defaultAmount = (activeFood.id === baseFood.id)
-                ? item.baseAmount
-                : calculateEquivalentAmount(baseFood, item.baseAmount, activeFood);
+            const defaultAmount = (activeFood.id === baseFood.id) ? item.baseAmount : calculateEquivalentAmount(baseFood, item.baseAmount, activeFood);
             const currentAmount = savedAmounts[item.id] !== undefined ? savedAmounts[item.id] : defaultAmount;
 
             const modal = document.createElement('div');
@@ -1763,9 +1775,8 @@
             modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
         };
 
-        altModal.onclick = (e) => {
-            if (e.target === altModal) altModal.classList.remove('active');
-        };
+        document.getElementById('closeModalBtn').onclick = () => altModal.classList.remove('active');
+        altModal.onclick = (e) => { if (e.target === altModal) altModal.classList.remove('active'); };
 
         function showToast(msg) {
             const toast = document.createElement('div');
@@ -1804,7 +1815,6 @@
                 }
             });
 
-            // تحديث إجمالي السعرات في الهيدر وفي العداد ليعكس أي تعديل في الكميات أو الإضافات فوراً
             targetCaloriesHeader.innerText = plannedCal;
             progressBar.style.width = pct + '%';
             progressText.innerText = pct + '%';
@@ -1815,7 +1825,6 @@
             return pct;
         }
 
-        // Water Tracker Logic
         function updateWaterUI() {
             const liters = parseFloat(localStorage.getItem(getUserKey('water'))) || 0;
             waterCountEl.innerText = liters.toFixed(2);
@@ -1834,7 +1843,6 @@
             updateWaterUI();
         };
 
-        // Extra Food Modal Logic
         const extraModal = document.getElementById('extraModal');
         const extraFoodSelect = document.getElementById('extraFoodSelect');
         const dbExtraSection = document.getElementById('dbExtraSection');
@@ -1843,15 +1851,8 @@
         const extraDbUnit = document.getElementById('extraDbUnit');
         const extraDbPreview = document.getElementById('extraDbPreview');
 
-        // تجميع كل الأكلات العادية في القائمة المنسدلة
         const ALL_FOODS_FLAT = [];
-        const categoryNamesAr = {
-            protein: 'بروتين',
-            carbs: 'كاربوهيدرات',
-            fruits: 'فواكه',
-            dairy: 'ألبان',
-            fats: 'دهون صحية'
-        };
+        const categoryNamesAr = { protein: 'بروتين', carbs: 'كاربوهيدرات', fruits: 'فواكه', dairy: 'ألبان', fats: 'دهون صحية' };
         Object.keys(FOOD_DB).forEach(cat => {
             const optGroup = document.createElement('optgroup');
             optGroup.label = categoryNamesAr[cat] || cat;
@@ -1865,10 +1866,7 @@
             extraFoodSelect.appendChild(optGroup);
         });
 
-        // جعل الاختيار الافتراضي أول أكلة من القائمة لسهولة الاختيار السريع
-        if (ALL_FOODS_FLAT.length > 0) {
-            extraFoodSelect.value = ALL_FOODS_FLAT[0].id;
-        }
+        if (ALL_FOODS_FLAT.length > 0) extraFoodSelect.value = ALL_FOODS_FLAT[0].id;
 
         function updateExtraDbPreview() {
             const selectedId = extraFoodSelect.value;
@@ -1891,9 +1889,7 @@
 
         extraFoodSelect.addEventListener('change', () => {
             const food = ALL_FOODS_FLAT.find(f => f.id === extraFoodSelect.value);
-            if (food) {
-                extraDbQty.value = food.isUnit ? 1 : 100;
-            }
+            if (food) extraDbQty.value = food.isUnit ? 1 : 100;
             updateExtraDbPreview();
         });
         extraDbQty.addEventListener('input', updateExtraDbPreview);
@@ -1902,12 +1898,8 @@
             updateExtraDbPreview();
             extraModal.classList.add('active');
         };
-        document.getElementById('closeExtraModalBtn').onclick = () => {
-            extraModal.classList.remove('active');
-        };
-        extraModal.onclick = (e) => {
-            if (e.target === extraModal) extraModal.classList.remove('active');
-        };
+        document.getElementById('closeExtraModalBtn').onclick = () => extraModal.classList.remove('active');
+        extraModal.onclick = (e) => { if (e.target === extraModal) extraModal.classList.remove('active'); };
 
         document.getElementById('confirmAddExtraBtn').onclick = () => {
             const selectedId = extraFoodSelect.value;
@@ -1922,17 +1914,13 @@
                 }
                 const m = getMacros(food, qty);
                 name = formatFoodLabel(food, qty);
-                cal = m.cal;
-                p = m.p;
-                c = m.c;
-                f = m.f;
+                cal = m.cal; p = m.p; c = m.c; f = m.f;
             } else {
                 name = document.getElementById('extraName').value.trim();
                 cal = parseInt(document.getElementById('extraCal').value) || 0;
                 p = parseInt(document.getElementById('extraProt').value) || 0;
                 c = parseInt(document.getElementById('extraCarb').value) || 0;
                 f = parseInt(document.getElementById('extraFat').value) || 0;
-
                 if (!name || cal <= 0) {
                     showToast('⚠️ اكتب اسم الأكلة والسعرات الأول');
                     return;
@@ -1954,9 +1942,8 @@
             document.getElementById('extraCarb').value = '';
             document.getElementById('extraFat').value = '';
             extraModal.classList.remove('active');
-
             renderMeals();
-            showToast('✅ تمت إضافة الأكلة وحساب سعراتها!');
+            showToast('➕ تمت إضافة الأكلة وحسابها في يومك!');
         };
 
         function loadData() {
@@ -1967,11 +1954,8 @@
             authScreen.classList.remove('active');
             document.getElementById('userHeaderTag').innerText = `👤 ${currentUser.name} | ID: ${currentUser.id}`;
 
-            if (localStorage.getItem(getUserKey('theme')) === 'dark') {
-                body.classList.add('dark-mode');
-            } else {
-                body.classList.remove('dark-mode');
-            }
+            if (localStorage.getItem(getUserKey('theme')) === 'dark') body.classList.add('dark-mode');
+            else body.classList.remove('dark-mode');
 
             userProfile = JSON.parse(localStorage.getItem(getUserKey('profile'))) || null;
             if (!userProfile) {
@@ -1990,9 +1974,7 @@
         document.getElementById('saveBtn').onclick = () => {
             const checkboxes = document.querySelectorAll('.meal-checkbox');
             const state = {};
-            checkboxes.forEach(cb => {
-                state[cb.dataset.id] = cb.checked;
-            });
+            checkboxes.forEach(cb => state[cb.dataset.id] = cb.checked);
             localStorage.setItem(getUserKey('checks'), JSON.stringify(state));
             localStorage.setItem(getUserKey('weight'), weightInput.value);
 
@@ -2003,8 +1985,7 @@
             history[currentDateStr] = { pct, w };
             localStorage.setItem(getUserKey('hist'), JSON.stringify(history));
             renderHistory();
-
-            showToast('✅ تم حفظ البيانات والبدائل بنجاح!');
+            showToast('✅ تم حفظ بيانات اليوم بنجاح!');
         };
 
         function renderHistory() {
