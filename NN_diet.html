@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="دايت الأبطال">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#090d16">
+    <title>تطبيق الدايت - عمرو</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23090d16%22/><text y=%22.88em%22 x=%2210%22 font-size=%2280%22>💪</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23090d16%22/><text y=%2276%22 x=%2212%22 font-size=%2274%22>💪</text></svg>">
+    <link id="pwaManifest" rel="manifest" href="">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding-bottom: 50px;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #000000 !important;
+            color: #f8fafc !important;
+        }
+        .container {
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        header {
+            background: linear-gradient(135deg, #090d16, #0f172a, #000000);
+            color: white;
+            padding: 24px 16px;
+            border-bottom-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        .header-btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .theme-btn, .date-badge {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 50px;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .stats-row {
+            display: flex;
+            gap: 12px;
+        }
+        .stat-box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #93c5fd;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-val {
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+        .weight-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px dashed rgba(147, 197, 253, 0.6);
+            color: white;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 900;
+            outline: none;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: background 0.3s, border 0.3s;
+        }
+        body.dark-mode .card {
+            background: #0d1117 !important;
+            border-color: #21262d !important;
+        }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            background: #e2e8f0;
+            height: 12px;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        body.dark-mode .progress-bar-bg {
+            background: #21262d;
+        }
+        .progress-bar-fill {
+            background: #2563eb;
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        .meal-card {
+            background: #ffffff;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: background 0.3s, border 0.3s;
+        }
+        body.dark-mode .meal-card {
+            background: #0d1117 !important;
+            border-color: #21262d !important;
+        }
+        .meal-header {
+            background: #f8fafc;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+        body.dark-mode .meal-header {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+            color: #60a5fa !important;
+        }
+        .meal-body {
+            padding: 16px;
+        }
+        .meal-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        body.dark-mode .meal-row {
+            border-color: #21262d;
+        }
+        .meal-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .meal-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .swap-btn {
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+            border: 1px solid rgba(37, 99, 235, 0.25);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .swap-btn:active {
+            transform: scale(0.95);
+        }
+        body.dark-mode .swap-btn {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .meal-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            display: grid;
+            place-content: center;
+            background: #fff;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        body.dark-mode .meal-checkbox {
+            background: #161b22;
+            border-color: #30363d;
+        }
+        .meal-checkbox:checked {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        .meal-checkbox::before {
+            content: "";
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            transform: scale(0);
+            transition: 0.1s;
+        }
+        .meal-checkbox:checked::before {
+            transform: scale(1);
+        }
+        .meal-text {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        body.dark-mode .meal-text {
+            color: #ffffff !important;
+        }
+        .meal-checkbox:checked ~ .meal-text {
+            color: #94a3b8 !important;
+            text-decoration: line-through;
+            font-weight: 600;
+        }
+        body.dark-mode .meal-checkbox:checked ~ .meal-text {
+            color: #64748b !important;
+        }
+        .btn-primary {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-secondary {
+            width: 100%;
+            background: #e2e8f0;
+            color: #334155;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 800;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        body.dark-mode .btn-secondary {
+            background: #21262d !important;
+            color: #f8fafc !important;
+            border-color: #30363d !important;
+        }
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+        body.dark-mode .history-row {
+            background: #161b22 !important;
+            border-color: #21262d !important;
+            color: #f8fafc !important;
+        }
+        .alert-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 800;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            white-space: nowrap;
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 16px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid #e2e8f0;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+        body.dark-mode .modal-box {
+            background: #0d1117;
+            border-color: #30363d;
+            color: #f8fafc;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        body.dark-mode .modal-header {
+            border-color: #21262d;
+        }
+        .modal-title {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: #2563eb;
+        }
+        body.dark-mode .modal-title {
+            color: #60a5fa;
+        }
+        .close-modal {
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 900;
+            cursor: pointer;
+            color: #475569;
+        }
+        body.dark-mode .close-modal {
+            background: #21262d;
+            color: #cbd5e1;
+        }
+        .alt-list {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+        .alt-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: right;
+            width: 100%;
+        }
+        .alt-option:hover, .alt-option:active {
+            border-color: #2563eb;
+            background: rgba(37, 99, 235, 0.08);
+        }
+        body.dark-mode .alt-option {
+            background: #161b22;
+            border-color: #21262d;
+            color: #f8fafc;
+        }
+        body.dark-mode .alt-option:hover, body.dark-mode .alt-option:active {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+        }
+        .alt-name {
+            font-weight: 800;
+            font-size: 0.92rem;
+        }
+        .alt-macros {
+            font-size: 0.72rem;
+            color: #64748b;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        body.dark-mode .alt-macros {
+            color: #94a3b8;
+        }
+        .meal-macros-tag {
+            display: block;
+            font-size: 0.72rem;
+            color: #64748b;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        body.dark-mode .meal-macros-tag {
+            color: #94a3b8;
+        }
+        .alt-amount {
+            background: #2563eb;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        /* Live Macros Grid */
+        .macros-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #e2e8f0;
+        }
+        body.dark-mode .macros-grid {
+            border-color: #21262d;
+        }
+        .macro-pill {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 10px 6px;
+            text-align: center;
+        }
+        body.dark-mode .macro-pill {
+            background: #161b22;
+            border-color: #21262d;
+        }
+        .macro-pill-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #64748b;
+        }
+        body.dark-mode .macro-pill-title {
+            color: #94a3b8;
+        }
+        .macro-pill-val {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: #2563eb;
+            margin-top: 2px;
+        }
+        body.dark-mode .macro-pill-val {
+            color: #60a5fa;
+        }
+        /* Water & Timer Tools */
+        .tools-grid {
+            display: block;
+            margin-bottom: 16px;
+        }
+        .tool-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+        body.dark-mode .tool-card {
+            background: #0d1117;
+            border-color: #21262d;
+        }
+        .tool-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+        .tool-display {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #2563eb;
+            margin: 4px 0 8px;
+        }
+        body.dark-mode .tool-display {
+            color: #60a5fa;
+        }
+        .tool-btn-row {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+        }
+        .mini-btn {
+            flex: 1;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 6px 4px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .mini-btn:active {
+            transform: scale(0.95);
+        }
+        .mini-btn.outline {
+            background: rgba(37, 99, 235, 0.12);
+            color: #2563eb;
+        }
+        body.dark-mode .mini-btn.outline {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+        .extra-food-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0f172a;
+            outline: none;
+        }
+        body.dark-mode .form-input {
+            background: #161b22;
+            border-color: #30363d;
+            color: #f8fafc;
+        }
+        .delete-extra-btn {
+            background: rgba(220, 38, 38, 0.12);
+            color: #ef4444;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        /* Setup Screen / Wizard Styles */
+        .setup-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(145deg, #090d16, #0f172a, #000000);
+            color: #ffffff;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .setup-screen.active {
+            display: flex;
+        }
+        .setup-card {
+            background: #0d1117;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-radius: 28px;
+            padding: 24px 20px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+        }
+        .setup-title {
+            font-size: 1.55rem;
+            font-weight: 900;
+            text-align: center;
+            color: #60a5fa;
+            margin-bottom: 6px;
+        }
+        .setup-subtitle {
+            font-size: 0.85rem;
+            text-align: center;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .setup-group {
+            margin-bottom: 16px;
+        }
+        .setup-label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: #e2e8f0;
+            margin-bottom: 8px;
+        }
+        .setup-input {
+            width: 100%;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 14px;
+            padding: 12px 14px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-align: center;
+            outline: none;
+        }
+        .setup-input:focus {
+            border-color: #3b82f6;
+        }
+        .goal-options, .protein-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .protein-options {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        .choice-pill {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 14px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #cbd5e1;
+            font-weight: 800;
+            font-size: 0.82rem;
+        }
+        .choice-pill.selected {
+            background: rgba(37, 99, 235, 0.25);
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+        .choice-pill span.sub {
+            display: block;
+            font-size: 0.68rem;
+            color: #93c5fd;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Initial Setup / Profile Wizard Screen -->
+    <div class="setup-screen" id="setupScreen">
+        <div class="setup-card">
+            <div class="setup-title">أهلاً بيك يا بطل 💪</div>
+            <div class="setup-subtitle">ظبط بياناتك وهدفك وهنحسبلك السعرات والماكروز بدقة علمية</div>
+
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:14px;">
+                <div>
+                    <label class="setup-label" style="font-size:0.78rem; text-align:center;">الوزن (كجم)</label>
+                    <input type="number" id="setupWeight" class="setup-input" placeholder="75" step="0.1" value="75">
+                </div>
+                <div>
+                    <label class="setup-label" style="font-size:0.78rem; text-align:center;">الطول (سم)</label>
+                    <input type="number" id="setupHeight" class="setup-input" placeholder="175" value="175">
+                </div>
+                <div>
+                    <label class="setup-label" style="font-size:0.78rem; text-align:center;">العمر (سنة)</label>
+                    <input type="number" id="setupAge" class="setup-input" placeholder="25" value="25">
+                </div>
+            </div>
+
+            <div class="setup-group" style="margin-bottom:14px;">
+                <label class="setup-label">🏋️‍♂️ عدد أيام التمرين في الأسبوع:</label>
+                <div class="protein-options" id="activityOptions">
+                    <div class="choice-pill" data-act="1.375">
+                        1 - 2 يوم
+                        <span class="sub">خفيف</span>
+                    </div>
+                    <div class="choice-pill selected" data-act="1.55">
+                        3 - 4 أيام
+                        <span class="sub">متوسط</span>
+                    </div>
+                    <div class="choice-pill" data-act="1.725">
+                        5 - 6 أيام
+                        <span class="sub">عالي</span>
+                    </div>
+                    <div class="choice-pill" data-act="1.9">
+                        يومياً
+                        <span class="sub">مكثف</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-group" style="margin-bottom:14px;">
+                <label class="setup-label">🎯 هدفك إيه الفترة دي؟</label>
+                <div class="goal-options" id="goalOptions">
+                    <div class="choice-pill selected" data-goal="bulk">
+                        🔥 زيادة وزن
+                        <span class="sub">تضخيم (+450)</span>
+                    </div>
+                    <div class="choice-pill" data-goal="maintain">
+                        ⚖️ ثبات
+                        <span class="sub">محافظة</span>
+                    </div>
+                    <div class="choice-pill" data-goal="cut">
+                        ✂️ خسارة وزن
+                        <span class="sub">تنشيف (-450)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-group" style="margin-bottom:14px;">
+                <label class="setup-label">🥩 نسبة البروتين لكل كيلو من وزنك:</label>
+                <div class="protein-options" id="proteinOptions">
+                    <div class="choice-pill" data-prot="1.6">
+                        1.6 جم
+                        <span class="sub">متوسط</span>
+                    </div>
+                    <div class="choice-pill" data-prot="1.8">
+                        1.8 جم
+                        <span class="sub">جيد</span>
+                    </div>
+                    <div class="choice-pill selected" data-prot="2.0">
+                        2.0 جم
+                        <span class="sub">مثالي</span>
+                    </div>
+                    <div class="choice-pill" data-prot="2.2">
+                        2.2 جم
+                        <span class="sub">عالي</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:#161b22; border-radius:14px; padding:12px; margin-bottom:14px; border:1px dashed #30363d; text-align:center;">
+                <div style="font-size:0.75rem; color:#94a3b8; font-weight:700;">التارجت المحسوب ليك تلقائياً:</div>
+                <div style="font-size:0.92rem; font-weight:900; color:#60a5fa; margin-top:4px;" id="setupPreviewText">
+                    3000 سعرة | 150ج بروتين | 380ج كارب | 83ج دهون
+                </div>
+            </div>
+
+            <button type="button" id="startPlanBtn" class="btn-primary">احسب وصمم وجباتي 🚀</button>
+        </div>
+    </div>
+
+    <!-- User Authentication Screen (Login / Register) -->
+    <div class="setup-screen active" id="authScreen" style="z-index: 2500;">
+        <div class="setup-card">
+            <div class="setup-title">بوابة الأبطال 💪</div>
+            <div class="setup-subtitle">سجل دخولك أو أنشئ حساباً جديداً لحفظ خطتك ووجباتك بشكل مستقل</div>
+
+            <div style="display:flex; gap:8px; margin-bottom:16px; background:#161b22; padding:6px; border-radius:16px; border:1px solid #30363d;">
+                <button type="button" id="tabLoginBtn" class="mini-btn" style="padding:10px; font-size:0.9rem;">تسجيل الدخول</button>
+                <button type="button" id="tabRegisterBtn" class="mini-btn outline" style="padding:10px; font-size:0.9rem;">حساب جديد</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginFormBox" style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <label class="setup-label">الاسم أو الـ ID الخاص بك:</label>
+                    <input type="text" id="loginIdentifier" class="setup-input" style="font-size:1rem;" placeholder="اكتب اسمك أو الـ ID">
+                </div>
+                <div>
+                    <label class="setup-label">كلمة السر:</label>
+                    <input type="password" id="loginPassword" class="setup-input" style="font-size:1rem;" placeholder="••••••••">
+                </div>
+                <button type="button" id="doLoginBtn" class="btn-primary">دخول لحسابي 🚀</button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerFormBox" style="display:none; flex-direction:column; gap:12px;">
+                <div>
+                    <label class="setup-label">الاسم (يجب ألا يتكرر):</label>
+                    <input type="text" id="regName" class="setup-input" style="font-size:1rem;" placeholder="مثلاً: عمرو أحمد">
+                </div>
+                <div>
+                    <label class="setup-label">رقم أو كود الـ ID (فريد وغير مكرر):</label>
+                    <input type="text" id="regId" class="setup-input" style="font-size:1rem;" placeholder="مثلاً: AMR100">
+                </div>
+                <div>
+                    <label class="setup-label">كلمة السر:</label>
+                    <input type="password" id="regPassword" class="setup-input" style="font-size:1rem;" placeholder="اختر كلمة سر قوية">
+                </div>
+                <button type="button" id="doRegisterBtn" class="btn-primary">إنشاء الحساب والبدء ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div>
+                    <h1 style="font-size:1.3rem;">خطة الدايت 🚀</h1>
+                    <div id="userHeaderTag" style="font-size:0.75rem; color:#93c5fd; font-weight:800; margin-top:2px;">مرحباً يا بطل</div>
+                </div>
+                <div class="header-btn-group" style="flex-wrap:wrap; justify-content:flex-end;">
+                    <button class="theme-btn" id="installAppBtn" style="background:rgba(37,99,235,0.35); border-color:rgba(96,165,250,0.6);" title="تثبيت البرنامج على الموبايل">📲 تثبيت</button>
+                    <button class="theme-btn" id="openSetupBtn" title="تعديل الهدف والوزن">⚙️ الخطة</button>
+                    <button class="theme-btn" id="themeToggle">🌓</button>
+                    <button class="theme-btn" id="logoutBtn" style="background:rgba(220,38,38,0.25); border-color:rgba(248,113,113,0.4);" title="تسجيل الخروج">🚪 خروج</button>
+                    <div class="date-badge" id="currentDate">اليوم</div>
+                </div>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label" id="goalBadgeLabel">الهدف اليومي</div>
+                    <div class="stat-val"><span id="targetCaloriesHeader">3650</span> <span style="font-size:0.8rem; font-weight:normal;">سعرة</span></div>
+                </div>
+                <div class="stat-box">
+                    <label for="weightInput" class="stat-label">الوزن (كجم)</label>
+                    <input type="number" id="weightInput" class="weight-input" placeholder="00.0" step="0.1">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Progress & Live Macros -->
+        <div class="card">
+            <div class="progress-header">
+                <span>إنجاز اليوم</span>
+                <span id="progressText" style="color: #2563eb;">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progressBar" class="progress-bar-fill"></div>
+            </div>
+            
+            <!-- Live Consumed Macros -->
+            <div class="macros-grid">
+                <div class="macro-pill">
+                    <div class="macro-pill-title">🔥 السعرات</div>
+                    <div class="macro-pill-val" id="liveCalories">0 / 3650</div>
+                </div>
+                <div class="macro-pill">
+                    <div class="macro-pill-title">💪 البروتين</div>
+                    <div class="macro-pill-val" id="liveProtein">0 / 150 جم</div>
+                </div>
+                <div class="macro-pill">
+                    <div class="macro-pill-title">🍚 الكارب</div>
+                    <div class="macro-pill-val" id="liveCarbs">0 / 300 جم</div>
+                </div>
+                <div class="macro-pill">
+                    <div class="macro-pill-title">🥑 الدهون</div>
+                    <div class="macro-pill-val" id="liveFats">0 / 80 جم</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gym & Hydration Tools -->
+        <div class="tools-grid">
+            <!-- Water Tracker -->
+            <div class="tool-card">
+                <div class="tool-title">💧 متتبع شرب المياه اليومي</div>
+                <div class="tool-display"><span id="waterCount">0.0</span> <span style="font-size:0.75rem;">لتر</span></div>
+                <div class="tool-btn-row">
+                    <button type="button" class="mini-btn" id="addWaterBtn">+ 250 مل</button>
+                    <button type="button" class="mini-btn outline" id="resetWaterBtn">تصفير</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meals -->
+        <div class="meal-card">
+            <div class="meal-header">🍳 الفطار</div>
+            <div class="meal-body" id="meal-breakfast"></div>
+        </div>
+
+        <div class="meal-card">
+            <div class="meal-header">🍗 الغداء</div>
+            <div class="meal-body" id="meal-lunch"></div>
+        </div>
+
+        <div class="meal-card">
+            <div class="meal-header">🥜 السناك</div>
+            <div class="meal-body" id="meal-snack"></div>
+        </div>
+
+        <div class="meal-card">
+            <div class="meal-header">🌙 العشاء</div>
+            <div class="meal-body" id="meal-dinner"></div>
+        </div>
+
+        <!-- Extra / Free Meal Card -->
+        <div class="meal-card">
+            <div class="meal-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>➕ إضافات اليوم (سناك خارجي)</span>
+                <button type="button" class="swap-btn" id="openExtraModalBtn">+ إضافة أكلة</button>
+            </div>
+            <div class="meal-body" id="meal-extra">
+                <p style="text-align:center; font-size:0.82rem; opacity:0.6; font-weight:700;">لا توجد إضافات خارجية اليوم</p>
+            </div>
+        </div>
+
+        <button id="saveBtn" class="btn-primary">💾 حفظ بيانات اليوم</button>
+        <button id="resetBtn" class="btn-secondary">تصفير اليوم للبدء من جديد</button>
+
+        <!-- History -->
+        <div class="card" style="margin-top: 24px;">
+            <div style="font-weight: 900; margin-bottom: 12px;">📅 سجل الأداء (الأيام السابقة)</div>
+            <div id="historyContainer" style="max-height: 250px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Alternatives Modal -->
+    <div class="modal-overlay" id="altModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">اختر البديل المناسب 🔄</div>
+                    <div id="modalSubtitle" style="font-size: 0.8rem; opacity: 0.8; font-weight: 700; margin-top: 2px;"></div>
+                </div>
+                <button class="close-modal" id="closeModalBtn">✕</button>
+            </div>
+            <div class="alt-list" id="altListContainer"></div>
+        </div>
+    </div>
+
+    <!-- Add Extra Food Modal -->
+    <div class="modal-overlay" id="extraModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">إضافة أكلة لليوم ➕</div>
+                <button class="close-modal" id="closeExtraModalBtn">✕</button>
+            </div>
+            <div class="extra-food-form">
+                <label style="font-size:0.82rem; font-weight:800; opacity:0.85;">اختر من الأكلات المتاحة أو (إدخال يدوي):</label>
+                <select id="extraFoodSelect" class="form-input" style="cursor:pointer;">
+                    <option value="custom">✍️ إدخال يدوي حر (أكلة خارج القائمة)</option>
+                </select>
+
+                <!-- Quick DB Food Mode -->
+                <div id="dbExtraSection" style="display:none; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="number" id="extraDbQty" class="form-input" placeholder="الكمية" value="100" min="1">
+                        <span id="extraDbUnit" style="font-weight:900; font-size:0.9rem; color:#2563eb; white-space:nowrap;">جم</span>
+                    </div>
+                    <div id="extraDbPreview" style="background:rgba(37,99,235,0.08); padding:10px; border-radius:12px; text-align:center; font-size:0.78rem; font-weight:800; color:#2563eb;">
+                        🔥 0 سعرة | 💪 0جم بروتين | 🍚 0جم كارب | 🥑 0جم دهون
+                    </div>
+                </div>
+
+                <!-- Custom Manual Mode -->
+                <div id="customExtraSection" style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="extraName" class="form-input" placeholder="اسم الأكلة (مثلاً: سكوب واي بروتين / تفاحة)">
+                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
+                        <input type="number" id="extraCal" class="form-input" placeholder="السعرات (kcal)">
+                        <input type="number" id="extraProt" class="form-input" placeholder="البروتين (جم)">
+                        <input type="number" id="extraCarb" class="form-input" placeholder="الكارب (جم)">
+                        <input type="number" id="extraFat" class="form-input" placeholder="الدهون (جم)">
+                    </div>
+                </div>
+
+                <button type="button" id="confirmAddExtraBtn" class="btn-primary" style="margin-top:4px; padding:12px;">إضافة لوجبات اليوم</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install App Guide Modal -->
+    <div class="modal-overlay" id="installModal">
+        <div class="modal-box" style="gap:14px;">
+            <div class="modal-header" style="margin-bottom:0;">
+                <div class="modal-title">📲 تثبيت التطبيق على الموبايل</div>
+                <button type="button" class="close-modal" id="closeInstallModalBtn">✕</button>
+            </div>
+            <div style="font-size:0.86rem; line-height:1.7; font-weight:700;">
+                <div style="background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.25); padding:12px; border-radius:14px; margin-bottom:10px;">
+                    <div style="color:#2563eb; font-weight:900; margin-bottom:4px;">📱 على الآيفون (Safari):</div>
+                    1. تأكد أنك فاتح الصفحة في متصفح <b>Safari</b>.<br>
+                    2. اضغط على زر <b>المشاركة (Share ⬆️)</b> بالأسفل.<br>
+                    3. اختر <b>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</b>.<br>
+                    4. افتح التطبيق من الأيقونة على شاشتك وهيعمل كبرنامج كامل ويحفظ كل بياناتك للأبد!
+                </div>
+                <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); padding:12px; border-radius:14px;">
+                    <div style="color:#10b981; font-weight:900; margin-bottom:4px;">🤖 على الأندرويد (Chrome):</div>
+                    1. اضغط على <b>الثلاث نقاط (⋮)</b> أعلى المتصفح.<br>
+                    2. اختر <b>"تثبيت التطبيق" (Install App)</b> أو <b>"إضافة إلى الشاشة الرئيسية"</b>.
+                </div>
+                <button type="button" id="triggerNativeInstallBtn" class="btn-primary" style="display:none; margin-top:12px; padding:12px;">تثبيت مباشر الآن 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إعداد ملف Manifest ديناميكي لدعم التثبيت كبرنامج مستقل (PWA) على الموبايل
+        (function setupPWA() {
+            const manifestObj = {
+                name: "تطبيق الدايت - بوابة الأبطال",
+                short_name: "دايت الأبطال",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#090d16",
+                theme_color: "#090d16",
+                orientation: "portrait",
+                icons: [
+                    {
+                        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%23090d16'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='340'>💪</text></svg>",
+                        sizes: "512x512",
+                        type: "image/svg+xml",
+                        purpose: "any maskable"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/json' });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const manifestLink = document.getElementById('pwaManifest');
+            if (manifestLink) manifestLink.setAttribute('href', manifestUrl);
+        })();
+
+        let deferredInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            const nativeBtn = document.getElementById('triggerNativeInstallBtn');
+            if (nativeBtn) nativeBtn.style.display = 'block';
+        });
+
+        const installModal = document.getElementById('installModal');
+        document.getElementById('installAppBtn').onclick = () => {
+            installModal.classList.add('active');
+        };
+        document.getElementById('closeInstallModalBtn').onclick = () => {
+            installModal.classList.remove('active');
+        };
+        installModal.onclick = (e) => {
+            if (e.target === installModal) installModal.classList.remove('active');
+        };
+        document.getElementById('triggerNativeInstallBtn').onclick = async () => {
+            if (deferredInstallPrompt) {
+                deferredInstallPrompt.prompt();
+                const { outcome } = await deferredInstallPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installModal.classList.remove('active');
+                    showToast('🎉 جاري تثبيت البرنامج على هاتفك!');
+                }
+                deferredInstallPrompt = null;
+            }
+        };
+
+        const USERS_DB_KEY = 'amrDiet_users_db_v1';
+        const ACTIVE_USER_KEY = 'amrDiet_active_user_v1';
+
+        let currentUser = JSON.parse(localStorage.getItem(ACTIVE_USER_KEY)) || null;
+
+        // مفاتيح تخزين ديناميكية مرتبطة بكل مستخدم على حدة لمنع تداخل البيانات
+        function getUserKey(base) {
+            const uid = currentUser ? currentUser.id : 'guest';
+            return `amrDiet_u_${uid}_${base}`;
+        }
+
+        // قاعدة بيانات البدائل بالسعرات الحرارية والبروتين والكارب والدهون لكل 100 جرام (أو بالوحدة للبيض)
+        const FOOD_DB = {
+            protein: [
+                { id: 'chicken_breast', name: 'صدور دجاج مطبوخة', cal: 165, p: 31, c: 0, f: 3.6, unit: 'جم' },
+                { id: 'chicken_thigh', name: 'أفخاذ دجاج بدون جلد', cal: 209, p: 26, c: 0, f: 10.9, unit: 'جم' },
+                { id: 'beef_minced', name: 'لحم بقري مفروم قليل الدسم', cal: 250, p: 26, c: 0, f: 15, unit: 'جم' },
+                { id: 'tilapia', name: 'سمك بلطي مشوي', cal: 128, p: 26, c: 0, f: 2.7, unit: 'جم' },
+                { id: 'tuna', name: 'تونة مصفاة', cal: 116, p: 26, c: 0, f: 0.8, unit: 'جم' },
+                { id: 'salmon', name: 'سمك سلمون', cal: 208, p: 20, c: 0, f: 13, unit: 'جم' },
+                { id: 'shrimp', name: 'جمبري مطبوخ', cal: 99, p: 24, c: 0, f: 0.3, unit: 'جم' },
+                { id: 'cottage_cheese', name: 'جبنة قريش', cal: 98, p: 11, c: 3.4, f: 4.3, unit: 'جم' },
+                { id: 'whole_eggs', name: 'بيض كامل', cal: 72, p: 6.3, c: 0.4, f: 4.8, unit: 'بيضة', isUnit: true },
+                { id: 'egg_whites', name: 'بياض بيض', cal: 52, p: 11, c: 0.7, f: 0.2, unit: 'جم' }
+            ],
+            carbs: [
+                { id: 'cooked_rice', name: 'أرز أبيض مطبوخ', cal: 130, p: 2.7, c: 28, f: 0.3, unit: 'جم' },
+                { id: 'basmati_rice', name: 'أرز بسمتي مطبوخ', cal: 121, p: 3.5, c: 25, f: 0.4, unit: 'جم' },
+                { id: 'pasta', name: 'مكرونة مسلوقة', cal: 131, p: 5, c: 25, f: 1.1, unit: 'جم' },
+                { id: 'baladi_bread', name: 'خبز بلدي / أسمر', cal: 265, p: 9, c: 52, f: 1.5, unit: 'جم' },
+                { id: 'oats', name: 'شوفان حبة كاملة', cal: 389, p: 16.9, c: 66, f: 6.9, unit: 'جم' },
+                { id: 'potatoes', name: 'بطاطس مسلوقة / مشوية', cal: 87, p: 1.9, c: 20, f: 0.1, unit: 'جم' },
+                { id: 'sweet_potato', name: 'بطاطا حلوة مشوية', cal: 90, p: 2, c: 21, f: 0.2, unit: 'جم' },
+                { id: 'rice_flour', name: 'دقيق أرز', cal: 366, p: 6, c: 80, f: 1.4, unit: 'جم' },
+                { id: 'toast_brown', name: 'توست أسمر', cal: 250, p: 9, c: 48, f: 3.2, unit: 'جم' }
+            ],
+            fruits: [
+                { id: 'banana', name: 'موز', cal: 89, p: 1.1, c: 23, f: 0.3, unit: 'جم' },
+                { id: 'apple', name: 'تفاح', cal: 52, p: 0.3, c: 14, f: 0.2, unit: 'جم' },
+                { id: 'dates', name: 'تمر / بلح', cal: 277, p: 1.8, c: 75, f: 0.2, unit: 'جم' },
+                { id: 'orange', name: 'برتقال', cal: 47, p: 0.9, c: 12, f: 0.1, unit: 'جم' },
+                { id: 'strawberry', name: 'فراولة', cal: 32, p: 0.7, c: 7.7, f: 0.3, unit: 'جم' },
+                { id: 'watermelon', name: 'بطيخ', cal: 30, p: 0.6, c: 7.6, f: 0.2, unit: 'جم' }
+            ],
+            dairy: [
+                { id: 'whole_milk', name: 'حليب كامل الدسم', cal: 61, p: 3.2, c: 4.8, f: 3.3, unit: 'مل' },
+                { id: 'skim_milk', name: 'حليب خالي الدسم', cal: 34, p: 3.4, c: 5, f: 0.1, unit: 'مل' },
+                { id: 'greek_yogurt', name: 'زبادي يوناني سادة', cal: 59, p: 10, c: 3.6, f: 0.4, unit: 'جم' },
+                { id: 'regular_yogurt', name: 'زبادي عادي', cal: 61, p: 3.5, c: 4.7, f: 3.3, unit: 'جم' }
+            ],
+            fats: [
+                { id: 'peanuts', name: 'فول سوداني', cal: 567, p: 26, c: 16, f: 49, unit: 'جم' },
+                { id: 'peanut_butter', name: 'زبدة فول سوداني طبيعية', cal: 588, p: 25, c: 20, f: 50, unit: 'جم' },
+                { id: 'almonds', name: 'لوز نيء', cal: 579, p: 21, c: 22, f: 50, unit: 'جم' },
+                { id: 'cashews', name: 'كاجو', cal: 553, p: 18, c: 30, f: 44, unit: 'جم' },
+                { id: 'olive_oil', name: 'زيت زيتون', cal: 884, p: 0, c: 0, f: 100, unit: 'مل' },
+                { id: 'avocado', name: 'أفوكادو', cal: 160, p: 2, c: 9, f: 15, unit: 'جم' }
+            ]
+        };
+
+        // هيكل الوجبات الأساسية
+        const MEAL_TEMPLATE = [
+            { id: 'm1', meal: 'breakfast', category: 'protein', baseFoodId: 'whole_eggs', role: 'protein', share: 0.16 },
+            { id: 'm2', meal: 'breakfast', category: 'carbs', baseFoodId: 'baladi_bread', role: 'carb', share: 0.25 },
+            
+            { id: 'm3', meal: 'lunch', category: 'carbs', baseFoodId: 'cooked_rice', role: 'carb', share: 0.30 },
+            { id: 'm4', meal: 'lunch', category: 'protein', baseFoodId: 'chicken_breast', role: 'protein', share: 0.34 },
+            { id: 'm5', meal: 'lunch', category: 'carbs', baseFoodId: 'rice_flour', role: 'carb', share: 0.12 },
+            
+            { id: 'm6', meal: 'snack', category: 'carbs', baseFoodId: 'oats', role: 'carb', share: 0.22 },
+            { id: 'm7', meal: 'snack', category: 'dairy', baseFoodId: 'whole_milk', role: 'dairy', share: 1.0 },
+            { id: 'm8', meal: 'snack', category: 'fruits', baseFoodId: 'banana', role: 'fruit', share: 0.5 },
+            { id: 'm9', meal: 'snack', category: 'fats', baseFoodId: 'peanuts', role: 'fat', share: 1.0 },
+            
+            { id: 'm10', meal: 'dinner', category: 'carbs', baseFoodId: 'cooked_rice', role: 'carb', share: 0.23 },
+            { id: 'm11', meal: 'dinner', category: 'protein', baseFoodId: 'chicken_breast', role: 'protein', share: 0.34 },
+            { id: 'm12', meal: 'dinner', category: 'fruits', baseFoodId: 'banana', role: 'fruit', share: 0.5 }
+        ];
+
+        let userProfile = null;
+        let GENERATED_MEALS = [];
+
+        const weightInput = document.getElementById('weightInput');
+        const targetCaloriesHeader = document.getElementById('targetCaloriesHeader');
+        const goalBadgeLabel = document.getElementById('goalBadgeLabel');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const liveCaloriesEl = document.getElementById('liveCalories');
+        const liveProteinEl = document.getElementById('liveProtein');
+        const liveCarbsEl = document.getElementById('liveCarbs');
+        const liveFatsEl = document.getElementById('liveFats');
+        const historyContainer = document.getElementById('historyContainer');
+        const dateDisplay = document.getElementById('currentDate');
+        const body = document.body;
+
+        const altModal = document.getElementById('altModal');
+        const altListContainer = document.getElementById('altListContainer');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const waterCountEl = document.getElementById('waterCount');
+
+        // Setup & Auth Screen elements
+        const authScreen = document.getElementById('authScreen');
+        const setupScreen = document.getElementById('setupScreen');
+        const setupWeightInput = document.getElementById('setupWeight');
+        const setupHeightInput = document.getElementById('setupHeight');
+        const setupAgeInput = document.getElementById('setupAge');
+        const setupPreviewText = document.getElementById('setupPreviewText');
+        let selectedGoal = 'bulk';
+        let selectedProt = '2.0';
+        let selectedActivity = '1.55';
+        const currentDateStr = new Date().toLocaleDateString('en-CA');
+        dateDisplay.innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', month: 'short', day: 'numeric' });
+
+        // إدارة التبويب بين تسجيل الدخول وإنشاء حساب جديد
+        const tabLoginBtn = document.getElementById('tabLoginBtn');
+        const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+        const loginFormBox = document.getElementById('loginFormBox');
+        const registerFormBox = document.getElementById('registerFormBox');
+
+        tabLoginBtn.onclick = () => {
+            tabLoginBtn.classList.remove('outline');
+            tabRegisterBtn.classList.add('outline');
+            loginFormBox.style.display = 'flex';
+            registerFormBox.style.display = 'none';
+        };
+
+        tabRegisterBtn.onclick = () => {
+            tabRegisterBtn.classList.remove('outline');
+            tabLoginBtn.classList.add('outline');
+            registerFormBox.style.display = 'flex';
+            loginFormBox.style.display = 'none';
+        };
+
+        // إنشاء حساب جديد مع التحقق الصارم من عدم تكرار الاسم أو الـ ID
+        document.getElementById('doRegisterBtn').onclick = () => {
+            const name = document.getElementById('regName').value.trim();
+            const id = document.getElementById('regId').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+
+            if (!name || !id || !password) {
+                showToast('⚠️ من فضلك املأ الاسم والـ ID وكلمة السر');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+            const nameExists = users.some(u => u.name.toLowerCase() === name.toLowerCase());
+            const idExists = users.some(u => u.id.toLowerCase() === id.toLowerCase());
+
+            if (nameExists) {
+                showToast('❌ هذا الاسم مسجل بالفعل لشخص آخر، اختر اسماً مختلفاً');
+                return;
+            }
+            if (idExists) {
+                showToast('❌ هذا الـ ID مستخدم بالفعل، اختر ID آخر فريد');
+                return;
+            }
+
+            const newUser = { name, id, password };
+            users.push(newUser);
+            localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+            
+            currentUser = { name, id };
+            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
+            authScreen.classList.remove('active');
+            showToast(`🎉 أهلاً بيك يا ${name}!`);
+            loadData();
+        };
+
+        // تسجيل الدخول بحساب موجود
+        document.getElementById('doLoginBtn').onclick = () => {
+            const identifier = document.getElementById('loginIdentifier').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!identifier || !password) {
+                showToast('⚠️ اكتب الاسم أو الـ ID وكلمة السر');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+            const matchedUser = users.find(u => 
+                (u.id.toLowerCase() === identifier.toLowerCase() || u.name.toLowerCase() === identifier.toLowerCase()) 
+                && u.password === password
+            );
+
+            if (!matchedUser) {
+                showToast('❌ بيانات الدخول غير صحيحة أو الحساب غير موجود');
+                return;
+            }
+
+            currentUser = { name: matchedUser.name, id: matchedUser.id };
+            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
+            authScreen.classList.remove('active');
+            showToast(`👋 نورت من تاني يا ${matchedUser.name}`);
+            loadData();
+        };
+
+        // تسجيل الخروج
+        document.getElementById('logoutBtn').onclick = () => {
+            localStorage.removeItem(ACTIVE_USER_KEY);
+            currentUser = null;
+            userProfile = null;
+            document.getElementById('loginIdentifier').value = '';
+            document.getElementById('loginPassword').value = '';
+            authScreen.classList.add('active');
+            showToast('🚪 تم تسجيل الخروج بنجاح');
+        };
+
+        if (localStorage.getItem(getUserKey('theme')) === 'dark' || localStorage.getItem('amrDiet_v7_theme') === 'dark') {
+            body.classList.add('dark-mode');
+        }
+
+        function calculateTargets(weight, height, age, activity, goal, protFactor) {
+            const w = parseFloat(weight) || 75;
+            const h = parseFloat(height) || 175;
+            const a = parseFloat(age) || 25;
+            const act = parseFloat(activity) || 1.55;
+            const pFactor = parseFloat(protFactor) || 2.0;
+
+            // معادلة Mifflin-St Jeor لحساب معدل الحرق الأساسي (BMR) وإجمالي الطاقة اليومية (TDEE)
+            const bmr = (10 * w) + (6.25 * h) - (5 * a) + 5;
+            let baseCal = Math.round(bmr * act);
+
+            if (goal === 'bulk') baseCal += 450;
+            else if (goal === 'cut') baseCal -= 450;
+            baseCal = Math.max(1400, baseCal);
+
+            const targetProtein = Math.round(w * pFactor);
+            const targetFats = Math.round((baseCal * 0.25) / 9);
+            const remainingCal = Math.max(200, baseCal - (targetProtein * 4) - (targetFats * 9));
+            const targetCarbs = Math.round(remainingCal / 4);
+
+            return { targetCal: baseCal, targetProtein, targetCarbs, targetFats };
+        }
+
+        function updateSetupPreview() {
+            const w = parseFloat(setupWeightInput.value) || 75;
+            const h = parseFloat(setupHeightInput.value) || 175;
+            const a = parseFloat(setupAgeInput.value) || 25;
+            const targets = calculateTargets(w, h, a, selectedActivity, selectedGoal, selectedProt);
+            setupPreviewText.innerText = `${targets.targetCal} سعرة | ${targets.targetProtein}ج بروتين | ${targets.targetCarbs}ج كارب | ${targets.targetFats}ج دهون`;
+        }
+
+        setupWeightInput.addEventListener('input', updateSetupPreview);
+        setupHeightInput.addEventListener('input', updateSetupPreview);
+        setupAgeInput.addEventListener('input', updateSetupPreview);
+
+        document.querySelectorAll('#activityOptions .choice-pill').forEach(pill => {
+            pill.onclick = () => {
+                document.querySelectorAll('#activityOptions .choice-pill').forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                selectedActivity = pill.dataset.act;
+                updateSetupPreview();
+            };
+        });
+
+        document.querySelectorAll('#goalOptions .choice-pill').forEach(pill => {
+            pill.onclick = () => {
+                document.querySelectorAll('#goalOptions .choice-pill').forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                selectedGoal = pill.dataset.goal;
+                updateSetupPreview();
+            };
+        });
+
+        document.querySelectorAll('#proteinOptions .choice-pill').forEach(pill => {
+            pill.onclick = () => {
+                document.querySelectorAll('#proteinOptions .choice-pill').forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                selectedProt = pill.dataset.prot;
+                updateSetupPreview();
+            };
+        });
+
+        document.getElementById('startPlanBtn').onclick = () => {
+            const w = parseFloat(setupWeightInput.value);
+            const h = parseFloat(setupHeightInput.value) || 175;
+            const a = parseFloat(setupAgeInput.value) || 25;
+            if (!w || w < 30 || w > 250) {
+                showToast('⚠️ من فضلك أدخل وزن صحيح بالكيلوجرام');
+                return;
+            }
+            if (h < 100 || h > 240 || a < 12 || a > 90) {
+                showToast('⚠️ تأكد من إدخال الطول والعمر بشكل صحيح');
+                return;
+            }
+            userProfile = {
+                weight: w,
+                height: h,
+                age: a,
+                activity: selectedActivity,
+                goal: selectedGoal,
+                protFactor: selectedProt
+            };
+            // مسح أي تعديلات أو كميات قديمة مخصصة لهذا المستخدم ليتم تطبيق الخطة الجديدة بدقة 100%
+            localStorage.setItem(getUserKey('profile'), JSON.stringify(userProfile));
+            localStorage.setItem(getUserKey('weight'), w.toString());
+            localStorage.removeItem(getUserKey('swaps'));
+            localStorage.removeItem(getUserKey('amounts'));
+            setupScreen.classList.remove('active');
+            loadData();
+            showToast('🚀 تم تصميم خطتك الغذائية وتطابق السعرات 100%!');
+        };
+
+        function buildMealsFromProfile(profile) {
+            const targets = calculateTargets(
+                profile.weight,
+                profile.height || 175,
+                profile.age || 25,
+                profile.activity || '1.55',
+                profile.goal,
+                profile.protFactor
+            );
+            targetCaloriesHeader.innerText = targets.targetCal;
+            const goalNames = { bulk: 'زيادة وزن 🔥', maintain: 'ثبات الوزن ⚖️', cut: 'خسارة وزن ✂️' };
+            goalBadgeLabel.innerText = goalNames[profile.goal] || 'الهدف اليومي';
+
+            // 1. حساب كميات الألبان والفواكه الأساسية أولاً
+            const amountsMap = {};
+            const milkFood = FOOD_DB.dairy.find(f => f.id === 'whole_milk');
+            amountsMap['m7'] = targets.targetCal >= 2500 ? 250 : 150;
+
+            const bananaFood = FOOD_DB.fruits.find(f => f.id === 'banana');
+            const bananaEach = targets.targetCal >= 2800 ? 150 : 100;
+            amountsMap['m8'] = bananaEach;
+            amountsMap['m12'] = bananaEach;
+
+            // 2. حساب كميات الكاربوهيدرات بناءً على الكارب المتبقي بعد خصم الفواكه والألبان
+            const usedCarbsFromFruitDairy = getMacros(milkFood, amountsMap['m7']).c + (getMacros(bananaFood, bananaEach).c * 2);
+            const remainingCarbs = Math.max(80, targets.targetCarbs - usedCarbsFromFruitDairy);
+
+            const carbItems = MEAL_TEMPLATE.filter(t => t.role === 'carb');
+            const totalCarbShare = carbItems.reduce((acc, t) => acc + t.share, 0);
+            let carbsProteinContribution = 0;
+            let carbsFatContribution = 0;
+
+            carbItems.forEach(tmpl => {
+                const food = FOOD_DB[tmpl.category].find(f => f.id === tmpl.baseFoodId);
+                const neededC = remainingCarbs * (tmpl.share / totalCarbShare);
+                const amt = Math.max(20, Math.round(((neededC / food.c) * 100) / 5) * 5);
+                amountsMap[tmpl.id] = amt;
+                const m = getMacros(food, amt);
+                carbsProteinContribution += m.p;
+                carbsFatContribution += m.f;
+            });
+
+            // 3. حساب الدهون الصحية (الفول السوداني) بدقة ليتطابق إجمالي الدهون مع التارجت المحسوب
+            const peanutsFood = FOOD_DB.fats.find(f => f.id === 'peanuts');
+            const dairyFat = getMacros(milkFood, amountsMap['m7']).f;
+            const estEggsCount = Math.max(2, Math.min(5, Math.round((targets.targetProtein * 0.14) / 6.3)));
+            const eggsFat = estEggsCount * 4.8;
+            const remainingFat = Math.max(10, targets.targetFats - carbsFatContribution - dairyFat - eggsFat - 8);
+            amountsMap['m9'] = Math.max(15, Math.round(((remainingFat / peanutsFood.f) * 100) / 5) * 5);
+
+            // 4. حساب مصادر البروتين الصافية بعد خصم البروتين القادم من الكارب والألبان والفول السوداني
+            const indirectProtein = carbsProteinContribution
+                + getMacros(milkFood, amountsMap['m7']).p
+                + getMacros(peanutsFood, amountsMap['m9']).p;
+            const netProteinNeeded = Math.max(40, targets.targetProtein - indirectProtein);
+
+            const protItems = MEAL_TEMPLATE.filter(t => t.role === 'protein');
+            const totalProtShare = protItems.reduce((acc, t) => acc + t.share, 0);
+
+            protItems.forEach(tmpl => {
+                const food = FOOD_DB[tmpl.category].find(f => f.id === tmpl.baseFoodId);
+                const neededP = netProteinNeeded * (tmpl.share / totalProtShare);
+                const amt = food.isUnit
+                    ? Math.max(1, Math.round(neededP / food.p))
+                    : Math.max(30, Math.round(((neededP / food.p) * 100) / 5) * 5);
+                amountsMap[tmpl.id] = amt;
+            });
+
+            // 5. ضبط دقيق أخير لكمية الأرز لتطابق السعرات الكلية بنسبة 100% مع التارجت المحسوب
+            let currentTotalCal = 0;
+            MEAL_TEMPLATE.forEach(tmpl => {
+                const food = FOOD_DB[tmpl.category].find(f => f.id === tmpl.baseFoodId);
+                currentTotalCal += getMacros(food, amountsMap[tmpl.id]).cal;
+            });
+
+            const calDiff = targets.targetCal - currentTotalCal;
+            if (Math.abs(calDiff) >= 15) {
+                const riceFood = FOOD_DB.carbs.find(f => f.id === 'cooked_rice');
+                const riceGramsDiff = Math.round(((calDiff / riceFood.cal) * 100) / 5) * 5;
+                const halfDiff = Math.round((riceGramsDiff / 2) / 5) * 5;
+                amountsMap['m3'] = Math.max(30, amountsMap['m3'] + halfDiff);
+                amountsMap['m10'] = Math.max(30, amountsMap['m10'] + (riceGramsDiff - halfDiff));
+            }
+
+            GENERATED_MEALS = MEAL_TEMPLATE.map(tmpl => ({
+                ...tmpl,
+                baseAmount: amountsMap[tmpl.id]
+            }));
+        }
+
+        window.openSwapModal = function(mealItemId) {
+            const item = GENERATED_MEALS.find(m => m.id === mealItemId);
+            if (!item) return;
+            const categoryList = FOOD_DB[item.category];
+            const baseFood = categoryList.find(f => f.id === item.baseFoodId);
+            const savedSwaps = JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {};
+            const currentId = savedSwaps[item.id] || item.baseFoodId;
+
+            modalSubtitle.innerText = `بدائل متكافئة السعرات لـ: ${formatFoodLabel(baseFood, item.baseAmount)}`;
+            altListContainer.innerHTML = '';
+
+            categoryList.forEach(altFood => {
+                const eqAmount = (altFood.id === baseFood.id)
+                    ? item.baseAmount
+                    : calculateEquivalentAmount(baseFood, item.baseAmount, altFood);
+                const macros = getMacros(altFood, eqAmount);
+                const isSelected = altFood.id === currentId;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'alt-option';
+                if (isSelected) btn.style.borderColor = '#2563eb';
+                btn.innerHTML = `
+                    <div>
+                        <div class="alt-name">${altFood.name} ${isSelected ? '✓' : ''}</div>
+                        <div class="alt-macros">🔥 ${macros.cal} سعرة | 💪 ${macros.p}جم | 🍚 ${macros.c}جم | 🥑 ${macros.f}جم</div>
+                    </div>
+                    <div class="alt-amount">${eqAmount} ${altFood.unit}</div>
+                `;
+                btn.onclick = () => selectAlternative(item.id, altFood.id, baseFood.id);
+                altListContainer.appendChild(btn);
+            });
+
+            altModal.classList.add('active');
+        };
+
+        document.getElementById('openSetupBtn').onclick = () => {
+            if (userProfile) {
+                setupWeightInput.value = userProfile.weight;
+                setupHeightInput.value = userProfile.height || 175;
+                setupAgeInput.value = userProfile.age || 25;
+                selectedActivity = userProfile.activity || '1.55';
+                selectedGoal = userProfile.goal;
+                selectedProt = userProfile.protFactor;
+                document.querySelectorAll('#activityOptions .choice-pill').forEach(p => {
+                    p.classList.toggle('selected', p.dataset.act === selectedActivity);
+                });
+                document.querySelectorAll('#goalOptions .choice-pill').forEach(p => {
+                    p.classList.toggle('selected', p.dataset.goal === selectedGoal);
+                });
+                document.querySelectorAll('#proteinOptions .choice-pill').forEach(p => {
+                    p.classList.toggle('selected', p.dataset.prot === selectedProt);
+                });
+            }
+            updateSetupPreview();
+            setupScreen.classList.add('active');
+        };
+
+        document.getElementById('themeToggle').onclick = () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem(getUserKey('theme'), body.classList.contains('dark-mode') ? 'dark' : 'light');
+        };
+
+        // حساب الكمية المكافئة بناءً على السعرات الحرارية المتكافئة
+        function calculateEquivalentAmount(baseFood, baseAmount, targetFood) {
+            const totalCalories = baseFood.isUnit 
+                ? (baseAmount * baseFood.cal) 
+                : ((baseAmount / 100) * baseFood.cal);
+
+            let targetAmount = targetFood.isUnit 
+                ? (totalCalories / targetFood.cal) 
+                : ((totalCalories / targetFood.cal) * 100);
+
+            if (targetFood.isUnit) {
+                return Math.max(1, Math.round(targetAmount));
+            }
+            return Math.round(targetAmount / 5) * 5 || Math.round(targetAmount);
+        }
+        // حساب السعرات والبروتين والكارب والدهون للكمية المحددة
+        function getMacros(food, amount) {
+            const factor = food.isUnit ? amount : (amount / 100);
+            return {
+                cal: Math.round(food.cal * factor),
+                p: Math.round(food.p * factor),
+                c: Math.round(food.c * factor),
+                f: Math.round((food.f || 0) * factor)
+            };
+        }
+
+        function formatFoodLabel(food, amount) {
+            if (food.id === 'whole_eggs') {
+                return amount === 1 ? '1 بيضة كاملة' : (amount === 2 ? '2 بيضة كاملة' : `${amount} بيضات كاملة`);
+            }
+            return `${amount} ${food.unit} ${food.name}`;
+        }
+
+        function renderMeals() {
+            const containers = {
+                breakfast: document.getElementById('meal-breakfast'),
+                lunch: document.getElementById('meal-lunch'),
+                snack: document.getElementById('meal-snack'),
+                dinner: document.getElementById('meal-dinner')
+            };
+
+            Object.values(containers).forEach(c => c.innerHTML = '');
+
+            const savedState = JSON.parse(localStorage.getItem(getUserKey('checks'))) || {};
+            const savedSwaps = JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {};
+            const savedAmounts = JSON.parse(localStorage.getItem(getUserKey('amounts'))) || {};
+
+            GENERATED_MEALS.forEach(item => {
+                const categoryList = FOOD_DB[item.category];
+                const baseFood = categoryList.find(f => f.id === item.baseFoodId);
+                
+                const activeFoodId = savedSwaps[item.id] || item.baseFoodId;
+                const activeFood = categoryList.find(f => f.id === activeFoodId) || baseFood;
+                
+                const defaultAmount = (activeFood.id === baseFood.id) 
+                    ? item.baseAmount 
+                    : calculateEquivalentAmount(baseFood, item.baseAmount, activeFood);
+
+                const activeAmount = savedAmounts[item.id] !== undefined ? savedAmounts[item.id] : defaultAmount;
+
+                const macros = getMacros(activeFood, activeAmount);
+                const isChecked = savedState[item.id] === true;
+                const isSwapped = activeFood.id !== baseFood.id;
+                const isCustomQty = savedAmounts[item.id] !== undefined;
+
+                const row = document.createElement('div');
+                row.className = 'meal-row';
+                row.innerHTML = `
+                    <label class="meal-item">
+                        <input type="checkbox" class="meal-checkbox" data-id="${item.id}" data-cal="${macros.cal}" data-p="${macros.p}" data-c="${macros.c}" data-f="${macros.f}" ${isChecked ? 'checked' : ''}>
+                        <div>
+                            <span class="meal-text">${formatFoodLabel(activeFood, activeAmount)} ${isSwapped ? '<span style="font-size:0.72rem; color:#2563eb;">(بديل)</span>' : ''} ${isCustomQty ? '<span style="font-size:0.72rem; color:#10b981;">(معدل)</span>' : ''}</span>
+                            <span class="meal-macros-tag">🔥 ${macros.cal} سعرة | 💪 ${macros.p}ج | 🍚 ${macros.c}ج | 🥑 ${macros.f}ج دهون</span>
+                        </div>
+                    </label>
+                    <div style="display:flex; gap:5px; flex-shrink:0;">
+                        <button type="button" class="swap-btn" style="background:rgba(16, 185, 129, 0.12); color:#10b981; border-color:rgba(16, 185, 129, 0.3);" onclick="openQtyModal('${item.id}')">✏️ كمية</button>
+                        <button type="button" class="swap-btn" onclick="openSwapModal('${item.id}')">🔄 بديل</button>
+                    </div>
+                `;
+
+                containers[item.meal].appendChild(row);
+            });
+
+            renderExtraMeals(savedState);
+
+            document.querySelectorAll('.meal-checkbox').forEach(cb => {
+                cb.onchange = calcPercentage;
+            });
+
+            calcPercentage();
+        }
+
+        function renderExtraMeals(savedState) {
+            const extraContainer = document.getElementById('meal-extra');
+            const extras = JSON.parse(localStorage.getItem(getUserKey('extra'))) || [];
+            if (extras.length === 0) {
+                extraContainer.innerHTML = '<p style="text-align:center; font-size:0.82rem; opacity:0.6; font-weight:700;">لا توجد إضافات خارجية اليوم</p>';
+                return;
+            }
+            extraContainer.innerHTML = '';
+            extras.forEach(ext => {
+                const isChecked = savedState[ext.id] !== false;
+                const fatVal = ext.f || 0;
+                const row = document.createElement('div');
+                row.className = 'meal-row';
+                row.innerHTML = `
+                    <label class="meal-item">
+                        <input type="checkbox" class="meal-checkbox" data-id="${ext.id}" data-cal="${ext.cal}" data-p="${ext.p}" data-c="${ext.c}" data-f="${fatVal}" ${isChecked ? 'checked' : ''}>
+                        <div>
+                            <span class="meal-text">${ext.name}</span>
+                            <span class="meal-macros-tag">🔥 ${ext.cal} سعرة | 💪 ${ext.p}ج | 🍚 ${ext.c}ج | 🥑 ${fatVal}ج دهون</span>
+                        </div>
+                    </label>
+                    <button type="button" class="delete-extra-btn" onclick="deleteExtraFood('${ext.id}')">حذف</button>
+                `;
+                extraContainer.appendChild(row);
+            });
+        }
+
+        window.deleteExtraFood = function(id) {
+            let extras = JSON.parse(localStorage.getItem(getUserKey('extra'))) || [];
+            extras = extras.filter(e => e.id !== id);
+            localStorage.setItem(getUserKey('extra'), JSON.stringify(extras));
+            renderMeals();
+        };
+
+        function selectAlternative(mealItemId, selectedFoodId, baseFoodId) {
+            const savedSwaps = JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {};
+            const savedAmounts = JSON.parse(localStorage.getItem(getUserKey('amounts'))) || {};
+            if (selectedFoodId === baseFoodId) {
+                delete savedSwaps[mealItemId];
+            } else {
+                savedSwaps[mealItemId] = selectedFoodId;
+            }
+            // مسح الكمية المخصصة القديمة ليتم حساب الكمية المكافئة للبديل الجديد تلقائياً
+            delete savedAmounts[mealItemId];
+            localStorage.setItem(getUserKey('swaps'), JSON.stringify(savedSwaps));
+            localStorage.setItem(getUserKey('amounts'), JSON.stringify(savedAmounts));
+            altModal.classList.remove('active');
+            renderMeals();
+            showToast('🔄 تم تبديل الأكلة وحساب الكمية تلقائياً!');
+        }
+
+        // نافذة تعديل الكمية يدوياً لكل أكلة
+        window.openQtyModal = function(mealItemId) {
+            const item = GENERATED_MEALS.find(m => m.id === mealItemId);
+            if (!item) return;
+            const categoryList = FOOD_DB[item.category];
+            const baseFood = categoryList.find(f => f.id === item.baseFoodId);
+            const savedSwaps = JSON.parse(localStorage.getItem(getUserKey('swaps'))) || {};
+            const savedAmounts = JSON.parse(localStorage.getItem(getUserKey('amounts'))) || {};
+
+            const activeFoodId = savedSwaps[item.id] || item.baseFoodId;
+            const activeFood = categoryList.find(f => f.id === activeFoodId) || baseFood;
+            const defaultAmount = (activeFood.id === baseFood.id)
+                ? item.baseAmount
+                : calculateEquivalentAmount(baseFood, item.baseAmount, activeFood);
+            const currentAmount = savedAmounts[item.id] !== undefined ? savedAmounts[item.id] : defaultAmount;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.innerHTML = `
+                <div class="modal-box" style="gap:14px;">
+                    <div class="modal-header" style="margin-bottom:0;">
+                        <div>
+                            <div class="modal-title">تعديل الكمية ✏️</div>
+                            <div style="font-size:0.82rem; opacity:0.8; font-weight:700; margin-top:2px;">${activeFood.name} (بالـ ${activeFood.unit})</div>
+                        </div>
+                        <button type="button" class="close-modal" id="closeQtyModalBtn">✕</button>
+                    </div>
+                    <div>
+                        <input type="number" id="customQtyInput" class="setup-input" style="background:rgba(37,99,235,0.08); color:inherit; border:2px solid #2563eb;" value="${currentAmount}" min="1" step="1">
+                        <div id="qtyLivePreview" style="text-align:center; font-size:0.8rem; font-weight:800; color:#2563eb; margin-top:8px;"></div>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" id="saveCustomQtyBtn" class="btn-primary" style="margin-top:0; padding:12px;">تأكيد الكمية ✓</button>
+                        <button type="button" id="resetCustomQtyBtn" class="btn-secondary" style="margin-top:0; padding:12px; width:auto; white-space:nowrap;">الأساسي (${defaultAmount})</button>
+                    </div>
+                </div>
+            `;
+            body.appendChild(modal);
+
+            const qtyInput = document.getElementById('customQtyInput');
+            const previewEl = document.getElementById('qtyLivePreview');
+
+            function updateQtyPreview() {
+                const val = parseFloat(qtyInput.value) || 0;
+                const m = getMacros(activeFood, val);
+                previewEl.innerText = `🔥 ${m.cal} سعرة | 💪 ${m.p}ج بروتين | 🍚 ${m.c}ج كارب | 🥑 ${m.f}ج دهون`;
+            }
+            updateQtyPreview();
+            qtyInput.addEventListener('input', updateQtyPreview);
+            qtyInput.focus();
+            qtyInput.select();
+
+            document.getElementById('saveCustomQtyBtn').onclick = () => {
+                const newVal = parseFloat(qtyInput.value);
+                if (!newVal || newVal <= 0) {
+                    showToast('⚠️ أدخل كمية صحيحة أكبر من صفر');
+                    return;
+                }
+                const updatedAmounts = JSON.parse(localStorage.getItem(getUserKey('amounts'))) || {};
+                updatedAmounts[mealItemId] = newVal;
+                localStorage.setItem(getUserKey('amounts'), JSON.stringify(updatedAmounts));
+                modal.remove();
+                renderMeals();
+                showToast(`✏️ تم تعديل الكمية إلى ${newVal} ${activeFood.unit}`);
+            };
+
+            document.getElementById('resetCustomQtyBtn').onclick = () => {
+                const updatedAmounts = JSON.parse(localStorage.getItem(getUserKey('amounts'))) || {};
+                delete updatedAmounts[mealItemId];
+                localStorage.setItem(getUserKey('amounts'), JSON.stringify(updatedAmounts));
+                modal.remove();
+                renderMeals();
+                showToast('↩️ تم إرجاع الكمية الأساسية');
+            };
+
+            document.getElementById('closeQtyModalBtn').onclick = () => modal.remove();
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        };
+
+        altModal.onclick = (e) => {
+            if (e.target === altModal) altModal.classList.remove('active');
+        };
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'alert-toast';
+            toast.innerText = msg;
+            body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        function calcPercentage() {
+            const checkboxes = document.querySelectorAll('.meal-checkbox');
+            const total = checkboxes.length;
+            const checkedBoxes = document.querySelectorAll('.meal-checkbox:checked');
+            const checked = checkedBoxes.length;
+            const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+            
+            let consumedCal = 0, consumedP = 0, consumedC = 0, consumedF = 0;
+            let plannedCal = 0, plannedP = 0, plannedC = 0, plannedF = 0;
+
+            checkboxes.forEach(cb => {
+                const c = Number(cb.dataset.cal || 0);
+                const p = Number(cb.dataset.p || 0);
+                const carb = Number(cb.dataset.c || 0);
+                const fat = Number(cb.dataset.f || 0);
+
+                plannedCal += c;
+                plannedP += p;
+                plannedC += carb;
+                plannedF += fat;
+
+                if (cb.checked) {
+                    consumedCal += c;
+                    consumedP += p;
+                    consumedC += carb;
+                    consumedF += fat;
+                }
+            });
+
+            // تحديث إجمالي السعرات في الهيدر وفي العداد ليعكس أي تعديل في الكميات أو الإضافات فوراً
+            targetCaloriesHeader.innerText = plannedCal;
+            progressBar.style.width = pct + '%';
+            progressText.innerText = pct + '%';
+            liveCaloriesEl.innerText = `${consumedCal} / ${plannedCal}`;
+            liveProteinEl.innerText = `${consumedP} / ${plannedP} جم`;
+            liveCarbsEl.innerText = `${consumedC} / ${plannedC} جم`;
+            liveFatsEl.innerText = `${consumedF} / ${plannedF} جم`;
+            return pct;
+        }
+
+        // Water Tracker Logic
+        function updateWaterUI() {
+            const liters = parseFloat(localStorage.getItem(getUserKey('water'))) || 0;
+            waterCountEl.innerText = liters.toFixed(2);
+        }
+
+        document.getElementById('addWaterBtn').onclick = () => {
+            let liters = parseFloat(localStorage.getItem(getUserKey('water'))) || 0;
+            liters += 0.25;
+            localStorage.setItem(getUserKey('water'), liters.toString());
+            updateWaterUI();
+            showToast('💧 عاش يا بطل! +250 مل مياه');
+        };
+
+        document.getElementById('resetWaterBtn').onclick = () => {
+            localStorage.setItem(getUserKey('water'), '0');
+            updateWaterUI();
+        };
+
+        // Extra Food Modal Logic
+        const extraModal = document.getElementById('extraModal');
+        const extraFoodSelect = document.getElementById('extraFoodSelect');
+        const dbExtraSection = document.getElementById('dbExtraSection');
+        const customExtraSection = document.getElementById('customExtraSection');
+        const extraDbQty = document.getElementById('extraDbQty');
+        const extraDbUnit = document.getElementById('extraDbUnit');
+        const extraDbPreview = document.getElementById('extraDbPreview');
+
+        // تجميع كل الأكلات العادية في القائمة المنسدلة
+        const ALL_FOODS_FLAT = [];
+        const categoryNamesAr = {
+            protein: 'بروتين',
+            carbs: 'كاربوهيدرات',
+            fruits: 'فواكه',
+            dairy: 'ألبان',
+            fats: 'دهون صحية'
+        };
+        Object.keys(FOOD_DB).forEach(cat => {
+            const optGroup = document.createElement('optgroup');
+            optGroup.label = categoryNamesAr[cat] || cat;
+            FOOD_DB[cat].forEach(food => {
+                ALL_FOODS_FLAT.push(food);
+                const opt = document.createElement('option');
+                opt.value = food.id;
+                opt.textContent = `${food.name} (${food.unit})`;
+                optGroup.appendChild(opt);
+            });
+            extraFoodSelect.appendChild(optGroup);
+        });
+
+        // جعل الاختيار الافتراضي أول أكلة من القائمة لسهولة الاختيار السريع
+        if (ALL_FOODS_FLAT.length > 0) {
+            extraFoodSelect.value = ALL_FOODS_FLAT[0].id;
+        }
+
+        function updateExtraDbPreview() {
+            const selectedId = extraFoodSelect.value;
+            if (selectedId === 'custom') {
+                dbExtraSection.style.display = 'none';
+                customExtraSection.style.display = 'flex';
+                return;
+            }
+            dbExtraSection.style.display = 'flex';
+            customExtraSection.style.display = 'none';
+
+            const food = ALL_FOODS_FLAT.find(f => f.id === selectedId);
+            if (!food) return;
+
+            extraDbUnit.innerText = food.unit;
+            const qty = parseFloat(extraDbQty.value) || 0;
+            const m = getMacros(food, qty);
+            extraDbPreview.innerText = `🔥 ${m.cal} سعرة | 💪 ${m.p}ج بروتين | 🍚 ${m.c}ج كارب | 🥑 ${m.f}ج دهون`;
+        }
+
+        extraFoodSelect.addEventListener('change', () => {
+            const food = ALL_FOODS_FLAT.find(f => f.id === extraFoodSelect.value);
+            if (food) {
+                extraDbQty.value = food.isUnit ? 1 : 100;
+            }
+            updateExtraDbPreview();
+        });
+        extraDbQty.addEventListener('input', updateExtraDbPreview);
+
+        document.getElementById('openExtraModalBtn').onclick = () => {
+            updateExtraDbPreview();
+            extraModal.classList.add('active');
+        };
+        document.getElementById('closeExtraModalBtn').onclick = () => {
+            extraModal.classList.remove('active');
+        };
+        extraModal.onclick = (e) => {
+            if (e.target === extraModal) extraModal.classList.remove('active');
+        };
+
+        document.getElementById('confirmAddExtraBtn').onclick = () => {
+            const selectedId = extraFoodSelect.value;
+            let name = '', cal = 0, p = 0, c = 0, f = 0;
+
+            if (selectedId !== 'custom') {
+                const food = ALL_FOODS_FLAT.find(item => item.id === selectedId);
+                const qty = parseFloat(extraDbQty.value) || 0;
+                if (!food || qty <= 0) {
+                    showToast('⚠️ أدخل كمية صحيحة أكبر من صفر');
+                    return;
+                }
+                const m = getMacros(food, qty);
+                name = formatFoodLabel(food, qty);
+                cal = m.cal;
+                p = m.p;
+                c = m.c;
+                f = m.f;
+            } else {
+                name = document.getElementById('extraName').value.trim();
+                cal = parseInt(document.getElementById('extraCal').value) || 0;
+                p = parseInt(document.getElementById('extraProt').value) || 0;
+                c = parseInt(document.getElementById('extraCarb').value) || 0;
+                f = parseInt(document.getElementById('extraFat').value) || 0;
+
+                if (!name || cal <= 0) {
+                    showToast('⚠️ اكتب اسم الأكلة والسعرات الأول');
+                    return;
+                }
+            }
+
+            const extras = JSON.parse(localStorage.getItem(getUserKey('extra'))) || [];
+            const newId = 'ext_' + Date.now();
+            extras.push({ id: newId, name, cal, p, c, f });
+            localStorage.setItem(getUserKey('extra'), JSON.stringify(extras));
+
+            const savedState = JSON.parse(localStorage.getItem(getUserKey('checks'))) || {};
+            savedState[newId] = true;
+            localStorage.setItem(getUserKey('checks'), JSON.stringify(savedState));
+
+            document.getElementById('extraName').value = '';
+            document.getElementById('extraCal').value = '';
+            document.getElementById('extraProt').value = '';
+            document.getElementById('extraCarb').value = '';
+            document.getElementById('extraFat').value = '';
+            extraModal.classList.remove('active');
+
+            renderMeals();
+            showToast('✅ تمت إضافة الأكلة وحساب سعراتها!');
+        };
+
+        function loadData() {
+            if (!currentUser) {
+                authScreen.classList.add('active');
+                return;
+            }
+            authScreen.classList.remove('active');
+            document.getElementById('userHeaderTag').innerText = `👤 ${currentUser.name} | ID: ${currentUser.id}`;
+
+            if (localStorage.getItem(getUserKey('theme')) === 'dark') {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+
+            userProfile = JSON.parse(localStorage.getItem(getUserKey('profile'))) || null;
+            if (!userProfile) {
+                updateSetupPreview();
+                setupScreen.classList.add('active');
+                return;
+            }
+            buildMealsFromProfile(userProfile);
+            renderMeals();
+            updateWaterUI();
+            const w = localStorage.getItem(getUserKey('weight')) || userProfile.weight;
+            if (w) weightInput.value = w;
+            renderHistory();
+        }
+
+        document.getElementById('saveBtn').onclick = () => {
+            const checkboxes = document.querySelectorAll('.meal-checkbox');
+            const state = {};
+            checkboxes.forEach(cb => {
+                state[cb.dataset.id] = cb.checked;
+            });
+            localStorage.setItem(getUserKey('checks'), JSON.stringify(state));
+            localStorage.setItem(getUserKey('weight'), weightInput.value);
+
+            const pct = calcPercentage();
+            const w = weightInput.value || '--';
+
+            const history = JSON.parse(localStorage.getItem(getUserKey('hist'))) || {};
+            history[currentDateStr] = { pct, w };
+            localStorage.setItem(getUserKey('hist'), JSON.stringify(history));
+            renderHistory();
+
+            showToast('✅ تم حفظ البيانات والبدائل بنجاح!');
+        };
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem(getUserKey('hist'))) || {};
+            const dates = Object.keys(history).sort((a, b) => new Date(b) - new Date(a));
+            if (dates.length === 0) {
+                historyContainer.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:12px;">لا يوجد سجل سابق.</p>';
+                return;
+            }
+            let html = '';
+            dates.forEach(d => {
+                const item = history[d];
+                const dStr = new Date(d).toLocaleDateString('ar-EG', { weekday: 'long', month: 'short', day: 'numeric' });
+                html += `
+                <div class="history-row">
+                    <span style="font-weight:700;">${dStr}</span>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <span style="font-size:0.8rem; opacity:0.8;">وزن: <b>${item.w}</b></span>
+                        <span style="font-weight:800; color:${item.pct === 100 ? '#2563eb' : '#eab308'};">${item.pct}%</span>
+                    </div>
+                </div>`;
+            });
+            historyContainer.innerHTML = html;
+        }
+
+        document.getElementById('resetBtn').onclick = () => {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.innerHTML = `
+                <div class="modal-box" style="text-align:center; gap:14px;">
+                    <div style="font-weight:900; font-size:1.15rem;">تصفير اليوم؟</div>
+                    <div style="font-size:0.9rem; opacity:0.85; font-weight:700;">متأكد إنك عايز تصفر وجبات اليوم وترجعها للأساسي؟</div>
+                    <div style="display:flex; gap:10px; margin-top:8px;">
+                        <button id="confirmResetYes" style="flex:1; background:#dc2626; color:white; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer;">نعم، تصفير</button>
+                        <button id="confirmResetNo" style="flex:1; background:#e2e8f0; color:#1e293b; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer;">إلغاء</button>
+                    </div>
+                </div>
+            `;
+            body.appendChild(modal);
+            document.getElementById('confirmResetYes').onclick = () => {
+                localStorage.removeItem(getUserKey('checks'));
+                localStorage.removeItem(getUserKey('swaps'));
+                localStorage.removeItem(getUserKey('amounts'));
+                localStorage.removeItem(getUserKey('extra'));
+                localStorage.setItem(getUserKey('water'), '0');
+                loadData();
+                modal.remove();
+            };
+            document.getElementById('confirmResetNo').onclick = () => modal.remove();
+        };
+
+        loadData();
+    </script>
+</body>
+</html>
