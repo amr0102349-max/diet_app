@@ -742,13 +742,14 @@
                     <input type="text" id="regId" class="auth-input" placeholder="مثال: ahmed_99" required>
                 </div>
                 <div class="auth-field">
-                    <label>كلمة السر:</label>
+                    <label>كلمة السر لحسابك:</label>
                     <input type="password" id="regPassword" class="auth-input" placeholder="اختر كلمة سر قوية" required>
                 </div>
-                <div style="font-size:0.75rem; color:#fbbf24; margin-bottom:10px; font-weight:700;">
-                    🔒 الحسابات الجديدة تحتاج موافقة الأدمن (عمرو) للتفعيل.
+                <div class="auth-field">
+                    <label style="color:#fbbf24;">🔑 كود الدعوة السري (اطلبه من عمرو):</label>
+                    <input type="text" id="regInviteCode" class="auth-input" placeholder="اكتب كود الدعوة السري هنا" style="border-color:rgba(251,191,36,0.5);" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-top:8px;">إنشاء الحساب وحفظه ✨</button>
+                <button type="submit" class="btn btn-primary" style="margin-top:8px;">إنشاء الحساب والدخول فوراً ✨</button>
             </form>
 
             <!-- نموذج استيراد الحساب من جهاز آخر -->
@@ -790,7 +791,7 @@
                     <button class="theme-btn" id="openPlanSettingsBtn" title="تخصيص سعراتك">⚙️ الخطة</button>
                     <button class="theme-btn" id="openSyncModalBtn" style="background:rgba(16,185,129,0.28); border-color:rgba(52,211,153,0.5);" title="نقل البيانات بين الموبايل واللاب">☁️ مزامنة</button>
                     <button class="theme-btn" id="openFriendsModalBtn" style="background:rgba(245,158,11,0.28); border-color:rgba(251,191,36,0.5);" title="الأصدقاء والمتابعة والتحدي">👥 الأصدقاء</button>
-                    <button class="theme-btn" id="openAdminModalBtn" style="display:none; background:rgba(168,85,247,0.3); border-color:rgba(192,132,252,0.6);" title="إدارة طلبات الدخول">👑 الأدمن <span id="pendingBadge" style="background:#ef4444; color:white; padding:1px 6px; border-radius:50px; font-size:0.7rem; margin-right:3px; display:none;">0</span></button>
+                    <button class="theme-btn" id="openAdminModalBtn" style="display:none; background:rgba(168,85,247,0.3); border-color:rgba(192,132,252,0.6);" title="كود الدعوة السري">🔑 كود الدعوة</button>
                     <button class="theme-btn" id="installAppBtn" style="background:rgba(37,99,235,0.35); border-color:rgba(96,165,250,0.6);" title="تثبيت البرنامج واللوجو">📲 اللوجو والتثبيت</button>
                     <button class="theme-btn" id="themeToggle" title="تغيير المظهر">🌓</button>
                     <div class="date-badge" id="currentDate">اليوم</div>
@@ -965,24 +966,34 @@
             </div>
 
             <div class="auth-field" style="margin-bottom:0;">
-                <input type="text" id="friendSearchInput" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:10px 12px; font-size:0.88rem;" placeholder="🔍 ابحث عن صديق بالاسم أو الـ ID...">
+                <input type="text" id="friendSearchInput" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:10px 12px;" placeholder="🔍 ابحث عن صديق بالاسم أو الـ ID...">
             </div>
 
-            <div id="friendsListContainer" class="alt-list" style="max-height:300px;"></div>
+            <div class="alt-list" id="friendsListContainer" style="max-height: 290px;"></div>
         </div>
     </div>
 
-    <!-- Modal for Admin Panel -->
+    <!-- Modal for Secret Invite Code (Owner Only) -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-box" style="gap: 12px;">
             <div class="modal-header" style="margin-bottom: 0;">
-                <div class="modal-title">👑 لوحة تحكم الأدمن (التصاريح)</div>
+                <div class="modal-title">🔑 كود الدعوة السري للتطبيق</div>
                 <button class="close-modal" id="closeAdminModalBtn">✕</button>
             </div>
-            <div style="font-size:0.8rem; opacity:0.85; font-weight:700;">
-                تحكم في من يُسمح له بفتح التطبيق واستخدامه (مزامنة سحابية فورية ☁️):
+            <div style="font-size:0.82rem; opacity:0.85; font-weight:700; line-height:1.5;">
+                أي شخص يفتح الرابط لن يتمكن من إنشاء حساب إلا إذا كتب هذا الكود السري:
             </div>
-            <div id="adminUsersList" class="alt-list" style="max-height:320px;"></div>
+            <div style="background:var(--bg-card-header); border:1px solid var(--border-color); border-radius:14px; padding:12px; text-align:center;">
+                <div style="font-size:0.78rem; color:var(--text-muted); font-weight:700; margin-bottom:4px;">الكود السري الحالي:</div>
+                <div id="currentInviteCodeText" style="font-size:1.35rem; font-weight:900; color:#10b981; letter-spacing:1px;">3iid2026</div>
+            </div>
+            <div class="auth-field" style="margin-bottom:0;">
+                <label style="color:var(--text-main);">تغيير الكود السري إلى كود جديد:</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="newInviteCodeInput" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:10px;" placeholder="اكتب الكود الجديد...">
+                    <button type="button" id="saveInviteCodeBtn" class="alt-badge" style="border:none; cursor:pointer; padding:0 16px;">حفظ</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1100,17 +1111,17 @@
 
     <script>
         // ==========================================
-        // 1. إدارة الحسابات والأدمن والأصدقاء والمزامنة
+        // 1. إدارة الحسابات وكود الدعوة السري والأصدقاء والمزامنة
         // ==========================================
         const USERS_DB_KEY = 'amrDiet_users_db_v1';
         const ACTIVE_USER_KEY = 'amrDiet_active_user_v1';
+        const INVITE_CODE_KEY = 'amrDiet_secret_invite_code_v1';
         const ADMIN_ID = '3iid@001';
         let currentUser = JSON.parse(localStorage.getItem(ACTIVE_USER_KEY)) || null;
         window.CLOUD_LIVE_STATS = {};
 
-        function getUserKey(suffix) {
-            const uid = currentUser ? currentUser.id.toLowerCase() : 'guest';
-            return `amrDiet_${uid}_${suffix}`;
+        function getSecretInviteCode() {
+            return localStorage.getItem(INVITE_CODE_KEY) || '3iid2026';
         }
 
         function getUserKeyByUid(uid, suffix) {
@@ -1215,20 +1226,26 @@
             const name = document.getElementById('regName').value.trim();
             const id = document.getElementById('regId').value.trim();
             const password = document.getElementById('regPassword').value;
+            const inviteCode = document.getElementById('regInviteCode').value.trim();
             if (!name || !id || !password) return;
+
+            const isOwner = id.toLowerCase() === ADMIN_ID.toLowerCase();
+            if (!isOwner && inviteCode !== getSecretInviteCode()) {
+                showToast('❌ كود الدعوة السري غير صحيح! اطلب الكود من عمرو.');
+                return;
+            }
 
             const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
             if (users.some(u => u.id.toLowerCase() === id.toLowerCase())) {
                 showToast('⚠️ هذا الـ ID مسجل بالفعل! اختر ID آخر أو سجل دخول.');
                 return;
             }
-            const isAdmin = id.toLowerCase() === ADMIN_ID.toLowerCase();
             const newUser = {
                 name,
                 id,
                 password,
-                approved: isAdmin,
-                role: isAdmin ? 'admin' : 'user',
+                approved: true,
+                role: isOwner ? 'admin' : 'user',
                 following: [],
                 followers: []
             };
@@ -1238,12 +1255,8 @@
             currentUser = { name, id };
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
             authScreen.classList.remove('active');
-            if (!newUser.approved) {
-                showPendingScreen(newUser);
-            } else {
-                showToast(`🎉 أهلاً بيك يا ${name}!`);
-                loadData();
-            }
+            showToast(`🎉 أهلاً بيك يا ${name}! تم تفعيل حسابك فوراً`);
+            loadData();
         };
 
         loginForm.onsubmit = (e) => {
@@ -1270,41 +1283,11 @@
             currentUser = { name: matchedUser.name, id: matchedUser.id };
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
             authScreen.classList.remove('active');
-
-            if (!matchedUser.approved && !isUserAdmin(matchedUser)) {
-                showPendingScreen(matchedUser);
-            } else {
-                showToast(`👋 مرحباً بعودتك يا ${matchedUser.name}!`);
-                loadData();
-            }
+            showToast(`👋 مرحباً بعودتك يا ${matchedUser.name}!`);
+            loadData();
         };
 
-        function showPendingScreen(userObj) {
-            document.getElementById('pendingUserInfo').innerHTML = `أهلاً يا <b>${userObj.name}</b> (ID: <span style="color:#60a5fa">${userObj.id}</span>)<br>حسابك مسجل حالياً وفي انتظار موافقة <b>الأدمن (عمرو)</b> لتفعيل الدخول.`;
-            pendingScreen.classList.add('active');
-        }
-
-        document.getElementById('checkApprovalBtn').onclick = () => {
-            if (!currentUser) return;
-            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
-            const u = users.find(x => x.id.toLowerCase() === currentUser.id.toLowerCase());
-            if (u && (u.approved || isUserAdmin(u))) {
-                pendingScreen.classList.remove('active');
-                showToast('🎉 مبروك! تم تفعيل حسابك من الأدمن.');
-                loadData();
-            } else {
-                showToast('⏳ لم يتم التفعيل بعد، تواصل مع الأدمن للموافقة.');
-            }
-        };
-
-        document.getElementById('pendingLogoutBtn').onclick = () => {
-            localStorage.removeItem(ACTIVE_USER_KEY);
-            currentUser = null;
-            pendingScreen.classList.remove('active');
-            authScreen.classList.add('active');
-        };
-
-        // لوحة تحكم الأدمن
+        // إدارة كود الدعوة السري (يظهر لحسابك فقط)
         const adminModal = document.getElementById('adminModal');
         const openAdminModalBtn = document.getElementById('openAdminModalBtn');
         const closeAdminModalBtn = document.getElementById('closeAdminModalBtn');
@@ -1314,66 +1297,30 @@
             const me = currentUser ? users.find(u => u.id.toLowerCase() === currentUser.id.toLowerCase()) : null;
             if (isUserAdmin(me) || (currentUser && currentUser.id.toLowerCase() === ADMIN_ID.toLowerCase())) {
                 openAdminModalBtn.style.display = 'inline-flex';
-                const pendingCount = users.filter(u => !u.approved && !isUserAdmin(u)).length;
-                const badge = document.getElementById('pendingBadge');
-                if (pendingCount > 0) {
-                    badge.innerText = pendingCount;
-                    badge.style.display = 'inline-block';
-                } else {
-                    badge.style.display = 'none';
-                }
             } else {
                 openAdminModalBtn.style.display = 'none';
             }
         }
 
-        function renderAdminUsersList() {
-            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
-            const container = document.getElementById('adminUsersList');
-            const otherUsers = users.filter(u => !isUserAdmin(u));
-
-            if (otherUsers.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:700;">لا يوجد مستخدمون آخرون مسجلون حتى الآن.</div>';
-                return;
-            }
-
-            container.innerHTML = otherUsers.map(u => `
-                <div class="alt-item" style="cursor:default;">
-                    <div>
-                        <div class="alt-name">${u.name} <span style="font-size:0.75rem; color:var(--text-muted);">(${u.id})</span></div>
-                        <div class="alt-desc" style="color:${u.approved ? '#10b981' : '#f59e0b'};">
-                            ${u.approved ? '✅ مسموح له بالدخول' : '⏳ في انتظار موافقتك'}
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        ${!u.approved
-                            ? `<button type="button" onclick="toggleUserApproval('${u.id}', true)" class="alt-badge" style="background:#10b981; border:none; cursor:pointer;">قبول ✅</button>`
-                            : `<button type="button" onclick="toggleUserApproval('${u.id}', false)" class="alt-badge" style="background:#ef4444; border:none; cursor:pointer;">إيقاف 🚫</button>`
-                        }
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.toggleUserApproval = function(targetId, status) {
-            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
-            const idx = users.findIndex(u => u.id.toLowerCase() === targetId.toLowerCase());
-            if (idx >= 0) {
-                users[idx].approved = status;
-                localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-                if (window.pushUserToCloud) window.pushUserToCloud(users[idx]);
-                renderAdminUsersList();
-                updateAdminBadge();
-                showToast(status ? '✅ تم السماح للمستخدم بالدخول!' : '🚫 تم إيقاف صلاحية الدخول');
-            }
-        };
-
         openAdminModalBtn.onclick = () => {
-            renderAdminUsersList();
+            document.getElementById('currentInviteCodeText').innerText = getSecretInviteCode();
+            document.getElementById('newInviteCodeInput').value = '';
             adminModal.classList.add('active');
         };
         closeAdminModalBtn.onclick = () => adminModal.classList.remove('active');
         adminModal.onclick = (e) => { if (e.target === adminModal) adminModal.classList.remove('active'); };
+
+        document.getElementById('saveInviteCodeBtn').onclick = () => {
+            const newCode = document.getElementById('newInviteCodeInput').value.trim();
+            if (!newCode || newCode.length < 3) {
+                showToast('⚠️ اكتب كود دعوة من 3 حروف أو أرقام على الأقل');
+                return;
+            }
+            localStorage.setItem(INVITE_CODE_KEY, newCode);
+            document.getElementById('currentInviteCodeText').innerText = newCode;
+            document.getElementById('newInviteCodeInput').value = '';
+            showToast(`✅ تم تحديث كود الدعوة السري إلى: ${newCode}`);
+        };
 
         // نظام الأصدقاء والمتابعة والتتبع المباشر
         const friendsModal = document.getElementById('friendsModal');
@@ -2048,12 +1995,6 @@
         function loadData() {
             if (!currentUser) {
                 authScreen.classList.add('active');
-                return;
-            }
-            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
-            const matched = users.find(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
-            if (matched && !matched.approved && !isUserAdmin(matched)) {
-                showPendingScreen(matched);
                 return;
             }
 
