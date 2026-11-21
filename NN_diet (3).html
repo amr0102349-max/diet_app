@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>تطبيق الدايت - عمرو</title>
+    
+    <link rel="icon" type="image/png" id="dynamicFavicon">
+    <link rel="apple-touch-icon" id="dynamicAppleIcon">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#172554">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-card-header: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-checked: #94a3b8;
+            --meal-title: #1e293b;
+            --accent-blue: #2563eb;
+            --accent-blue-hover: #1d4ed8;
+            --checkbox-bg: #ffffff;
+            --checkbox-border: #cbd5e1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --modal-overlay: rgba(15, 23, 42, 0.65);
+        }
+
+        body.dark-mode {
+            --bg-body: #000000;
+            --bg-card: #0d1117;
+            --bg-card-header: #161b22;
+            --border-color: #21262d;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --text-checked: #475569;
+            --meal-title: #60a5fa;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --checkbox-bg: #161b22;
+            --checkbox-border: #30363d;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --modal-overlay: rgba(0, 0, 0, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-bottom: 50px;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* Auth Screen Styles */
+        .auth-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #020617 0%, #0f172a 45%, #1e3a8a 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .auth-screen.hidden {
+            display: none !important;
+        }
+        .auth-box {
+            background: rgba(13, 17, 23, 0.92);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-radius: 26px;
+            padding: 26px 22px;
+            width: 100%;
+            max-width: 400px;
+            color: #ffffff;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+        }
+        .auth-logo {
+            width: 68px;
+            height: 68px;
+            border-radius: 20px;
+            margin: 0 auto 12px;
+            display: block;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+        }
+        .auth-tabs {
+            display: flex;
+            background: #161b22;
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 18px;
+            border: 1px solid #21262d;
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 9px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: 800;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .auth-tab.active {
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+        .auth-field {
+            margin-bottom: 13px;
+            text-align: right;
+        }
+        .auth-field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #93c5fd;
+            margin-bottom: 5px;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            background: #161b22;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .auth-input:focus {
+            border-color: #3b82f6;
+        }
+        .auth-id-row {
+            display: flex;
+            gap: 8px;
+        }
+        .gen-id-btn {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #60a5fa;
+            border-radius: 12px;
+            padding: 0 12px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .auth-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #020617 0%, #172554 60%, #090d16 100%);
+            color: #ffffff;
+            padding: 24px 20px;
+            border-bottom-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title {
+            font-size: 1.45rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .user-badge {
+            font-size: 0.72rem;
+            color: #93c5fd;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.92);
+        }
+
+        .install-pill {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: 1px solid rgba(147, 197, 253, 0.4);
+            color: #ffffff;
+            padding: 6px 11px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+        }
+
+        .logout-pill {
+            background: rgba(239, 68, 68, 0.18);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .date-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px 11px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #dbeafe;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #93c5fd;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+
+        .stat-sub {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #bfdbfe;
+        }
+
+        .weight-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px dashed rgba(147, 197, 253, 0.5);
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 900;
+            text-align: center;
+            outline: none;
+        }
+
+        .weight-input::placeholder {
+            color: rgba(147, 197, 253, 0.5);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
+            overflow: hidden;
+            transition: background-color 0.25s, border-color 0.25s;
+        }
+
+        .card-padded {
+            padding: 18px;
+        }
+
+        .card-header {
+            background-color: var(--bg-card-header);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meal-title {
+            color: var(--meal-title);
+            font-size: 1.15rem;
+            font-weight: 900;
+        }
+
+        body.dark-mode .meal-title {
+            text-shadow: 0 0 12px rgba(96, 165, 250, 0.35);
+        }
+
+        /* Progress & Macros */
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .progress-pct {
+            color: var(--accent-blue);
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 12px;
+            background-color: var(--border-color);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            border-radius: 999px;
+            transition: width 0.35s ease;
+        }
+
+        .macros-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .macro-pill {
+            background-color: var(--bg-card-header);
+            border: 1px solid var(--border-color);
+            padding: 7px 10px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .macro-pill span:last-child {
+            color: var(--accent-blue);
+            font-weight: 900;
+        }
+
+        /* Water Tracker */
+        .water-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .water-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card-header);
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .water-btn.add {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+        }
+
+        .water-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Meal Items & Alternatives */
+        .meal-body {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .food-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .food-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+            flex: 1;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            background-color: var(--checkbox-bg);
+            border: 2px solid var(--checkbox-border);
+            border-radius: 7px;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .custom-checkbox::before {
+            content: "";
+            width: 13px;
+            height: 13px;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            transform: scale(0);
+            background-color: #ffffff;
+            transition: transform 0.12s ease-in-out;
+        }
+
+        .custom-checkbox:checked {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .custom-checkbox:checked::before {
+            transform: scale(1);
+        }
+
+        .food-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .food-label {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.35;
+            transition: color 0.15s;
+        }
+
+        .food-macros {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .custom-checkbox:checked + .food-info .food-label {
+            color: var(--text-checked);
+            text-decoration: line-through;
+            font-weight: 600;
+        }
+
+        .swap-btn {
+            background-color: var(--bg-card-header);
+            border: 1px solid var(--border-color);
+            color: var(--accent-blue);
+            padding: 6px 9px;
+            border-radius: 10px;
+            font-size: 0.73rem;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+
+        .swap-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            border: none;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.15s, background-color 0.2s;
+            margin-top: 12px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.45);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            padding: 13px;
+        }
+
+        /* History */
+        .history-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            margin-bottom: 14px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background-color: var(--bg-card-header);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .history-date {
+            font-weight: 800;
+        }
+
+        .history-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            padding: 3px 9px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            border: 1px solid currentColor;
+        }
+
+        .badge-high { color: #3b82f6; }
+        .badge-mid { color: #eab308; }
+        .badge-low { color: #ef4444; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: var(--modal-overlay);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 20px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--meal-title);
+        }
+
+        .close-modal {
+            background: var(--bg-card-header);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .alt-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .alt-option {
+            background-color: var(--bg-card-header);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        .alt-option:hover, .alt-option:active {
+            border-color: var(--accent-blue);
+            transform: scale(0.99);
+        }
+
+        .alt-option.selected {
+            border: 2px solid var(--accent-blue);
+            background-color: rgba(37, 99, 235, 0.08);
+        }
+
+        .alt-name {
+            font-weight: 800;
+            font-size: 0.92rem;
+            color: var(--text-main);
+        }
+
+        .alt-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 12px 22px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.5);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            text-align: center;
+            width: max-content;
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Friends & Admin Styles */
+        .friend-card {
+            background-color: var(--bg-card-header);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .friend-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .friend-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-align: center;
+        }
+        .friend-stat-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 5px;
+        }
+        .mini-btn {
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+        }
+        .mini-btn-blue { background: #2563eb; color: #fff; }
+        .mini-btn-green { background: #10b981; color: #fff; }
+        .mini-btn-red { background: rgba(239,68,68,0.18); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+        .mini-btn-gray { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+
+        .admin-pill {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: 1px solid rgba(253, 224, 71, 0.5);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+        }
+
+        /* Onboarding Setup Screen */
+        .onboarding-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e3a8a 100%);
+            z-index: 9500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .onboarding-screen.hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <!-- شاشة إعداد الخطة الذكية لأول مرة -->
+    <div id="onboardingScreen" class="onboarding-screen hidden">
+        <div class="auth-box" style="max-width: 420px;">
+            <div style="text-align:center; margin-bottom:14px;">
+                <div style="font-size: 2.3rem; margin-bottom:4px;">🧬</div>
+                <h2 style="font-size:1.25rem; font-weight:900;">تفصيل خطتك الغذائية</h2>
+                <p style="font-size:0.8rem; color:#93c5fd; font-weight:700;">جاوب على البيانات دي عشان نحسب سعراتك ونفصّل كميات وجباتك بالجرام تلقائياً!</p>
+            </div>
+
+            <form id="onboardingForm">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="auth-field">
+                        <label>⚖️ الوزن الحالي (كجم)</label>
+                        <input type="number" id="obWeight" class="auth-input" placeholder="75" step="0.1" min="30" max="250" required>
+                    </div>
+                    <div class="auth-field">
+                        <label>📏 الطول (سم)</label>
+                        <input type="number" id="obHeight" class="auth-input" placeholder="175" min="120" max="230" required>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="auth-field">
+                        <label>🎂 العمر (سنة)</label>
+                        <input type="number" id="obAge" class="auth-input" placeholder="22" min="14" max="90" required>
+                    </div>
+                    <div class="auth-field">
+                        <label>🏃‍♂️ التمرين أسبوعياً</label>
+                        <select id="obActivity" class="auth-input" style="padding:10px 8px; font-size:0.85rem;">
+                            <option value="1.375">خفيف (1-3 أيام)</option>
+                            <option value="1.55" selected>متوسط (3-5 أيام)</option>
+                            <option value="1.725">عالي (6-7 أيام)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="auth-field">
+                        <label>🎯 الهدف الأساسي</label>
+                        <select id="obGoal" class="auth-input" style="padding:10px 8px; font-size:0.85rem;">
+                            <option value="bulk" selected>🔥 تضخيم</option>
+                            <option value="cut">✂️ تنشيف</option>
+                            <option value="maintain">⚖️ ثبات</option>
+                        </select>
+                    </div>
+                    <div class="auth-field">
+                        <label>🥩 نسبة البروتين</label>
+                        <select id="obProteinRatio" class="auth-input" style="padding:10px 8px; font-size:0.85rem;">
+                            <option value="1.6">1.6 جم / كجم</option>
+                            <option value="1.8">1.8 جم / كجم</option>
+                            <option value="2.0" selected>2.0 جم / كجم (مثالي)</option>
+                            <option value="2.2">2.2 جم / كجم (عالي)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top:8px;">🚀 احسب سعراتي وابدأ الخطة</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- شاشة تسجيل الدخول وإنشاء الحساب -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-box">
+            <img id="authLogoImg" class="auth-logo" alt="Logo">
+            <h2 style="text-align:center; font-size:1.3rem; font-weight:900; margin-bottom:4px;">بوابة الأبطال 💪</h2>
+            <p style="text-align:center; font-size:0.8rem; color:#93c5fd; font-weight:700; margin-bottom:16px;">سجل برقم التعريف الخاص بك لحفظ خطتك ووجباتك</p>
+
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" id="tabLoginBtn">تسجيل الدخول</button>
+                <button type="button" class="auth-tab" id="tabRegisterBtn">حساب جديد</button>
+            </div>
+
+            <div id="authErrorBox" class="auth-error"></div>
+
+            <!-- نموذج تسجيل الدخول -->
+            <form id="loginForm">
+                <div class="auth-field">
+                    <label>رقم التعريف (ID)</label>
+                    <input type="text" id="loginIdInput" class="auth-input" placeholder="مثال: 3iid@001" required>
+                </div>
+                <div class="auth-field">
+                    <label>كلمة السر</label>
+                    <input type="password" id="loginPassInput" class="auth-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top:10px;">🚀 دخول إلى خطتي</button>
+            </form>
+
+            <!-- نموذج إنشاء حساب جديد -->
+            <form id="registerForm" style="display:none;">
+                <div class="auth-field">
+                    <label>الاسم (حروف وأرقام فقط)</label>
+                    <input type="text" id="regNameInput" class="auth-input" maxlength="25" placeholder="مثال: Amr" required>
+                </div>
+                <div class="auth-field">
+                    <label>رقم التعريف (ID) — حروف وأرقام فقط</label>
+                    <div class="auth-id-row">
+                        <input type="text" id="regIdInput" class="auth-input" maxlength="20" placeholder="amr001" required>
+                        <button type="button" id="generateIdBtn" class="gen-id-btn">🎲 توليد ID</button>
+                    </div>
+                </div>
+                <div class="auth-field">
+                    <label>كلمة السر (حروف وأرقام فقط)</label>
+                    <input type="password" id="regPassInput" class="auth-input" maxlength="25" placeholder="اختر كلمة سر قوية" required>
+                </div>
+                <div class="auth-field">
+                    <label>🔑 كود الدعوة السري (اطلبه من عمرو)</label>
+                    <input type="password" id="regSecretPasscodeInput" class="auth-input" maxlength="25" placeholder="اكتب كود الدعوة السري" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top:10px;">✨ إنشاء الحساب والبدء</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">تم الحفظ بنجاح!</div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="header-title-group">
+                    <div class="header-title">خطة الدايت 🚀</div>
+                    <div class="user-badge" id="userBadgeDisplay">👤 Amr | ID: 3iid@001</div>
+                </div>
+                <div class="header-controls">
+                    <button class="admin-pill" id="secretCodeAdminBtn" title="إدارة كود الدعوة السري" style="display:none;">🔑 كود الدعوة</button>
+                    <button class="install-pill" id="friendsNavBtn" style="background:linear-gradient(135deg,#f59e0b,#d97706); border-color:rgba(253,224,71,0.4);">👥 الأصدقاء</button>
+                    <button class="install-pill" id="syncNavBtn" style="background:linear-gradient(135deg,#10b981,#059669); border-color:rgba(167,243,208,0.4);">☁️ مزامنة</button>
+                    <button class="install-pill" id="customizePlanNavBtn" style="background:rgba(255,255,255,0.14); border-color:rgba(255,255,255,0.25);">⚙️ الخطة</button>
+                    <button class="install-pill" id="installNavBtn">📲 اللوجو والتثبيت</button>
+                    <button class="icon-btn" id="themeToggle" aria-label="تبديل المظهر">☀️</button>
+                    <div class="date-badge" id="currentDate">اليوم</div>
+                    <button class="logout-pill" id="logoutBtn" title="تسجيل الخروج">🚪 خروج</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label" id="goalLabelDisplay">الهدف اليومي</div>
+                    <div class="stat-value"><span id="targetCaloriesDisplay">3650</span> <span class="stat-sub">سعرة</span></div>
+                </div>
+                <div class="stat-box">
+                    <label class="stat-label" for="weightInput" style="display:block;">الوزن (كجم)</label>
+                    <input type="number" id="weightInput" class="weight-input" placeholder="00.0" step="0.1">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="container">
+        
+        <!-- Progress & Macros Card -->
+        <div class="card card-padded">
+            <div class="progress-header">
+                <span>إنجاز اليوم</span>
+                <span class="progress-pct" id="progressText">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="macros-summary">
+                <div class="macro-pill">
+                    <span>🔥 السعرات</span>
+                    <span id="calCounter">0 / 3650</span>
+                </div>
+                <div class="macro-pill">
+                    <span>💪 البروتين</span>
+                    <span id="proCounter">0 / 162 جم</span>
+                </div>
+                <div class="macro-pill">
+                    <span>🍚 الكارب</span>
+                    <span id="carbCounter">0 / 485 جم</span>
+                </div>
+                <div class="macro-pill">
+                    <span>🥑 الدهون</span>
+                    <span id="fatCounter">0 / 118 جم</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water Tracker Card -->
+        <div class="card card-padded">
+            <div class="progress-header" style="margin-bottom: 4px;">
+                <span>💧 متتبع شرب المياه اليومي</span>
+                <span class="progress-pct" id="waterText">0.00 لتر</span>
+            </div>
+            <div class="water-controls">
+                <button class="water-btn add" id="addWaterBtn">+ 250 مل</button>
+                <button class="water-btn" id="resetWaterBtn">تصفير</button>
+            </div>
+        </div>
+
+        <!-- Meals Container -->
+        <div id="mealsContainer"></div>
+
+        <!-- Action Buttons -->
+        <button class="btn btn-primary" id="saveBtn">💾 حفظ بيانات اليوم</button>
+        <button class="btn btn-secondary" id="resetBtn">تصفير اليوم للبدء من جديد</button>
+
+        <!-- History Card -->
+        <div class="card card-padded" style="margin-top: 22px;">
+            <div class="history-title">📅 سجل الأداء (الأيام السابقة)</div>
+            <div class="history-list" id="historyContainer"></div>
+        </div>
+
+    </main>
+
+    <!-- Modal for Food Alternatives -->
+    <div class="modal-overlay" id="altModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">اختر البديل المناسب</div>
+                <button class="close-modal" id="closeModalBtn">✕</button>
+            </div>
+            <div class="alt-list" id="altListContainer"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Editing Quantity -->
+    <div class="modal-overlay" id="qtyModal">
+        <div class="modal-box" style="gap: 12px; max-width: 360px;">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div class="modal-title" id="qtyModalTitle">✏️ تعديل الكمية</div>
+                <button class="close-modal" id="closeQtyModalBtn">✕</button>
+            </div>
+            <div class="auth-field" style="margin-bottom:0;">
+                <label id="qtyModalLabel" style="color:var(--text-main);">الكمية:</label>
+                <input type="number" id="customQtyInput" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); font-size:1.1rem; text-align:center;" min="1" max="2000" step="1">
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button type="button" id="saveCustomQtyBtn" class="btn btn-primary" style="margin-top:0; flex:2;">✅ حفظ الكمية</button>
+                <button type="button" id="resetCustomQtyBtn" class="btn btn-secondary" style="margin-top:0; flex:1; font-size:0.82rem;">تلقائي</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Food Item to a Meal -->
+    <div class="modal-overlay" id="addFoodModal">
+        <div class="modal-box" style="gap: 12px;">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div class="modal-title" id="addFoodModalTitle">➕ إضافة صنف للوجبة</div>
+                <button class="close-modal" id="closeAddFoodModalBtn">✕</button>
+            </div>
+
+            <div class="auth-tabs" style="margin-bottom:4px; background:var(--bg-card-header); border-color:var(--border-color);">
+                <button type="button" class="auth-tab active" id="tabAddFromDbBtn" style="color:var(--text-main);">من قائمة الأطعمة</button>
+                <button type="button" class="auth-tab" id="tabAddCustomFoodBtn" style="color:var(--text-main);">صنف جديد يدوي</button>
+            </div>
+
+            <!-- إضافة من قاعدة بيانات الأطعمة -->
+            <div id="addFromDbBox" style="display:flex; flex-direction:column; gap:10px;">
+                <div class="auth-field" style="margin-bottom:0;">
+                    <label style="color:var(--text-main);">اختر الصنف:</label>
+                    <select id="addDbFoodSelect" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);"></select>
+                </div>
+                <div class="auth-field" style="margin-bottom:0;">
+                    <label id="addDbQtyLabel" style="color:var(--text-main);">الكمية (جم / مل / قطعة):</label>
+                    <input type="number" id="addDbQtyInput" class="auth-input" value="100" min="1" max="2000" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);">
+                </div>
+                <button type="button" id="confirmAddDbFoodBtn" class="btn btn-primary" style="margin-top:4px;">➕ إضافة للوجبة</button>
+            </div>
+
+            <!-- إضافة صنف مخصص يدوياً -->
+            <div id="addCustomFoodBox" style="display:none; flex-direction:column; gap:10px;">
+                <div class="auth-field" style="margin-bottom:0;">
+                    <label style="color:var(--text-main);">اسم الأكلة (حروف وأرقام فقط):</label>
+                    <input type="text" id="customFoodNameInput" maxlength="30" placeholder="مثال: 200 جم كفتة مشوية" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div class="auth-field" style="margin-bottom:0;">
+                        <label style="color:var(--text-main);">السعرات:</label>
+                        <input type="number" id="customFoodCalInput" value="200" min="0" max="3000" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);">
+                    </div>
+                    <div class="auth-field" style="margin-bottom:0;">
+                        <label style="color:var(--text-main);">البروتين (جم):</label>
+                        <input type="number" id="customFoodProInput" value="15" min="0" max="300" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);">
+                    </div>
+                    <div class="auth-field" style="margin-bottom:0;">
+                        <label style="color:var(--text-main);">الكارب (جم):</label>
+                        <input type="number" id="customFoodCarbInput" value="20" min="0" max="500" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);">
+                    </div>
+                    <div class="auth-field" style="margin-bottom:0;">
+                        <label style="color:var(--text-main);">الدهون (جم):</label>
+                        <input type="number" id="customFoodFatInput" value="5" min="0" max="200" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);">
+                    </div>
+                </div>
+                <button type="button" id="confirmAddCustomFoodBtn" class="btn btn-primary" style="margin-top:4px;">➕ إضافة الصنف للوجبة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Customizing Diet Plan & Calories -->
+    <div class="modal-overlay" id="planModal">
+        <div class="modal-box" style="gap: 14px;">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div class="modal-title">⚙️ تخصيص خطتك وسعراتك</div>
+                <button class="close-modal" id="closePlanModalBtn">✕</button>
+            </div>
+
+            <button type="button" id="openOnboardingFromPlanBtn" class="btn" style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; margin-top:0; font-size:0.85rem; padding:11px;">
+                📊 حاسبة الجسم الذكية (الطول / العمر / التمرين / البروتين)
+            </button>
+
+            <p style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; line-height: 1.5; border-top:1px solid var(--border-color); padding-top:10px;">
+                أو عدّل هدفك وسعراتك مباشرة:
+            </p>
+
+            <div class="auth-field" style="margin-bottom: 4px;">
+                <label style="color: var(--text-main);">نوع الهدف:</label>
+                <select id="planGoalSelect" class="auth-input" style="background: var(--bg-card-header); color: var(--text-main); border-color: var(--border-color);">
+                    <option value="bulk">🔥 زيادة وزن وتضخيم (Bulking)</option>
+                    <option value="cut">✂️ تنشيف وخسارة دهون (Cutting)</option>
+                    <option value="maintain">⚖️ ثبات وزن ولياقة (Maintenance)</option>
+                </select>
+            </div>
+
+            <div class="auth-field" style="margin-bottom: 4px;">
+                <label style="color: var(--text-main);">السعرات اليومية المستهدفة (سعرة):</label>
+                <input type="number" id="planCaloriesInput" class="auth-input" value="3650" min="1200" max="6000" step="50" style="background: var(--bg-card-header); color: var(--text-main); border-color: var(--border-color);">
+            </div>
+
+            <div style="background: var(--bg-card-header); border: 1px solid var(--border-color); border-radius: 14px; padding: 10px;">
+                <p style="font-size: 0.75rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 6px;">🧮 أو احسب سعراتك سريعاً حسب وزنك الحالي:</p>
+                <div style="display:flex; gap:8px;">
+                    <input type="number" id="calcWeightInput" class="auth-input" placeholder="الوزن كجم" style="background: var(--bg-card); color: var(--text-main); border-color: var(--border-color); padding: 8px 10px; font-size: 0.85rem;">
+                    <button type="button" id="autoCalcCalBtn" class="swap-btn" style="background: var(--accent-blue); color: #fff; border: none; padding: 0 14px;">احسب الآن</button>
+                </div>
+            </div>
+
+            <button type="button" id="applyPlanBtn" class="btn btn-primary" style="margin-top: 4px;">✅ تطبيق الخطة وتعديل الكميات</button>
+        </div>
+    </div>
+
+    <!-- Modal for Cloud Sync Between Devices -->
+    <div class="modal-overlay" id="syncModal">
+        <div class="modal-box" style="gap: 12px;">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div class="modal-title">☁️ مزامنة الحساب بين أجهزتك</div>
+                <button class="close-modal" id="closeSyncModalBtn">✕</button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; line-height: 1.5;">
+                لفتح نفس حسابك وبياناتك على الموبايل واللاب توب في نفس الوقت، انسخ كود المزامنة من جهازك الأول والصقه في الجهاز الثاني:
+            </p>
+            <button type="button" id="exportSyncBtn" class="btn btn-primary" style="margin-top: 2px; font-size: 0.9rem; padding: 12px;">📋 نسخ كود بياناتي (تصدير)</button>
+            
+            <div style="border-top: 1px solid var(--border-color); margin: 4px 0;"></div>
+            
+            <label style="font-size: 0.78rem; font-weight: 800; color: var(--text-main);">استيراد من جهاز آخر (الصق الكود هنا):</label>
+            <textarea id="importSyncInput" rows="3" class="auth-input" placeholder="الصق كود المزامنة هنا..." style="background: var(--bg-card-header); color: var(--text-main); border-color: var(--border-color); font-size: 0.75rem; resize: none;"></textarea>
+            <button type="button" id="importSyncBtn" class="btn btn-secondary" style="margin-top: 2px; font-size: 0.9rem; padding: 12px;">📥 استيراد وتحديث بياناتي</button>
+        </div>
+    </div>
+
+    <!-- Modal for Friends & Following -->
+    <div class="modal-overlay" id="friendsModal">
+        <div class="modal-box" style="gap: 12px;">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div class="modal-title">👥 الأصدقاء والمتابعة والتحدي</div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <button type="button" id="refreshFriendsBtn" class="swap-btn" style="padding:4px 8px;">🔄 تحديث</button>
+                    <button class="close-modal" id="closeFriendsModalBtn">✕</button>
+                </div>
+            </div>
+
+            <div style="background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.3); border-radius:12px; padding:10px; font-size:0.78rem; font-weight:800; display:flex; justify-content:space-between; align-items:center;">
+                <span>الـ ID الخاص بك لمشاركته:</span>
+                <span id="myShareIdText" style="color:var(--accent-blue); font-weight:900; direction:ltr;">3iid@001</span>
+            </div>
+
+            <!-- إضافة صديق بالـ ID -->
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="friendSearchInput" class="auth-input" maxlength="20" placeholder="اكتب ID صديقك (مثال: ahmed01)" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:9px 12px; font-size:0.85rem;">
+                <button type="button" id="addFriendByIdBtn" class="swap-btn" style="background:var(--accent-blue); color:#fff; border:none; padding:0 14px;">+ متابعة</button>
+            </div>
+
+            <!-- تبويبات الأصدقاء -->
+            <div class="auth-tabs" style="margin-bottom:4px; background:var(--bg-card-header); border-color:var(--border-color);">
+                <button type="button" class="auth-tab active" id="tabFollowingBtn" style="color:var(--text-main);">أتابعهم (<span id="followingCount">0</span>)</button>
+                <button type="button" class="auth-tab" id="tabFollowersBtn" style="color:var(--text-main);">يتابعونني (<span id="followersCount">0</span>)</button>
+                <button type="button" class="auth-tab" id="tabDiscoverBtn" style="color:var(--text-main);">اكتشف</button>
+            </div>
+
+            <div id="friendsListContainer" style="display:flex; flex-direction:column; gap:10px; max-height:48vh; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Secret Invite Passcode (Admin Only) -->
+    <div class="modal-overlay" id="secretCodeModal">
+        <div class="modal-box" style="gap: 12px;">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div class="modal-title">🔑 إدارة كود الدعوة السري</div>
+                <button class="close-modal" id="closeSecretCodeModalBtn">✕</button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; line-height: 1.5;">
+                أي شخص جديد يريد إنشاء حساب يجب أن يكتب هذا الكود السري حتى يفتح له التطبيق فوراً:
+            </p>
+            <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.4); border-radius:14px; padding:12px; text-align:center;">
+                <div style="font-size:0.75rem; color:#f59e0b; font-weight:800; margin-bottom:4px;">كود الدعوة السري الحالي:</div>
+                <div id="currentSecretCodeDisplay" style="font-size:1.35rem; font-weight:900; letter-spacing:2px; direction:ltr;">—</div>
+            </div>
+            <div class="auth-field" style="margin-bottom:0;">
+                <label style="color:var(--text-main);">تغيير كود الدعوة السري:</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="newSecretCodeInput" class="auth-input" maxlength="25" placeholder="اكتب الكود الجديد..." style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color);">
+                    <button type="button" id="saveSecretCodeBtn" class="swap-btn" style="background:var(--accent-blue); color:#fff; border:none; padding:0 16px;">حفظ</button>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--border-color); margin-top: 6px; padding-top: 10px;">
+                <button type="button" id="purgeOtherAccountsBtn" class="btn" style="background: rgba(239,68,68,0.16); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); margin-top: 0; font-size: 0.82rem; padding: 11px;">
+                    🧹 مسح كل الحسابات الأخرى (إبقاء 3iid@001 فقط)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for App Icon & Installation -->
+    <div class="modal-overlay" id="installModal">
+        <div class="modal-box" style="text-align: center; gap: 14px;">
+            <div class="modal-header" style="margin-bottom: 0;">
+                <div class="modal-title">📲 تثبيت التطبيق باللوجو</div>
+                <button class="close-modal" id="closeInstallModalBtn">✕</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 6px 0;">
+                <img id="previewLogoImg" style="width: 88px; height: 88px; border-radius: 22px; box-shadow: 0 10px 25px rgba(37,99,235,0.45);" alt="لوجو التطبيق">
+                <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; line-height: 1.5;">
+                    لظهور هذا اللوجو على شاشة الآيفون عند الإضافة للشاشة الرئيسية، افتح الرابط من متصفح <strong>Safari</strong>:
+                </p>
+            </div>
+
+            <div style="background: var(--bg-card-header); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; text-align: right; font-size: 0.78rem; line-height: 1.7; font-weight: 700;">
+                <div>1️⃣ انسخ رابط التطبيق بالضغط على الزر بالأسفل.</div>
+                <div>2️⃣ افتح متصفح <strong>Safari</strong> والصق الرابط في شريط العنوان.</div>
+                <div>3️⃣ اضغط زر <strong>المشاركة ⬆️</strong> ثم اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong>.</div>
+            </div>
+
+            <button class="btn btn-primary" id="copyLinkBtn" style="margin-top: 2px;">🔗 نسخ رابط التطبيق لفتحه في Safari</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 0. الإعدادات الأساسية وضبط المصنع النظيف (إبقاء الأدمن فقط)
+        // ==========================================
+        const FIREBASE_DB_URL = 'https://diet-26426-default-rtdb.firebaseio.com';
+        const ADMIN_ID = '3iid@001';
+        const DEFAULT_INVITE_CODE = '';
+        const FB_API_KEY = 'AIzaSyAHUUp93cf4_oJD-oENqMdbne8rngMtbVs';
+        let fbIdToken = null, fbExp = 0;
+        if (!localStorage.getItem('fbRefresh')) localStorage.removeItem('amrDietActiveUser_v1');
+        function idToEmail(id) { return String(id).toLowerCase().replace(/[^a-z0-9]/g, c => '-' + c.charCodeAt(0).toString(16) + '-') + '@diet-users.app'; }
+        function setFbSession(t, rt, exp, uid) { fbIdToken = t; fbExp = Date.now() + (Number(exp) - 60) * 1000; localStorage.setItem('fbRefresh', rt); if (uid) localStorage.setItem('fbUid', uid); }
+        async function fbAuth(kind, id, pass) {
+            try {
+                const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${kind}?key=${FB_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: idToEmail(id), password: pass, returnSecureToken: true }) });
+                return await r.json();
+            } catch (e) { return { error: { message: 'NETWORK' } }; }
+        }
+        async function getToken() {
+            if (fbIdToken && Date.now() < fbExp) return fbIdToken;
+            const rt = localStorage.getItem('fbRefresh');
+            if (!rt) return null;
+            try {
+                const r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${FB_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rt) });
+                const d = await r.json();
+                if (!d.id_token) return null;
+                setFbSession(d.id_token, d.refresh_token, d.expires_in, d.user_id);
+                return fbIdToken;
+            } catch (e) { return null; }
+        }
+        function fbErrMsg(m) {
+            m = String(m || '').split(' ')[0];
+            if (m === 'EMAIL_EXISTS') return '❌ رقم التعريف (ID) مستخدم بالفعل، اختر رقماً آخر.';
+            if (m === 'WEAK_PASSWORD') return '❌ كلمة السر يجب ألا تقل عن 6 أحرف.';
+            if (['INVALID_LOGIN_CREDENTIALS', 'INVALID_PASSWORD', 'EMAIL_NOT_FOUND'].includes(m)) return '❌ رقم التعريف أو كلمة السر غير صحيحة.';
+            if (m === 'NETWORK') return '❌ تأكد من اتصال الإنترنت.';
+            return '❌ خطأ: ' + m;
+        }
+        const FACTORY_CLEAN_FLAG = 'amrDietFactoryClean_v11_fb';
+
+        (function enforceCleanAdminOnlyStart() {
+            if (localStorage.getItem(FACTORY_CLEAN_FLAG) === 'done') return;
+
+            const keysToDelete = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (!k) continue;
+                if (k.startsWith('amrDiet_') && !k.startsWith(`amrDiet_${ADMIN_ID}_`)) {
+                    keysToDelete.push(k);
+                }
+            }
+            keysToDelete.forEach(k => localStorage.removeItem(k));
+
+            const freshAdminDB = {};
+            freshAdminDB[ADMIN_ID] = {
+                name: 'Amr',
+                id: ADMIN_ID,
+                pass: '',
+                isDefault: true,
+                following: [],
+                followers: [],
+                stats: { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+            };
+            localStorage.setItem('amrDietUsersDB_v1', JSON.stringify(freshAdminDB));
+
+            const currentActive = localStorage.getItem('amrDietActiveUser_v1');
+            if (currentActive && currentActive !== ADMIN_ID) {
+                localStorage.removeItem('amrDietActiveUser_v1');
+            }
+
+            localStorage.setItem(FACTORY_CLEAN_FLAG, 'done');
+        })();
+
+        // ==========================================
+        // 1. حماية وتنظيف المدخلات (Security Sanitization)
+        // ==========================================
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/`/g, '&#96;');
+        }
+
+        function isValidName(name) {
+            return /^[\u0600-\u06FFa-zA-Z0-9\s]{2,25}$/.test(name);
+        }
+
+        function isValidIdOrCode(val) {
+            return /^[a-zA-Z0-9@._-]{3,25}$/.test(val);
+        }
+
+        function toFirebaseKey(id) {
+            return String(id).toLowerCase().replace(/\./g, '_DOT_').replace(/[#$\[\]\/]/g, '_');
+        }
+
+        function sanitizeInputRealTime(inputEl, pattern) {
+            if (!inputEl) return;
+            inputEl.addEventListener('input', () => {
+                const cleaned = inputEl.value.replace(pattern, '');
+                if (inputEl.value !== cleaned) {
+                    inputEl.value = cleaned;
+                }
+            });
+        }
+
+        // ==========================================
+        // 2. نظام قاعدة البيانات السحابية الحقيقية (Firebase Realtime Database REST)
+        // ==========================================
+        const SECRET_CODE_KEY = 'amrDietSecretCodeV1';
+        let currentSecretPasscode = localStorage.getItem(SECRET_CODE_KEY) || DEFAULT_INVITE_CODE;
+
+        function sanitizeUserRecord(rawU) {
+            if (!rawU || typeof rawU !== 'object') return null;
+            const uid = String(rawU.id || '').toLowerCase();
+            if (!isValidIdOrCode(uid) || !isValidName(rawU.name)) return null;
+
+            const cleanStats = rawU.stats && typeof rawU.stats === 'object' ? {
+                pct: Math.max(0, Math.min(100, Number(rawU.stats.pct) || 0)),
+                cal: Math.max(0, Math.min(20000, Number(rawU.stats.cal) || 0)),
+                targetCal: Math.max(500, Math.min(20000, Number(rawU.stats.targetCal) || 3650)),
+                water: Math.max(0, Math.min(30, Number(rawU.stats.water) || 0)),
+                weight: (rawU.stats.weight && !isNaN(Number(rawU.stats.weight))) ? String(rawU.stats.weight) : '--'
+            } : { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' };
+
+            return {
+                id: uid,
+                name: String(rawU.name).trim(),
+                pass: '',
+                following: Array.isArray(rawU.following) ? Array.from(new Set(rawU.following.filter(x => isValidIdOrCode(x)))) : [],
+                followers: Array.isArray(rawU.followers) ? Array.from(new Set(rawU.followers.filter(x => isValidIdOrCode(x)))) : [],
+                stats: cleanStats
+            };
+        }
+
+        async function fetchFirebaseCloud() {
+            try {
+                const tk = await getToken();
+                if (!tk) return false;
+                const [usersRes, codeRes] = await Promise.all([
+                    fetch(`${FIREBASE_DB_URL}/users.json?auth=${tk}`),
+                    fetch(`${FIREBASE_DB_URL}/config/secretCode.json?auth=${tk}`)
+                ]);
+
+                if (codeRes.ok) {
+                    const remoteCode = await codeRes.json();
+                    if (typeof remoteCode === 'string' && isValidIdOrCode(remoteCode)) {
+                        currentSecretPasscode = remoteCode;
+                        localStorage.setItem(SECRET_CODE_KEY, currentSecretPasscode);
+                        const disp = document.getElementById('currentSecretCodeDisplay');
+                        if (disp) disp.innerText = currentSecretPasscode;
+                    }
+                }
+
+                if (usersRes.ok) {
+                    const remoteUsers = await usersRes.json();
+                    const localDB = getUsersDB();
+                    const activeU = getActiveUser();
+                    const newDB = {};
+
+                    if (remoteUsers && typeof remoteUsers === 'object') {
+                        Object.values(remoteUsers).forEach(rawU => {
+                            const clean = sanitizeUserRecord(rawU);
+                            if (!clean) return;
+                            newDB[clean.id] = clean;
+                        });
+                    }
+
+                    // تأكيد وجود الأدمن دائماً
+                    if (!newDB[ADMIN_ID]) {
+                        newDB[ADMIN_ID] = localDB[ADMIN_ID] || {
+                            name: 'Amr',
+                            id: ADMIN_ID,
+                            pass: '',
+                            isDefault: true,
+                            following: [],
+                            followers: [],
+                            stats: { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+                        };
+                    }
+
+                    // إذا كان المستخدم الحالي مسجلاً محلياً ولم يُرفع بعد نحافظ على بياناته
+                    if (activeU && localDB[activeU.id] && !newDB[activeU.id]) {
+                        newDB[activeU.id] = localDB[activeU.id];
+                    }
+
+                    saveUsersDB(newDB);
+
+                    if (document.getElementById('friendsModal').classList.contains('active')) {
+                        renderFriendsModal();
+                    }
+                }
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        async function pushUserToFirebase(userObj) {
+            if (!userObj || !userObj.id) return false;
+            try {
+                const tk = await getToken();
+                if (!tk) return false;
+                const fbKey = encodeURIComponent(toFirebaseKey(userObj.id));
+                const me = getActiveUser();
+                const isOwner = me && me.id === userObj.id;
+                const url = isOwner ? `${FIREBASE_DB_URL}/users/${fbKey}.json?auth=${tk}` : `${FIREBASE_DB_URL}/users/${fbKey}/followers.json?auth=${tk}`;
+                const body = isOwner ? {
+                    id: userObj.id,
+                    uid: localStorage.getItem('fbUid'),
+                    name: userObj.name,
+                    following: userObj.following || [],
+                    followers: userObj.followers || [],
+                    stats: userObj.stats || { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+                } : (userObj.followers || []);
+                const res = await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                return res.ok;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        async function pushSecretCodeToFirebase(newCode) {
+            try {
+                const res = await fetch(`${FIREBASE_DB_URL}/config/secretCode.json?auth=${await getToken()}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newCode)
+                });
+                return res.ok;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        // تحديث تلقائي كل 12 ثانية من Firebase
+        setInterval(() => {
+            fetchFirebaseCloud();
+        }, 12000);
+
+        // توليد أيقونة التطبيق الاحترافية HD (PNG) للآيفون والأندرويد
+        (function generateAppIcon() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            const grad = ctx.createLinearGradient(0, 0, 512, 512);
+            grad.addColorStop(0, '#020617');
+            grad.addColorStop(0.5, '#1e3a8a');
+            grad.addColorStop(1, '#2563eb');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+
+            ctx.beginPath();
+            ctx.arc(256, 256, 195, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(147, 197, 253, 0.35)';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '210px sans-serif';
+            ctx.fillText('💪', 256, 215);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 54px Cairo, sans-serif';
+            ctx.fillText('3IID DIET', 256, 395);
+
+            const pngUrl = 'icon-512.png';
+            document.getElementById('dynamicFavicon').href = pngUrl;
+            document.getElementById('dynamicAppleIcon').href = pngUrl;
+            const previewImg = document.getElementById('previewLogoImg');
+            if (previewImg) previewImg.src = pngUrl;
+            const authLogoImg = document.getElementById('authLogoImg');
+            if (authLogoImg) authLogoImg.src = pngUrl;
+
+            if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+        })();
+
+        // ==========================================
+        // 3. نظام الحسابات وكود الدعوة السري
+        // ==========================================
+        const USERS_DB_KEY = 'amrDietUsersDB_v1';
+        const ACTIVE_USER_KEY = 'amrDietActiveUser_v1';
+
+        function getUsersDB() {
+            let db = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || {};
+            if (!db[ADMIN_ID]) {
+                db[ADMIN_ID] = {
+                    name: 'Amr',
+                    id: ADMIN_ID,
+                    pass: '',
+                    isDefault: true,
+                    following: [],
+                    followers: [],
+                    stats: { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+                };
+                localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
+            }
+            return db;
+        }
+
+        function saveUsersDB(db) {
+            localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
+        }
+
+        function getActiveUser() {
+            const activeId = localStorage.getItem(ACTIVE_USER_KEY);
+            if (!activeId) return null;
+            const db = getUsersDB();
+            return db[activeId] || null;
+        }
+
+        function getUserKey(suffix) {
+            const user = getActiveUser();
+            const uid = user ? user.id : ADMIN_ID;
+            return `amrDiet_${uid}_${suffix}`;
+        }
+
+        let statsSyncTimer = null;
+        function syncMyStatsToCloud(immediate = false) {
+            const user = getActiveUser();
+            if (!user) return;
+            const db = getUsersDB();
+            if (!db[user.id]) return;
+
+            const pctText = document.getElementById('progressText').innerText.replace('%', '');
+            const calParts = document.getElementById('calCounter').innerText.split('/');
+            const currentCal = parseInt(calParts[0]) || 0;
+            const targetCal = parseInt(calParts[1]) || 3650;
+            const weightVal = document.getElementById('weightInput').value || '--';
+
+            db[user.id].stats = {
+                pct: parseInt(pctText) || 0,
+                cal: currentCal,
+                targetCal: targetCal,
+                water: Number(waterLiters.toFixed(2)),
+                weight: weightVal
+            };
+            saveUsersDB(db);
+
+            if (immediate) {
+                pushUserToFirebase(db[user.id]);
+            } else {
+                clearTimeout(statsSyncTimer);
+                statsSyncTimer = setTimeout(() => {
+                    pushUserToFirebase(db[user.id]);
+                }, 600);
+            }
+        }
+
+        // فلترة فورية للحقول ضد الأكواد والرموز الضارة
+        sanitizeInputRealTime(document.getElementById('loginIdInput'), /[^a-zA-Z0-9@._-]/g);
+        sanitizeInputRealTime(document.getElementById('loginPassInput'), /[^a-zA-Z0-9@._-]/g);
+        sanitizeInputRealTime(document.getElementById('regNameInput'), /[^\u0600-\u06FFa-zA-Z0-9\s]/g);
+        sanitizeInputRealTime(document.getElementById('regIdInput'), /[^a-zA-Z0-9@._-]/g);
+        sanitizeInputRealTime(document.getElementById('regPassInput'), /[^a-zA-Z0-9@._-]/g);
+        sanitizeInputRealTime(document.getElementById('regSecretPasscodeInput'), /[^a-zA-Z0-9@._-]/g);
+        sanitizeInputRealTime(document.getElementById('friendSearchInput'), /[^a-zA-Z0-9@._-]/g);
+        sanitizeInputRealTime(document.getElementById('newSecretCodeInput'), /[^a-zA-Z0-9@._-]/g);
+
+        const authScreen = document.getElementById('authScreen');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const tabLoginBtn = document.getElementById('tabLoginBtn');
+        const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+        const authErrorBox = document.getElementById('authErrorBox');
+        const userBadgeDisplay = document.getElementById('userBadgeDisplay');
+
+        function showAuthError(msg) {
+            authErrorBox.innerText = msg;
+            authErrorBox.style.display = 'block';
+        }
+
+        tabLoginBtn.onclick = () => {
+            tabLoginBtn.classList.add('active');
+            tabRegisterBtn.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            authErrorBox.style.display = 'none';
+        };
+
+        tabRegisterBtn.onclick = () => {
+            tabRegisterBtn.classList.add('active');
+            tabLoginBtn.classList.remove('active');
+            registerForm.style.display = 'block';
+            loginForm.style.display = 'none';
+            authErrorBox.style.display = 'none';
+            fetchFirebaseCloud();
+        };
+
+        document.getElementById('generateIdBtn').onclick = () => {
+            const rawName = document.getElementById('regNameInput').value.trim().replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const prefix = rawName.length >= 2 ? rawName.slice(0, 5) : 'hero';
+            const randNum = Math.floor(100 + Math.random() * 900);
+            document.getElementById('regIdInput').value = `${prefix}${randNum}`;
+        };
+
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const idVal = document.getElementById('loginIdInput').value.trim().toLowerCase();
+            const passVal = document.getElementById('loginPassInput').value.trim();
+            if (!isValidIdOrCode(idVal) || !isValidIdOrCode(passVal)) {
+                showAuthError('❌ يُسمح بالحروف والأرقام فقط بدون رموز برمجية.');
+                return;
+            }
+            const r = await fbAuth('signInWithPassword', idVal, passVal);
+            if (r.error) { showAuthError(fbErrMsg(r.error.message)); return; }
+            setFbSession(r.idToken, r.refreshToken, r.expiresIn, r.localId);
+            localStorage.setItem(ACTIVE_USER_KEY, idVal);
+            await fetchFirebaseCloud();
+            const account = getUsersDB()[idVal];
+            if (!account) {
+                localStorage.removeItem(ACTIVE_USER_KEY);
+                showAuthError('❌ بيانات الحساب غير موجودة على السيرفر.');
+                return;
+            }
+            authErrorBox.style.display = 'none';
+            initAppForCurrentUser();
+            showToast(`👋 أهلاً بعودتك يا ${escapeHTML(account.name)}!`);
+        };
+
+        registerForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const nameVal = document.getElementById('regNameInput').value.trim();
+            const idVal = document.getElementById('regIdInput').value.trim().toLowerCase();
+            const passVal = document.getElementById('regPassInput').value.trim();
+            const secretVal = document.getElementById('regSecretPasscodeInput').value.trim();
+            if (!isValidName(nameVal)) {
+                showAuthError('❌ الاسم يجب أن يكون من 2 إلى 25 حرفاً (حروف وأرقام فقط).');
+                return;
+            }
+            if (!isValidIdOrCode(idVal) || !isValidIdOrCode(passVal) || !isValidIdOrCode(secretVal)) {
+                showAuthError('❌ الـ ID وكلمة السر وكود الدعوة: حروف إنجليزية وأرقام فقط (3 أحرف على الأقل).');
+                return;
+            }
+            const r = await fbAuth('signUp', idVal, passVal);
+            if (r.error) { showAuthError(fbErrMsg(r.error.message)); return; }
+            setFbSession(r.idToken, r.refreshToken, r.expiresIn, r.localId);
+
+            // التحقق من كود الدعوة على السيرفر (قواعد Firebase تقارنه بالكود السري)
+            let okCode = false;
+            try {
+                const cr = await fetch(`${FIREBASE_DB_URL}/signups/${r.localId}.json?auth=${r.idToken}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: secretVal }) });
+                okCode = cr.ok;
+            } catch (err) {}
+            if (!okCode) {
+                try { await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:delete?key=${FB_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken: r.idToken }) }); } catch (err) {}
+                localStorage.removeItem('fbRefresh'); localStorage.removeItem('fbUid'); fbIdToken = null;
+                showAuthError('🔒 كود الدعوة السري غير صحيح! اطلبه من عمرو للدخول.');
+                return;
+            }
+
+            localStorage.setItem(ACTIVE_USER_KEY, idVal);
+            await fetchFirebaseCloud();
+            const db = getUsersDB();
+            const newAccount = {
+                name: nameVal,
+                id: idVal,
+                pass: '',
+                following: idVal === ADMIN_ID ? [] : [ADMIN_ID],
+                followers: [],
+                stats: { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+            };
+            db[idVal] = newAccount;
+            if (idVal !== ADMIN_ID && db[ADMIN_ID]) {
+                db[ADMIN_ID].followers = Array.from(new Set([...(db[ADMIN_ID].followers || []), idVal]));
+            }
+            saveUsersDB(db);
+            await Promise.all([
+                pushUserToFirebase(newAccount),
+                (idVal !== ADMIN_ID && db[ADMIN_ID]) ? pushUserToFirebase(db[ADMIN_ID]) : Promise.resolve()
+            ]);
+            authErrorBox.style.display = 'none';
+            initAppForCurrentUser();
+            showToast(`🎉 تم إنشاء حسابك بنجاح يا ${escapeHTML(nameVal)}!`);
+        };
+
+        document.getElementById('logoutBtn').onclick = () => {
+            localStorage.removeItem('fbRefresh'); localStorage.removeItem('fbUid'); fbIdToken = null;
+            localStorage.removeItem(ACTIVE_USER_KEY);
+            authScreen.classList.remove('hidden');
+            loginForm.reset();
+            registerForm.reset();
+            authErrorBox.style.display = 'none';
+        };
+
+        // ==========================================
+        // 4. قاعدة بيانات الأطعمة والبدائل
+        // ==========================================
+        const FOODS = {
+            whole_egg: { name: 'بيض كامل', unit: 'بيضة', baseQty: 1, cal: 72, p: 6.3, c: 0.4, f: 4.8 },
+            egg_white: { name: 'بياض بيض', unit: 'بياض', baseQty: 1, cal: 17, p: 3.6, c: 0.2, f: 0.1 },
+            cottage_cheese: { name: 'جبن قريش', unit: 'جم', baseQty: 100, cal: 98, p: 11, c: 3.4, f: 4.3 },
+            feta_light: { name: 'جبن فيتا لايت', unit: 'جم', baseQty: 100, cal: 150, p: 14, c: 4, f: 8 },
+            greek_yogurt: { name: 'زبادي يوناني', unit: 'جم', baseQty: 100, cal: 97, p: 9, c: 4, f: 5 },
+            fava_beans: { name: 'فول مدمس بدون زيت', unit: 'جم', baseQty: 100, cal: 110, p: 7.5, c: 19, f: 0.5 },
+
+            baladi_bread: { name: 'خبز (بلدي/أسمر)', unit: 'جم', baseQty: 100, cal: 250, p: 8, c: 50, f: 1.5 },
+            toast_brown: { name: 'توست أسمر', unit: 'جم', baseQty: 100, cal: 265, p: 9, c: 49, f: 3 },
+            oats: { name: 'شوفان', unit: 'جم', baseQty: 100, cal: 389, p: 16.9, c: 66.3, f: 6.9 },
+            rice_flour: { name: 'دقيق أرز', unit: 'جم', baseQty: 100, cal: 366, p: 6, c: 80, f: 1.4 },
+            potato_boiled: { name: 'بطاطس مسلوقة/مشوية', unit: 'جم', baseQty: 100, cal: 87, p: 1.9, c: 20, f: 0.1 },
+            sweet_potato: { name: 'بطاطا حلوة', unit: 'جم', baseQty: 100, cal: 86, p: 1.6, c: 20, f: 0.1 },
+
+            chicken_breast: { name: 'صدور دجاج', unit: 'جم', baseQty: 100, cal: 165, p: 31, c: 0, f: 3.6 },
+            beef_lean: { name: 'لحم بقري قليل الدسم', unit: 'جم', baseQty: 100, cal: 210, p: 28, c: 0, f: 10 },
+            tuna_water: { name: 'تونة مصفاة', unit: 'جم', baseQty: 100, cal: 116, p: 25.5, c: 0, f: 0.8 },
+            tilapia_fish: { name: 'سمك بلطي مشوي', unit: 'جم', baseQty: 100, cal: 128, p: 26, c: 0, f: 2.7 },
+            liver_beef: { name: 'كبدة بقري مشوية', unit: 'جم', baseQty: 100, cal: 175, p: 26, c: 3.8, f: 4.7 },
+            turkey_breast: { name: 'صدور رومي', unit: 'جم', baseQty: 100, cal: 135, p: 29, c: 0, f: 1.5 },
+
+            cooked_rice: { name: 'أرز مطبوخ', unit: 'جم', baseQty: 100, cal: 130, p: 2.7, c: 28, f: 0.3 },
+            cooked_pasta: { name: 'مكرونة مسلوقة', unit: 'جم', baseQty: 100, cal: 158, p: 5.8, c: 31, f: 0.9 },
+            freekeh_cooked: { name: 'فريك مطبوخ', unit: 'جم', baseQty: 100, cal: 140, p: 5, c: 27, f: 0.8 },
+
+            whole_milk: { name: 'حليب كامل الدسم', unit: 'مل', baseQty: 100, cal: 61, p: 3.2, c: 4.8, f: 3.3 },
+            skim_milk: { name: 'حليب خالي الدسم', unit: 'مل', baseQty: 100, cal: 34, p: 3.4, c: 5, f: 0.1 },
+            rayeb_milk: { name: 'لبن رايب', unit: 'مل', baseQty: 100, cal: 55, p: 3.1, c: 4.5, f: 2.5 },
+
+            banana: { name: 'موز', unit: 'جم', baseQty: 100, cal: 89, p: 1.1, c: 22.8, f: 0.3 },
+            dates: { name: 'تمر', unit: 'جم', baseQty: 100, cal: 277, p: 1.8, c: 75, f: 0.2 },
+            apple: { name: 'تفاح', unit: 'جم', baseQty: 100, cal: 52, p: 0.3, c: 14, f: 0.2 },
+            mango: { name: 'مانجو', unit: 'جم', baseQty: 100, cal: 60, p: 0.8, c: 15, f: 0.4 },
+
+            peanuts: { name: 'فول سوداني', unit: 'جم', baseQty: 100, cal: 567, p: 25.8, c: 16.1, f: 49.2 },
+            peanut_butter: { name: 'زبدة فول سوداني طبيعية', unit: 'جم', baseQty: 100, cal: 588, p: 25, c: 20, f: 50 },
+            almonds: { name: 'لوز ني', unit: 'جم', baseQty: 100, cal: 579, p: 21, c: 21.6, f: 49.9 },
+            cashews: { name: 'كاجو', unit: 'جم', baseQty: 100, cal: 553, p: 18, c: 30, f: 44 },
+            olive_oil: { name: 'زيت زيتون', unit: 'جم', baseQty: 100, cal: 884, p: 0, c: 0, f: 100 }
+        };
+
+        const ALTERNATIVE_GROUPS = {
+            breakfast_protein: ['whole_egg', 'egg_white', 'cottage_cheese', 'feta_light', 'greek_yogurt', 'fava_beans'],
+            breakfast_carb: ['baladi_bread', 'toast_brown', 'oats', 'potato_boiled', 'sweet_potato'],
+            protein: ['chicken_breast', 'beef_lean', 'tuna_water', 'tilapia_fish', 'liver_beef', 'turkey_breast', 'cottage_cheese'],
+            carb: ['cooked_rice', 'cooked_pasta', 'potato_boiled', 'sweet_potato', 'freekeh_cooked', 'baladi_bread'],
+            carb_powder: ['rice_flour', 'oats', 'cooked_rice', 'potato_boiled'],
+            milk: ['whole_milk', 'skim_milk', 'rayeb_milk', 'greek_yogurt'],
+            fruit: ['banana', 'dates', 'apple', 'mango'],
+            fat: ['peanuts', 'peanut_butter', 'almonds', 'cashews', 'olive_oil']
+        };
+
+        function buildDynamicMeals(targetCalories, goalType, proteinRatio = 2.0, weightKg = 75) {
+            const scale = targetCalories / 3650;
+            const proScale = (weightKg && weightKg >= 35 && weightKg <= 200)
+                ? ((weightKg * proteinRatio) / 162)
+                : (goalType === 'cut' ? scale * 1.18 : (goalType === 'maintain' ? scale * 1.08 : scale));
+            const carbScale = goalType === 'cut' ? scale * 0.85 : scale;
+            const fatScale = goalType === 'cut' ? scale * 0.80 : scale;
+
+            return [
+                {
+                    mealId: 'breakfast',
+                    title: '🍳 الفطار',
+                    items: [
+                        { slotId: 'b1', role: 'breakfast_protein', foodId: 'whole_egg', targetCal: Math.round(216 * proScale), targetPro: Math.round(19 * proScale) },
+                        { slotId: 'b2', role: 'breakfast_carb', foodId: 'baladi_bread', targetCal: Math.round(475 * carbScale), targetCarb: Math.round(95 * carbScale) }
+                    ]
+                },
+                {
+                    mealId: 'lunch',
+                    title: '🍗 الغداء',
+                    items: [
+                        { slotId: 'l1', role: 'carb', foodId: 'cooked_rice', targetCal: Math.round(325 * carbScale), targetCarb: Math.round(70 * carbScale) },
+                        { slotId: 'l2', role: 'protein', foodId: 'chicken_breast', targetCal: Math.round(206 * proScale), targetPro: Math.round(39 * proScale) },
+                        { slotId: 'l3', role: 'carb_powder', foodId: 'rice_flour', targetCal: Math.round(256 * carbScale), targetCarb: Math.round(56 * carbScale) }
+                    ]
+                },
+                {
+                    mealId: 'snacks',
+                    title: '🥜 السناك',
+                    items: [
+                        { slotId: 's1', role: 'breakfast_carb', foodId: 'oats', targetCal: Math.round(506 * carbScale), targetCarb: Math.round(86 * carbScale) },
+                        { slotId: 's2', role: 'milk', foodId: 'whole_milk', targetCal: Math.round(146 * scale) },
+                        { slotId: 's3', role: 'fruit', foodId: 'banana', targetCal: Math.round(178 * carbScale), targetCarb: Math.round(46 * carbScale) },
+                        { slotId: 's4', role: 'fat', foodId: 'peanuts', targetCal: Math.round(567 * fatScale), targetFat: Math.round(49 * fatScale) }
+                    ]
+                },
+                {
+                    mealId: 'dinner',
+                    title: '🌙 العشاء',
+                    items: [
+                        { slotId: 'd1', role: 'carb', foodId: 'cooked_rice', targetCal: Math.round(325 * carbScale), targetCarb: Math.round(70 * carbScale) },
+                        { slotId: 'd2', role: 'protein', foodId: 'chicken_breast', targetCal: Math.round(206 * proScale), targetPro: Math.round(39 * proScale) },
+                        { slotId: 'd3', role: 'fruit', foodId: 'banana', targetCal: Math.round(178 * carbScale), targetCarb: Math.round(46 * carbScale) }
+                    ]
+                }
+            ];
+        }
+
+        function calcFoodAmount(foodId, slot) {
+            const food = FOODS[foodId];
+            if (!food) return { qty: 100, cal: 0, p: 0, c: 0, f: 0 };
+
+            let finalQty;
+            if (slot && typeof customQuantities[slot.slotId] === 'number' && customQuantities[slot.slotId] > 0) {
+                finalQty = customQuantities[slot.slotId];
+            } else {
+                let rawQty = 100;
+                if ((slot.role === 'protein' || slot.role === 'breakfast_protein') && food.p > 0 && slot.targetPro) {
+                    rawQty = (slot.targetPro / food.p) * food.baseQty;
+                } else if ((slot.role === 'carb' || slot.role === 'breakfast_carb' || slot.role === 'fruit') && food.c > 0 && slot.targetCarb) {
+                    rawQty = (slot.targetCarb / food.c) * food.baseQty;
+                } else if (slot.role === 'fat' && food.f > 0 && slot.targetFat) {
+                    rawQty = (slot.targetFat / food.f) * food.baseQty;
+                } else {
+                    rawQty = (slot.targetCal / food.cal) * food.baseQty;
+                }
+
+                finalQty = food.unit === 'بيضة' || food.unit === 'بياض'
+                    ? Math.max(1, Math.round(rawQty))
+                    : Math.max(10, Math.round(rawQty / 5) * 5);
+            }
+
+            const ratio = finalQty / food.baseQty;
+            return {
+                qty: finalQty,
+                cal: Math.round(food.cal * ratio),
+                p: Math.round(food.p * ratio),
+                c: Math.round(food.c * ratio),
+                f: Math.round(food.f * ratio)
+            };
+        }
+
+        // ==========================================
+        // 5. المتغيرات الأساسية وعرض الوجبات
+        // ==========================================
+        const mealsContainer = document.getElementById('mealsContainer');
+        const weightInput = document.getElementById('weightInput');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const calCounter = document.getElementById('calCounter');
+        const proCounter = document.getElementById('proCounter');
+        const carbCounter = document.getElementById('carbCounter');
+        const fatCounter = document.getElementById('fatCounter');
+        const waterText = document.getElementById('waterText');
+        const historyContainer = document.getElementById('historyContainer');
+        const dateDisplay = document.getElementById('currentDate');
+        const themeToggle = document.getElementById('themeToggle');
+
+        const altModal = document.getElementById('altModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const altListContainer = document.getElementById('altListContainer');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        let userSelections = {};
+        let customQuantities = {};
+        let extraMealItems = {};
+        let checkedItems = {};
+        let waterLiters = 0;
+        let GENERATED_MEALS = [];
+        let userPlanConfig = { goal: 'bulk', calories: 3650, proteinRatio: 2.0 };
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('amrDietThemeFinal') || 'dark';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerText = '☀️';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.innerText = '🌙';
+            }
+        }
+
+        themeToggle.onclick = () => {
+            const isDark = document.body.classList.toggle('dark-mode');
+            themeToggle.innerText = isDark ? '☀️' : '🌙';
+            localStorage.setItem('amrDietThemeFinal', isDark ? 'dark' : 'light');
+        };
+
+        const todayISO = new Date().toLocaleDateString('en-CA');
+        dateDisplay.innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', month: 'short', day: 'numeric' });
+
+        function renderMeals() {
+            mealsContainer.innerHTML = '';
+
+            GENERATED_MEALS.forEach(meal => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                let itemsHtml = '';
+                meal.items.forEach(slot => {
+                    const selectedFoodId = FOODS[userSelections[slot.slotId]] ? userSelections[slot.slotId] : slot.foodId;
+                    const food = FOODS[selectedFoodId];
+                    const stats = calcFoodAmount(selectedFoodId, slot);
+                    const isChecked = checkedItems[slot.slotId] === true;
+
+                    itemsHtml += `
+                        <div class="food-row">
+                            <label class="food-item">
+                                <input type="checkbox" class="custom-checkbox diet-checkbox" data-slot="${slot.slotId}" ${isChecked ? 'checked' : ''}>
+                                <div class="food-info">
+                                    <span class="food-label">${stats.qty} ${food.unit} ${food.name}</span>
+                                    <span class="food-macros">${stats.cal} سعرة • ${stats.p}ب • ${stats.c}ك • ${stats.f}د</span>
+                                </div>
+                            </label>
+                            <div style="display:flex; gap:5px; align-items:center;">
+                                <button class="swap-btn" style="background:rgba(16,185,129,0.12); color:#10b981; border-color:rgba(16,185,129,0.35);" onclick="openQtyModal('${slot.slotId}', '${selectedFoodId}', ${stats.qty})">✏️ كمية</button>
+                                <button class="swap-btn" onclick="openSwapModal('${slot.slotId}', '${slot.role}', ${slot.targetCal}, ${slot.targetPro || 0}, ${slot.targetCarb || 0}, ${slot.targetFat || 0})">🔄 بديل</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const mealExtras = Array.isArray(extraMealItems[meal.mealId]) ? extraMealItems[meal.mealId] : [];
+                mealExtras.forEach(extra => {
+                    const isChecked = checkedItems[extra.id] === true;
+                    let labelText = '';
+                    let cal = 0, p = 0, c = 0, f = 0;
+                    if (extra.type === 'db' && FOODS[extra.foodId]) {
+                        const food = FOODS[extra.foodId];
+                        const ratio = extra.qty / food.baseQty;
+                        labelText = `${extra.qty} ${food.unit} ${food.name}`;
+                        cal = Math.round(food.cal * ratio);
+                        p = Math.round(food.p * ratio);
+                        c = Math.round(food.c * ratio);
+                        f = Math.round(food.f * ratio);
+                    } else {
+                        labelText = escapeHTML(extra.name);
+                        cal = Math.round(Number(extra.cal) || 0);
+                        p = Math.round(Number(extra.p) || 0);
+                        c = Math.round(Number(extra.c) || 0);
+                        f = Math.round(Number(extra.f) || 0);
+                    }
+
+                    itemsHtml += `
+                        <div class="food-row" style="border-top:1px dashed var(--border-color); padding-top:10px;">
+                            <label class="food-item">
+                                <input type="checkbox" class="custom-checkbox diet-checkbox" data-slot="${extra.id}" ${isChecked ? 'checked' : ''}>
+                                <div class="food-info">
+                                    <span class="food-label">${labelText} <span style="font-size:0.7rem; color:#10b981; font-weight:800;">(إضافي)</span></span>
+                                    <span class="food-macros">${cal} سعرة • ${p}ب • ${c}ك • ${f}د</span>
+                                </div>
+                            </label>
+                            <div style="display:flex; gap:5px; align-items:center;">
+                                ${extra.type === 'db' ? `<button class="swap-btn" style="background:rgba(16,185,129,0.12); color:#10b981; border-color:rgba(16,185,129,0.35);" onclick="openExtraQtyModal('${meal.mealId}', '${extra.id}', '${extra.foodId}', ${extra.qty})">✏️ كمية</button>` : ''}
+                                <button class="swap-btn" style="background:rgba(239,68,68,0.12); color:#ef4444; border-color:rgba(239,68,68,0.35);" onclick="removeExtraMealItem('${meal.mealId}', '${extra.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="meal-title">${meal.title}</div>
+                        <button type="button" class="swap-btn" style="background:var(--accent-blue); color:#fff; border-color:var(--accent-blue);" onclick="openAddFoodModal('${meal.mealId}', '${meal.title}')">+ إضافة</button>
+                    </div>
+                    <div class="meal-body">${itemsHtml}</div>
+                `;
+                mealsContainer.appendChild(card);
+            });
+
+            document.querySelectorAll('.diet-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const slotId = e.target.getAttribute('data-slot');
+                    checkedItems[slotId] = e.target.checked;
+                    localStorage.setItem(getUserKey('checks'), JSON.stringify(checkedItems));
+                    updateNutritionAndProgress();
+                });
+            });
+
+            updateNutritionAndProgress();
+        }
+
+        function updateNutritionAndProgress() {
+            let totalSlots = 0, checkedCount = 0;
+            let eatenCal = 0, eatenPro = 0, eatenCarb = 0, eatenFat = 0;
+            let planCal = 0, planPro = 0, planCarb = 0, planFat = 0;
+
+            GENERATED_MEALS.forEach(meal => {
+                meal.items.forEach(slot => {
+                    totalSlots++;
+                    const selectedFoodId = FOODS[userSelections[slot.slotId]] ? userSelections[slot.slotId] : slot.foodId;
+                    const stats = calcFoodAmount(selectedFoodId, slot);
+
+                    planCal += stats.cal;
+                    planPro += stats.p;
+                    planCarb += stats.c;
+                    planFat += stats.f;
+
+                    if (checkedItems[slot.slotId]) {
+                        checkedCount++;
+                        eatenCal += stats.cal;
+                        eatenPro += stats.p;
+                        eatenCarb += stats.c;
+                        eatenFat += stats.f;
+                    }
+                });
+
+                const mealExtras = Array.isArray(extraMealItems[meal.mealId]) ? extraMealItems[meal.mealId] : [];
+                mealExtras.forEach(extra => {
+                    totalSlots++;
+                    let cal = 0, p = 0, c = 0, f = 0;
+                    if (extra.type === 'db' && FOODS[extra.foodId]) {
+                        const food = FOODS[extra.foodId];
+                        const ratio = extra.qty / food.baseQty;
+                        cal = Math.round(food.cal * ratio);
+                        p = Math.round(food.p * ratio);
+                        c = Math.round(food.c * ratio);
+                        f = Math.round(food.f * ratio);
+                    } else {
+                        cal = Math.round(Number(extra.cal) || 0);
+                        p = Math.round(Number(extra.p) || 0);
+                        c = Math.round(Number(extra.c) || 0);
+                        f = Math.round(Number(extra.f) || 0);
+                    }
+
+                    planCal += cal;
+                    planPro += p;
+                    planCarb += c;
+                    planFat += f;
+
+                    if (checkedItems[extra.id]) {
+                        checkedCount++;
+                        eatenCal += cal;
+                        eatenPro += p;
+                        eatenCarb += c;
+                        eatenFat += f;
+                    }
+                });
+            });
+
+            const pct = totalSlots ? Math.round((checkedCount / totalSlots) * 100) : 0;
+            progressBar.style.width = pct + '%';
+            progressText.innerText = pct + '%';
+
+            document.getElementById('targetCaloriesDisplay').innerText = planCal;
+            calCounter.innerText = `${eatenCal} / ${planCal}`;
+            proCounter.innerText = `${eatenPro} / ${planPro} جم`;
+            carbCounter.innerText = `${eatenCarb} / ${planCarb} جم`;
+            fatCounter.innerText = `${eatenFat} / ${planFat} جم`;
+
+            syncMyStatsToCloud(false);
+            return pct;
+        }
+
+        // ==========================================
+        // 6. تعديل الكمية وإضافة أصناف جديدة لأي وجبة
+        // ==========================================
+        const qtyModal = document.getElementById('qtyModal');
+        let editingQtyTarget = null;
+
+        window.openQtyModal = function(slotId, foodId, currentQty) {
+            const food = FOODS[foodId];
+            if (!food) return;
+            editingQtyTarget = { mode: 'slot', slotId };
+            document.getElementById('qtyModalTitle').innerText = `✏️ كمية ${food.name}`;
+            document.getElementById('qtyModalLabel').innerText = `الكمية الجديدة (${food.unit}):`;
+            document.getElementById('customQtyInput').value = currentQty;
+            document.getElementById('resetCustomQtyBtn').style.display = 'flex';
+            qtyModal.classList.add('active');
+        };
+
+        window.openExtraQtyModal = function(mealId, extraId, foodId, currentQty) {
+            const food = FOODS[foodId];
+            if (!food) return;
+            editingQtyTarget = { mode: 'extra', mealId, extraId };
+            document.getElementById('qtyModalTitle').innerText = `✏️ كمية ${food.name}`;
+            document.getElementById('qtyModalLabel').innerText = `الكمية الجديدة (${food.unit}):`;
+            document.getElementById('customQtyInput').value = currentQty;
+            document.getElementById('resetCustomQtyBtn').style.display = 'none';
+            qtyModal.classList.add('active');
+        };
+
+        document.getElementById('closeQtyModalBtn').onclick = () => qtyModal.classList.remove('active');
+        qtyModal.onclick = (e) => { if (e.target === qtyModal) qtyModal.classList.remove('active'); };
+
+        document.getElementById('saveCustomQtyBtn').onclick = () => {
+            const val = parseFloat(document.getElementById('customQtyInput').value);
+            if (isNaN(val) || val <= 0 || val > 2000) {
+                showToast('⚠️ اكتب كمية صحيحة (من 1 إلى 2000)');
+                return;
+            }
+            if (editingQtyTarget && editingQtyTarget.mode === 'slot') {
+                customQuantities[editingQtyTarget.slotId] = Math.round(val);
+                localStorage.setItem(getUserKey('customQtys'), JSON.stringify(customQuantities));
+            } else if (editingQtyTarget && editingQtyTarget.mode === 'extra') {
+                const list = extraMealItems[editingQtyTarget.mealId] || [];
+                const item = list.find(x => x.id === editingQtyTarget.extraId);
+                if (item) item.qty = Math.round(val);
+                localStorage.setItem(getUserKey('extraItems'), JSON.stringify(extraMealItems));
+            }
+            qtyModal.classList.remove('active');
+            renderMeals();
+            showToast('✅ تم تعديل الكمية وحساب السعرات!');
+        };
+
+        document.getElementById('resetCustomQtyBtn').onclick = () => {
+            if (editingQtyTarget && editingQtyTarget.mode === 'slot') {
+                delete customQuantities[editingQtyTarget.slotId];
+                localStorage.setItem(getUserKey('customQtys'), JSON.stringify(customQuantities));
+            }
+            qtyModal.classList.remove('active');
+            renderMeals();
+            showToast('🔄 تم إرجاع الكمية التلقائية حسب سعراتك');
+        };
+
+        const addFoodModal = document.getElementById('addFoodModal');
+        const addDbFoodSelect = document.getElementById('addDbFoodSelect');
+        let activeAddMealId = 'breakfast';
+
+        Object.keys(FOODS).forEach(fId => {
+            const opt = document.createElement('option');
+            opt.value = fId;
+            opt.innerText = `${FOODS[fId].name} (${FOODS[fId].cal} سعرة / ${FOODS[fId].baseQty} ${FOODS[fId].unit})`;
+            addDbFoodSelect.appendChild(opt);
+        });
+
+        addDbFoodSelect.onchange = () => {
+            const f = FOODS[addDbFoodSelect.value];
+            if (f) {
+                document.getElementById('addDbQtyLabel').innerText = `الكمية (${f.unit}):`;
+                document.getElementById('addDbQtyInput').value = f.baseQty;
+            }
+        };
+
+        sanitizeInputRealTime(document.getElementById('customFoodNameInput'), /[^\u0600-\u06FFa-zA-Z0-9\s()\/-]/g);
+
+        document.getElementById('tabAddFromDbBtn').onclick = () => {
+            document.getElementById('tabAddFromDbBtn').classList.add('active');
+            document.getElementById('tabAddCustomFoodBtn').classList.remove('active');
+            document.getElementById('addFromDbBox').style.display = 'flex';
+            document.getElementById('addCustomFoodBox').style.display = 'none';
+        };
+
+        document.getElementById('tabAddCustomFoodBtn').onclick = () => {
+            document.getElementById('tabAddCustomFoodBtn').classList.add('active');
+            document.getElementById('tabAddFromDbBtn').classList.remove('active');
+            document.getElementById('addCustomFoodBox').style.display = 'flex';
+            document.getElementById('addFromDbBox').style.display = 'none';
+        };
+
+        window.openAddFoodModal = function(mealId, mealTitle) {
+            activeAddMealId = mealId;
+            document.getElementById('addFoodModalTitle').innerText = `➕ إضافة صنف إلى ${mealTitle}`;
+            addDbFoodSelect.onchange();
+            addFoodModal.classList.add('active');
+        };
+
+        document.getElementById('closeAddFoodModalBtn').onclick = () => addFoodModal.classList.remove('active');
+        addFoodModal.onclick = (e) => { if (e.target === addFoodModal) addFoodModal.classList.remove('active'); };
+
+        document.getElementById('confirmAddDbFoodBtn').onclick = () => {
+            const foodId = addDbFoodSelect.value;
+            const qty = Math.round(parseFloat(document.getElementById('addDbQtyInput').value));
+            if (!FOODS[foodId] || isNaN(qty) || qty <= 0 || qty > 2000) {
+                showToast('⚠️ اكتب كمية صحيحة');
+                return;
+            }
+            extraMealItems[activeAddMealId] = extraMealItems[activeAddMealId] || [];
+            extraMealItems[activeAddMealId].push({
+                id: 'ext_' + Date.now(),
+                type: 'db',
+                foodId,
+                qty
+            });
+            localStorage.setItem(getUserKey('extraItems'), JSON.stringify(extraMealItems));
+            addFoodModal.classList.remove('active');
+            renderMeals();
+            showToast(`✅ تمت إضافة ${qty} ${FOODS[foodId].unit} ${FOODS[foodId].name}!`);
+        };
+
+        document.getElementById('confirmAddCustomFoodBtn').onclick = () => {
+            const rawName = document.getElementById('customFoodNameInput').value.trim();
+            if (rawName.length < 2 || rawName.length > 30) {
+                showToast('⚠️ اكتب اسم الأكلة (من 2 إلى 30 حرف)');
+                return;
+            }
+            const cal = Math.max(0, Math.min(3000, Math.round(parseFloat(document.getElementById('customFoodCalInput').value) || 0)));
+            const p = Math.max(0, Math.min(300, Math.round(parseFloat(document.getElementById('customFoodProInput').value) || 0)));
+            const c = Math.max(0, Math.min(500, Math.round(parseFloat(document.getElementById('customFoodCarbInput').value) || 0)));
+            const f = Math.max(0, Math.min(200, Math.round(parseFloat(document.getElementById('customFoodFatInput').value) || 0)));
+
+            extraMealItems[activeAddMealId] = extraMealItems[activeAddMealId] || [];
+            extraMealItems[activeAddMealId].push({
+                id: 'ext_' + Date.now(),
+                type: 'custom',
+                name: rawName,
+                cal, p, c, f
+            });
+            localStorage.setItem(getUserKey('extraItems'), JSON.stringify(extraMealItems));
+            document.getElementById('customFoodNameInput').value = '';
+            addFoodModal.classList.remove('active');
+            renderMeals();
+            showToast(`✅ تمت إضافة "${rawName}" للوجبة!`);
+        };
+
+        window.removeExtraMealItem = function(mealId, extraId) {
+            if (!extraMealItems[mealId]) return;
+            extraMealItems[mealId] = extraMealItems[mealId].filter(x => x.id !== extraId);
+            delete checkedItems[extraId];
+            localStorage.setItem(getUserKey('extraItems'), JSON.stringify(extraMealItems));
+            localStorage.setItem(getUserKey('checks'), JSON.stringify(checkedItems));
+            renderMeals();
+            showToast('🗑️ تم حذف الصنف الإضافي');
+        };
+
+        // ==========================================
+        // 7. نافذة تبديل البدائل الذكية
+        // ==========================================
+        window.openSwapModal = function(slotId, role, targetCal, targetPro, targetCarb, targetFat) {
+            const options = ALTERNATIVE_GROUPS[role] || [];
+            const currentFoodId = userSelections[slotId] || options[0];
+
+            modalTitle.innerText = 'اختر البديل (محسوب تلقائياً)';
+            altListContainer.innerHTML = '';
+
+            options.forEach(fId => {
+                const food = FOODS[fId];
+                const stats = calcFoodAmount(fId, { role, targetCal, targetPro, targetCarb, targetFat });
+                const isSelected = fId === currentFoodId;
+
+                const div = document.createElement('div');
+                div.className = `alt-option ${isSelected ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <div>
+                        <div class="alt-name">${stats.qty} ${food.unit} ${food.name}</div>
+                        <div class="alt-meta">${stats.cal} سعرة • ${stats.p} جم بروتين • ${stats.c} جم كارب • ${stats.f} جم دهون</div>
+                    </div>
+                    <div style="font-weight:900; color:var(--accent-blue);">${isSelected ? '✓' : 'اختيار'}</div>
+                `;
+                div.onclick = () => {
+                    userSelections[slotId] = fId;
+                    delete customQuantities[slotId];
+                    localStorage.setItem(getUserKey('selections'), JSON.stringify(userSelections));
+                    localStorage.setItem(getUserKey('customQtys'), JSON.stringify(customQuantities));
+                    altModal.classList.remove('active');
+                    renderMeals();
+                    showToast(`🔄 تم التبديل إلى: ${stats.qty} ${food.unit} ${food.name}`);
+                };
+                altListContainer.appendChild(div);
+            });
+
+            altModal.classList.add('active');
+        };
+
+        closeModalBtn.onclick = () => altModal.classList.remove('active');
+        altModal.onclick = (e) => { if (e.target === altModal) altModal.classList.remove('active'); };
+
+        // ==========================================
+        // 8. متتبع المياه والحفظ والسجل
+        // ==========================================
+        function updateWaterUI() {
+            waterText.innerText = `${waterLiters.toFixed(2)} لتر`;
+        }
+
+        document.getElementById('addWaterBtn').onclick = () => {
+            waterLiters = Math.min(30, Math.round((waterLiters + 0.25) * 100) / 100);
+            localStorage.setItem(getUserKey('water'), waterLiters);
+            updateWaterUI();
+            syncMyStatsToCloud(false);
+            showToast('💧 عاش يا بطل! +250 مل مياه');
+        };
+
+        document.getElementById('resetWaterBtn').onclick = () => {
+            waterLiters = 0;
+            localStorage.setItem(getUserKey('water'), waterLiters);
+            updateWaterUI();
+            syncMyStatsToCloud(false);
+            showToast('تم تصفير عداد المياه');
+        };
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem(getUserKey('history'))) || {};
+            const dates = Object.keys(history).sort((a, b) => new Date(b) - new Date(a));
+
+            if (dates.length === 0) {
+                historyContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:16px; font-weight:700;">لا يوجد سجل سابق حتى الآن.</p>';
+                return;
+            }
+
+            historyContainer.innerHTML = dates.map(date => {
+                const entry = history[date];
+                const badgeClass = entry.pct === 100 ? 'badge-high' : (entry.pct >= 50 ? 'badge-mid' : 'badge-low');
+                const formattedDate = new Date(date).toLocaleDateString('ar-EG', { weekday: 'short', month: 'short', day: 'numeric' });
+                return `
+                    <div class="history-item">
+                        <span class="history-date">${formattedDate}</span>
+                        <div class="history-stats">
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">💧 ${entry.water || 0}ل</span>
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">⚖️ ${entry.weight || '--'}</span>
+                            <span class="badge ${badgeClass}">${entry.pct}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyGoalHeaderUI() {
+            const goalMap = { bulk: 'زيادة وزن 🔥', cut: 'تنشيف ✂️', maintain: 'ثبات وزن ⚖️' };
+            document.getElementById('goalLabelDisplay').innerText = goalMap[userPlanConfig.goal] || 'الهدف اليومي';
+        }
+
+        function initAppForCurrentUser() {
+            const user = getActiveUser();
+            if (!user) {
+                authScreen.classList.remove('hidden');
+                return;
+            }
+            authScreen.classList.add('hidden');
+            userBadgeDisplay.innerText = `👤 ${escapeHTML(user.name)} | ID: ${escapeHTML(user.id)}`;
+
+            const secretCodeAdminBtn = document.getElementById('secretCodeAdminBtn');
+            if (user.id === ADMIN_ID) {
+                secretCodeAdminBtn.style.display = 'inline-flex';
+                document.getElementById('currentSecretCodeDisplay').innerText = currentSecretPasscode;
+            } else {
+                secretCodeAdminBtn.style.display = 'none';
+            }
+
+            fetchFirebaseCloud().then(() => {
+                const db = getUsersDB();
+                if (db[user.id]) pushUserToFirebase(db[user.id]);
+            });
+
+            const savedPlan = JSON.parse(localStorage.getItem(getUserKey('plan')));
+            if (!savedPlan) {
+                document.getElementById('onboardingScreen').classList.remove('hidden');
+                return;
+            } else {
+                document.getElementById('onboardingScreen').classList.add('hidden');
+            }
+
+            userPlanConfig = savedPlan;
+            const savedWeight = localStorage.getItem(getUserKey('weight'));
+            weightInput.value = savedWeight || savedPlan.weight || '';
+
+            GENERATED_MEALS = buildDynamicMeals(userPlanConfig.calories, userPlanConfig.goal, userPlanConfig.proteinRatio || 2.0, parseFloat(weightInput.value) || 75);
+            applyGoalHeaderUI();
+
+            waterLiters = Math.max(0, Math.min(30, parseFloat(localStorage.getItem(getUserKey('water'))) || 0));
+            userSelections = JSON.parse(localStorage.getItem(getUserKey('selections'))) || {};
+            customQuantities = JSON.parse(localStorage.getItem(getUserKey('customQtys'))) || {};
+            extraMealItems = JSON.parse(localStorage.getItem(getUserKey('extraItems'))) || {};
+            checkedItems = JSON.parse(localStorage.getItem(getUserKey('checks'))) || {};
+
+            updateWaterUI();
+            renderMeals();
+            renderHistory();
+        }
+
+        document.getElementById('saveBtn').onclick = () => {
+            const rawW = parseFloat(weightInput.value);
+            const safeW = (!isNaN(rawW) && rawW >= 20 && rawW <= 300) ? String(rawW) : '';
+            weightInput.value = safeW;
+            localStorage.setItem(getUserKey('weight'), safeW);
+            localStorage.setItem(getUserKey('checks'), JSON.stringify(checkedItems));
+            localStorage.setItem(getUserKey('selections'), JSON.stringify(userSelections));
+            localStorage.setItem(getUserKey('customQtys'), JSON.stringify(customQuantities));
+            localStorage.setItem(getUserKey('extraItems'), JSON.stringify(extraMealItems));
+
+            const pct = updateNutritionAndProgress();
+            const history = JSON.parse(localStorage.getItem(getUserKey('history'))) || {};
+            history[todayISO] = { pct, weight: safeW || '--', water: waterLiters };
+            localStorage.setItem(getUserKey('history'), JSON.stringify(history));
+
+            syncMyStatsToCloud(true);
+            renderHistory();
+            showToast('✅ تم حفظ بيانات اليوم ومزامنتها أونلاين!');
+        };
+
+        document.getElementById('resetBtn').onclick = () => {
+            checkedItems = {};
+            waterLiters = 0;
+            localStorage.removeItem(getUserKey('checks'));
+            localStorage.setItem(getUserKey('water'), 0);
+            updateWaterUI();
+            renderMeals();
+            showToast('🔄 تم تصفير اليوم للبدء من جديد');
+        };
+
+        // ==========================================
+        // 9. شاشة إعداد الخطة الذكية (الطول / العمر / التمرين / البروتين)
+        // ==========================================
+        const onboardingScreen = document.getElementById('onboardingScreen');
+        document.getElementById('onboardingForm').onsubmit = (e) => {
+            e.preventDefault();
+            const w = parseFloat(document.getElementById('obWeight').value);
+            const h = parseFloat(document.getElementById('obHeight').value);
+            const age = parseFloat(document.getElementById('obAge').value);
+            const act = parseFloat(document.getElementById('obActivity').value);
+            const goal = document.getElementById('obGoal').value;
+            const proteinRatio = parseFloat(document.getElementById('obProteinRatio').value) || 2.0;
+
+            if (isNaN(w) || w < 30 || w > 250 || isNaN(h) || h < 120 || h > 230 || isNaN(age) || age < 14 || age > 90) {
+                showToast('⚠️ تأكد من إدخال الوزن والطول والعمر بشكل صحيح');
+                return;
+            }
+
+            const bmr = (10 * w) + (6.25 * h) - (5 * age) + 5;
+            const tdee = bmr * act;
+            let finalCal = tdee;
+            if (goal === 'bulk') finalCal += 450;
+            else if (goal === 'cut') finalCal -= 450;
+            finalCal = Math.max(1200, Math.min(6000, Math.round(finalCal / 50) * 50));
+
+            userPlanConfig = { goal, calories: finalCal, weight: w, height: h, age, activity: act, proteinRatio };
+            localStorage.setItem(getUserKey('plan'), JSON.stringify(userPlanConfig));
+            localStorage.setItem(getUserKey('weight'), w);
+            customQuantities = {};
+            localStorage.removeItem(getUserKey('customQtys'));
+
+            onboardingScreen.classList.add('hidden');
+            initAppForCurrentUser();
+            showToast(`🎯 تم تفصيل خطتك على ${finalCal} سعرة وبروتين ${proteinRatio} جم/كجم!`);
+        };
+
+        // ==========================================
+        // 10. تخصيص الخطة والسعرات
+        // ==========================================
+        const planModal = document.getElementById('planModal');
+        document.getElementById('customizePlanNavBtn').onclick = () => {
+            document.getElementById('planGoalSelect').value = userPlanConfig.goal || 'bulk';
+            document.getElementById('planCaloriesInput').value = userPlanConfig.calories || 3650;
+            document.getElementById('calcWeightInput').value = weightInput.value || '';
+            planModal.classList.add('active');
+        };
+        document.getElementById('closePlanModalBtn').onclick = () => planModal.classList.remove('active');
+        planModal.onclick = (e) => { if (e.target === planModal) planModal.classList.remove('active'); };
+
+        document.getElementById('openOnboardingFromPlanBtn').onclick = () => {
+            planModal.classList.remove('active');
+            document.getElementById('obWeight').value = weightInput.value || userPlanConfig.weight || '';
+            if (userPlanConfig.height) document.getElementById('obHeight').value = userPlanConfig.height;
+            if (userPlanConfig.age) document.getElementById('obAge').value = userPlanConfig.age;
+            if (userPlanConfig.activity) document.getElementById('obActivity').value = userPlanConfig.activity;
+            if (userPlanConfig.goal) document.getElementById('obGoal').value = userPlanConfig.goal;
+            if (userPlanConfig.proteinRatio) document.getElementById('obProteinRatio').value = String(userPlanConfig.proteinRatio);
+            onboardingScreen.classList.remove('hidden');
+        };
+
+        document.getElementById('autoCalcCalBtn').onclick = () => {
+            const w = parseFloat(document.getElementById('calcWeightInput').value);
+            const g = document.getElementById('planGoalSelect').value;
+            if (!w || w < 30 || w > 250) {
+                showToast('⚠️ اكتب وزنك الصحيح أولاً');
+                return;
+            }
+            const mult = g === 'bulk' ? 42 : (g === 'cut' ? 27 : 34);
+            const est = Math.round((w * mult) / 50) * 50;
+            document.getElementById('planCaloriesInput').value = est;
+            showToast(`🧮 السعرات المقترحة لوزنك: ${est} سعرة`);
+        };
+
+        document.getElementById('applyPlanBtn').onclick = () => {
+            const goal = document.getElementById('planGoalSelect').value;
+            const cals = Math.max(1200, Math.min(6000, parseInt(document.getElementById('planCaloriesInput').value) || 3650));
+            userPlanConfig = { ...userPlanConfig, goal, calories: cals };
+            localStorage.setItem(getUserKey('plan'), JSON.stringify(userPlanConfig));
+            customQuantities = {};
+            localStorage.removeItem(getUserKey('customQtys'));
+
+            GENERATED_MEALS = buildDynamicMeals(cals, goal, userPlanConfig.proteinRatio || 2.0, parseFloat(weightInput.value) || 75);
+            applyGoalHeaderUI();
+            renderMeals();
+            planModal.classList.remove('active');
+            showToast(`✅ تم تحديث خطتك إلى ${cals} سعرة!`);
+        };
+
+        // ==========================================
+        // 11. المزامنة اليدوية بين الأجهزة
+        // ==========================================
+        const syncModal = document.getElementById('syncModal');
+        document.getElementById('syncNavBtn').onclick = () => {
+            document.getElementById('importSyncInput').value = '';
+            syncModal.classList.add('active');
+        };
+        document.getElementById('closeSyncModalBtn').onclick = () => syncModal.classList.remove('active');
+        syncModal.onclick = (e) => { if (e.target === syncModal) syncModal.classList.remove('active'); };
+
+        document.getElementById('exportSyncBtn').onclick = async () => {
+            const user = getActiveUser();
+            if (!user) return;
+            const payload = {
+                user,
+                plan: userPlanConfig,
+                weight: weightInput.value,
+                water: waterLiters,
+                selections: userSelections,
+                customQtys: customQuantities,
+                extraItems: extraMealItems,
+                checks: checkedItems,
+                history: JSON.parse(localStorage.getItem(getUserKey('history'))) || {}
+            };
+            const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+            try {
+                await navigator.clipboard.writeText(code);
+                showToast('📋 تم نسخ كود المزامنة! الصقه في جهازك الآخر');
+            } catch (e) {
+                document.getElementById('importSyncInput').value = code;
+                showToast('انسخ الكود من المربع بالأسفل');
+            }
+        };
+
+        document.getElementById('importSyncBtn').onclick = () => {
+            const code = document.getElementById('importSyncInput').value.trim();
+            if (!code) {
+                showToast('⚠️ الصق كود المزامنة أولاً');
+                return;
+            }
+            try {
+                const decoded = JSON.parse(decodeURIComponent(escape(atob(code))));
+                if (!decoded.user || !decoded.user.id || !isValidIdOrCode(decoded.user.id) || !isValidName(decoded.user.name)) {
+                    throw new Error('Invalid code');
+                }
+                const db = getUsersDB();
+                db[decoded.user.id] = decoded.user;
+                saveUsersDB(db);
+                localStorage.setItem(ACTIVE_USER_KEY, decoded.user.id);
+
+                if (decoded.plan) localStorage.setItem(getUserKey('plan'), JSON.stringify(decoded.plan));
+                if (decoded.weight !== undefined) localStorage.setItem(getUserKey('weight'), decoded.weight);
+                if (decoded.water !== undefined) localStorage.setItem(getUserKey('water'), decoded.water);
+                if (decoded.selections) localStorage.setItem(getUserKey('selections'), JSON.stringify(decoded.selections));
+                if (decoded.customQtys) localStorage.setItem(getUserKey('customQtys'), JSON.stringify(decoded.customQtys));
+                if (decoded.extraItems) localStorage.setItem(getUserKey('extraItems'), JSON.stringify(decoded.extraItems));
+                if (decoded.checks) localStorage.setItem(getUserKey('checks'), JSON.stringify(decoded.checks));
+                if (decoded.history) localStorage.setItem(getUserKey('history'), JSON.stringify(decoded.history));
+
+                syncModal.classList.remove('active');
+                initAppForCurrentUser();
+                showToast(`🎉 تم استيراد حساب ${escapeHTML(decoded.user.name)} وبياناته بنجاح!`);
+            } catch (err) {
+                showToast('❌ كود المزامنة غير صالح، تأكد من نسخه بالكامل');
+            }
+        };
+
+        // ==========================================
+        // 12. إدارة كود الدعوة السري ومسح الحسابات (Firebase Admin)
+        // ==========================================
+        const secretCodeModal = document.getElementById('secretCodeModal');
+        document.getElementById('secretCodeAdminBtn').onclick = () => {
+            document.getElementById('currentSecretCodeDisplay').innerText = currentSecretPasscode;
+            document.getElementById('newSecretCodeInput').value = '';
+            secretCodeModal.classList.add('active');
+        };
+        document.getElementById('closeSecretCodeModalBtn').onclick = () => secretCodeModal.classList.remove('active');
+        secretCodeModal.onclick = (e) => { if (e.target === secretCodeModal) secretCodeModal.classList.remove('active'); };
+
+        document.getElementById('saveSecretCodeBtn').onclick = async () => {
+            const newCode = document.getElementById('newSecretCodeInput').value.trim();
+            if (!isValidIdOrCode(newCode)) {
+                showToast('⚠️ الكود السري يجب أن يكون حروفاً إنجليزية وأرقاماً فقط (3 أحرف على الأقل)');
+                return;
+            }
+            currentSecretPasscode = newCode;
+            localStorage.setItem(SECRET_CODE_KEY, newCode);
+            document.getElementById('currentSecretCodeDisplay').innerText = newCode;
+            document.getElementById('newSecretCodeInput').value = '';
+            await pushSecretCodeToFirebase(newCode);
+            showToast(`🔑 تم تحديث كود الدعوة السري على السيرفر إلى: ${newCode}`);
+        };
+
+        document.getElementById('purgeOtherAccountsBtn').onclick = async () => {
+            const currentUser = getActiveUser();
+            if (!currentUser || currentUser.id !== ADMIN_ID) return;
+
+            const db = getUsersDB();
+            const adminRecord = db[ADMIN_ID] || {
+                name: 'Amr',
+                id: ADMIN_ID,
+                pass: '',
+                isDefault: true,
+                following: [],
+                followers: [],
+                stats: { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+            };
+            adminRecord.following = [];
+            adminRecord.followers = [];
+
+            // تنظيف الذاكرة المحلية
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('amrDiet_') && !k.startsWith(`amrDiet_${ADMIN_ID}_`)) {
+                    keysToRemove.push(k);
+                }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+
+            const cleanDB = {};
+            cleanDB[ADMIN_ID] = adminRecord;
+            saveUsersDB(cleanDB);
+
+            // مسح كل الحسابات الأخرى من Firebase نهائياً وإبقاء الأدمن فقط
+            const fbPayload = {};
+            fbPayload[toFirebaseKey(ADMIN_ID)] = adminRecord;
+            try {
+                /* حذف الحسابات من Firebase يتم من الـ Console */
+            } catch (e) {}
+
+            secretCodeModal.classList.remove('active');
+            showToast('🧹 تم المسح محلياً. احذف الحسابات من Firebase Console');
+        };
+
+        // ==========================================
+        // 13. نظام الأصدقاء والمتابعة والتحدي (Firebase Realtime)
+        // ==========================================
+        const friendsModal = document.getElementById('friendsModal');
+        const friendsListContainer = document.getElementById('friendsListContainer');
+        let activeFriendsTab = 'following';
+
+        document.getElementById('friendsNavBtn').onclick = async () => {
+            const u = getActiveUser();
+            if (u) document.getElementById('myShareIdText').innerText = u.id;
+            renderFriendsModal();
+            friendsModal.classList.add('active');
+            await fetchFirebaseCloud();
+            renderFriendsModal();
+        };
+        document.getElementById('closeFriendsModalBtn').onclick = () => friendsModal.classList.remove('active');
+        friendsModal.onclick = (e) => { if (e.target === friendsModal) friendsModal.classList.remove('active'); };
+
+        document.getElementById('refreshFriendsBtn').onclick = async () => {
+            showToast('🔄 جاري التحديث من السيرفر...');
+            const me = getActiveUser();
+            if (me) {
+                const db = getUsersDB();
+                if (db[me.id]) await pushUserToFirebase(db[me.id]);
+            }
+            await fetchFirebaseCloud();
+            renderFriendsModal();
+            showToast('✅ تم تحديث قائمة الأصدقاء!');
+        };
+
+        document.getElementById('tabFollowingBtn').onclick = () => {
+            activeFriendsTab = 'following';
+            document.getElementById('tabFollowingBtn').classList.add('active');
+            document.getElementById('tabFollowersBtn').classList.remove('active');
+            document.getElementById('tabDiscoverBtn').classList.remove('active');
+            renderFriendsModal();
+        };
+        document.getElementById('tabFollowersBtn').onclick = () => {
+            activeFriendsTab = 'followers';
+            document.getElementById('tabFollowersBtn').classList.add('active');
+            document.getElementById('tabFollowingBtn').classList.remove('active');
+            document.getElementById('tabDiscoverBtn').classList.remove('active');
+            renderFriendsModal();
+        };
+        document.getElementById('tabDiscoverBtn').onclick = () => {
+            activeFriendsTab = 'discover';
+            document.getElementById('tabDiscoverBtn').classList.add('active');
+            document.getElementById('tabFollowingBtn').classList.remove('active');
+            document.getElementById('tabFollowersBtn').classList.remove('active');
+            renderFriendsModal();
+        };
+
+        window.toggleFollowUser = async function(targetId) {
+            const me = getActiveUser();
+            if (!me || me.id === targetId || !isValidIdOrCode(targetId)) return;
+            const db = getUsersDB();
+            const targetUser = db[targetId];
+            if (!targetUser) {
+                showToast('❌ هذا الـ ID غير موجود');
+                return;
+            }
+            db[me.id].following = db[me.id].following || [];
+            db[targetId].followers = db[targetId].followers || [];
+
+            const idx = db[me.id].following.indexOf(targetId);
+            if (idx > -1) {
+                db[me.id].following.splice(idx, 1);
+                db[targetId].followers = db[targetId].followers.filter(id => id !== me.id);
+                showToast(`تم إلغاء متابعة ${escapeHTML(db[targetId].name)}`);
+            } else {
+                db[me.id].following.push(targetId);
+                if (!db[targetId].followers.includes(me.id)) db[targetId].followers.push(me.id);
+                showToast(`🔥 بدأت متابعة ${escapeHTML(db[targetId].name)}!`);
+            }
+            saveUsersDB(db);
+            renderFriendsModal();
+
+            // تحديث الطرفين على Firebase فوراً
+            await Promise.all([
+                pushUserToFirebase(db[me.id]),
+                pushUserToFirebase(db[targetId])
+            ]);
+        };
+
+        document.getElementById('addFriendByIdBtn').onclick = async () => {
+            const searchId = document.getElementById('friendSearchInput').value.trim().toLowerCase();
+            if (!searchId || !isValidIdOrCode(searchId)) {
+                showToast('⚠️ اكتب ID صديقك (حروف وأرقام فقط)');
+                return;
+            }
+            const me = getActiveUser();
+            if (me && me.id === searchId) {
+                showToast('😅 ده رقم التعريف بتاعك إنت!');
+                return;
+            }
+            await fetchFirebaseCloud();
+            const db = getUsersDB();
+            if (!db[searchId]) {
+                showToast('❌ لم يتم العثور على حساب بهذا الـ ID');
+                return;
+            }
+            await toggleFollowUser(searchId);
+            document.getElementById('friendSearchInput').value = '';
+        };
+
+        window.cheerFriend = function(friendName) {
+            showToast(`🔥 بعتّ تشجيع حماس لـ ${escapeHTML(friendName)}: "عاش يا وحش كمل!"`);
+        };
+
+        function renderFriendsModal() {
+            const me = getActiveUser();
+            if (!me) return;
+            const db = getUsersDB();
+            const myRecord = db[me.id] || me;
+            const followingList = myRecord.following || [];
+            const followersList = myRecord.followers || [];
+
+            document.getElementById('followingCount').innerText = followingList.length;
+            document.getElementById('followersCount').innerText = followersList.length;
+
+            let targetIds = [];
+            if (activeFriendsTab === 'following') {
+                targetIds = followingList;
+            } else if (activeFriendsTab === 'followers') {
+                targetIds = followersList;
+            } else {
+                targetIds = Object.keys(db).filter(id => id !== me.id);
+            }
+
+            if (targetIds.length === 0) {
+                friendsListContainer.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:18px; font-weight:700; font-size:0.85rem;">لا يوجد أشخاص في هذه القائمة حالياً.</p>`;
+                return;
+            }
+
+            friendsListContainer.innerHTML = targetIds.map(uid => {
+                const u = db[uid];
+                if (!u) return '';
+                const safeName = escapeHTML(u.name);
+                const safeId = escapeHTML(u.id);
+                const st = u.stats || { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' };
+                const isFollowing = followingList.includes(uid);
+                return `
+                    <div class="friend-card">
+                        <div class="friend-top">
+                            <div>
+                                <div style="font-weight:900; font-size:0.95rem;">👤 ${safeName} <span style="font-size:0.72rem; color:var(--accent-blue);">(${safeId})</span></div>
+                                <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;">إنجاز اليوم: <strong style="color:var(--accent-blue);">${st.pct}%</strong></div>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button type="button" class="mini-btn mini-btn-green" onclick="cheerFriend('${safeName}')">🔥 شجعه</button>
+                                <button type="button" class="mini-btn ${isFollowing ? 'mini-btn-gray' : 'mini-btn-blue'}" onclick="toggleFollowUser('${safeId}')">${isFollowing ? 'متابَع ✓' : '+ متابعة'}</button>
+                            </div>
+                        </div>
+                        <div class="friend-stats-row">
+                            <div class="friend-stat-pill">🔥 ${st.cal}/${st.targetCal}</div>
+                            <div class="friend-stat-pill">💧 ${st.water} لتر</div>
+                            <div class="friend-stat-pill">⚖️ ${st.weight} كجم</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // نافذة التثبيت ونسخ الرابط لـ Safari
+        const installModal = document.getElementById('installModal');
+        document.getElementById('installNavBtn').onclick = () => installModal.classList.add('active');
+        document.getElementById('closeInstallModalBtn').onclick = () => installModal.classList.remove('active');
+        installModal.onclick = (e) => { if (e.target === installModal) installModal.classList.remove('active'); };
+
+        document.getElementById('copyLinkBtn').onclick = async () => {
+            const appUrl = 'https://amr0102349-max.github.io/diet_app/NN_diet.html';
+            try {
+                await navigator.clipboard.writeText(appUrl);
+                showToast('🔗 تم نسخ الرابط! افتح Safari والصقه الآن');
+            } catch (err) {
+                showToast('انسخ الرابط من شريط المتصفح بالأعلى');
+            }
+        };
+
+        // التشغيل المبدئي
+        initTheme();
+        fetchFirebaseCloud().then(() => {
+            initAppForCurrentUser();
+        });
+    </script>
+</body>
+</html>
