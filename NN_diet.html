@@ -1208,7 +1208,7 @@
 
             <!-- إضافة صديق بالـ ID -->
             <div style="display:flex; gap:8px;">
-                <input type="text" id="friendSearchInput" class="auth-input" maxlength="20" placeholder="اكتب ID صديقك (مثال: amr142)" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:9px 12px; font-size:0.85rem;">
+                <input type="text" id="friendSearchInput" class="auth-input" maxlength="20" placeholder="اكتب ID صديقك (مثال: ahmed01)" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:9px 12px; font-size:0.85rem;">
                 <button type="button" id="addFriendByIdBtn" class="swap-btn" style="background:var(--accent-blue); color:#fff; border:none; padding:0 14px;">+ متابعة</button>
             </div>
 
@@ -1279,11 +1279,48 @@
 
     <script>
         // ==========================================
-        // 0. حماية وتنظيف المدخلات (Security Sanitization)
+        // 0. ضبط المصنع النظيف (إزالة أي حسابات قديمة وإبقاء الأدمن فقط)
         // ==========================================
         const ADMIN_ID = '3iid@001';
         const DEFAULT_INVITE_CODE = '3id';
+        const FACTORY_CLEAN_FLAG = 'amrDietFactoryClean_v10';
 
+        (function enforceCleanAdminOnlyStart() {
+            if (localStorage.getItem(FACTORY_CLEAN_FLAG) === 'done') return;
+
+            const keysToDelete = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (!k) continue;
+                if (k.startsWith('amrDiet_') && !k.startsWith(`amrDiet_${ADMIN_ID}_`)) {
+                    keysToDelete.push(k);
+                }
+            }
+            keysToDelete.forEach(k => localStorage.removeItem(k));
+
+            const freshAdminDB = {};
+            freshAdminDB[ADMIN_ID] = {
+                name: 'Amr',
+                id: ADMIN_ID,
+                pass: '123456',
+                isDefault: true,
+                following: [],
+                followers: [],
+                stats: { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+            };
+            localStorage.setItem('amrDietUsersDB_v1', JSON.stringify(freshAdminDB));
+
+            const currentActive = localStorage.getItem('amrDietActiveUser_v1');
+            if (currentActive && currentActive !== ADMIN_ID) {
+                localStorage.removeItem('amrDietActiveUser_v1');
+            }
+
+            localStorage.setItem(FACTORY_CLEAN_FLAG, 'done');
+        })();
+
+        // ==========================================
+        // 1. حماية وتنظيف المدخلات (Security Sanitization)
+        // ==========================================
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
             return String(str)
@@ -1314,155 +1351,144 @@
         }
 
         // ==========================================
-        // 1. نظام المزامنة السحابية REST API (سريع ومستقر 100%)
+        // 2. نظام المزامنة السحابية النظيف (ntfy.sh Pub/Sub Cloud - قناة جديدة تماماً)
         // ==========================================
-        const CLOUD_API_URL = 'https://kvdb.io/A2x9KmPqR7vN4wLpZ8tY3c/amr_diet_cloud_v4';
+        const CLOUD_TOPIC_URL = 'https://ntfy.sh/amr_diet_clean_3iid_2026_v10';
         const SECRET_CODE_KEY = 'amrDietSecretCodeV1';
         let currentSecretPasscode = localStorage.getItem(SECRET_CODE_KEY) || DEFAULT_INVITE_CODE;
-        let cloudSyncInProgress = false;
+        let lastBroadcastHash = '';
 
         async function fetchCloudState() {
             try {
-                const res = await fetch(CLOUD_API_URL + '?t=' + Date.now(), {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
+                const res = await fetch(`${CLOUD_TOPIC_URL}/json?poll=1&since=24h&_=${Date.now()}`, {
+                    method: 'GET'
                 });
                 if (!res.ok) return null;
-                const data = await res.json();
-                if (!data || typeof data !== 'object') return null;
+                const rawText = await res.text();
+                if (!rawText) return null;
 
-                if (typeof data.secretPasscode === 'string' && isValidIdOrCode(data.secretPasscode)) {
-                    currentSecretPasscode = data.secretPasscode;
-                    localStorage.setItem(SECRET_CODE_KEY, currentSecretPasscode);
-                    const disp = document.getElementById('currentSecretCodeDisplay');
-                    if (disp) disp.innerText = currentSecretPasscode;
-                }
+                const lines = rawText.trim().split('\n');
+                const db = getUsersDB();
+                let changed = false;
+                let latestPurgeTs = 0;
+                let purgedList = [];
 
-                if (data.users && typeof data.users === 'object') {
-                    const db = getUsersDB();
-                    let changed = false;
+                lines.forEach(line => {
+                    try {
+                        const evt = JSON.parse(line);
+                        if (!evt || !evt.message) return;
+                        const msg = JSON.parse(evt.message);
+                        if (!msg || typeof msg !== 'object') return;
 
-                    if (Array.isArray(data.purgedIds)) {
-                        data.purgedIds.forEach(pid => {
-                            if (pid !== ADMIN_ID && db[pid]) {
-                                delete db[pid];
-                                changed = true;
+                        if (msg.type === 'PURGE' && Array.isArray(msg.purgedIds)) {
+                            const ts = Number(msg.ts) || 0;
+                            if (ts > latestPurgeTs) {
+                                latestPurgeTs = ts;
+                                purgedList = msg.purgedIds;
                             }
-                        });
-                    }
+                        } else if (msg.type === 'SECRET_CODE' && typeof msg.code === 'string' && isValidIdOrCode(msg.code)) {
+                            currentSecretPasscode = msg.code;
+                            localStorage.setItem(SECRET_CODE_KEY, currentSecretPasscode);
+                            const disp = document.getElementById('currentSecretCodeDisplay');
+                            if (disp) disp.innerText = currentSecretPasscode;
+                        } else if (msg.type === 'USER_SYNC' && msg.user && typeof msg.user === 'object') {
+                            const rawU = msg.user;
+                            const uid = String(rawU.id || '').toLowerCase();
+                            if (!isValidIdOrCode(uid) || !isValidName(rawU.name)) return;
+                            const msgTs = Number(msg.ts) || 0;
+                            if (purgedList.includes(uid) && uid !== ADMIN_ID && msgTs <= latestPurgeTs) return;
 
-                    Object.keys(data.users).forEach(uid => {
-                        const rawU = data.users[uid];
-                        if (!rawU || !isValidIdOrCode(uid) || !isValidName(rawU.name)) return;
-                        if (Array.isArray(data.purgedIds) && data.purgedIds.includes(uid) && uid !== ADMIN_ID) return;
-
-                        const cleanUser = {
-                            id: uid.toLowerCase(),
-                            name: String(rawU.name).trim(),
-                            pass: typeof rawU.pass === 'string' ? rawU.pass : '',
-                            following: Array.isArray(rawU.following) ? rawU.following.filter(x => isValidIdOrCode(x)) : [],
-                            followers: Array.isArray(rawU.followers) ? rawU.followers.filter(x => isValidIdOrCode(x)) : [],
-                            stats: rawU.stats && typeof rawU.stats === 'object' ? {
+                            const cleanStats = rawU.stats && typeof rawU.stats === 'object' ? {
                                 pct: Math.max(0, Math.min(100, Number(rawU.stats.pct) || 0)),
                                 cal: Math.max(0, Math.min(20000, Number(rawU.stats.cal) || 0)),
                                 targetCal: Math.max(500, Math.min(20000, Number(rawU.stats.targetCal) || 3650)),
                                 water: Math.max(0, Math.min(30, Number(rawU.stats.water) || 0)),
                                 weight: (rawU.stats.weight && !isNaN(Number(rawU.stats.weight))) ? String(rawU.stats.weight) : '--'
-                            } : { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
-                        };
+                            } : { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' };
 
-                        if (db[cleanUser.id]) {
-                            db[cleanUser.id].name = cleanUser.name;
-                            db[cleanUser.id].following = Array.from(new Set([...(db[cleanUser.id].following || []), ...cleanUser.following]));
-                            db[cleanUser.id].followers = Array.from(new Set([...(db[cleanUser.id].followers || []), ...cleanUser.followers]));
-                            if (cleanUser.id !== (getActiveUser() && getActiveUser().id)) {
-                                db[cleanUser.id].stats = cleanUser.stats;
+                            const cleanFollowing = Array.isArray(rawU.following) ? rawU.following.filter(x => isValidIdOrCode(x)) : [];
+                            const cleanFollowers = Array.isArray(rawU.followers) ? rawU.followers.filter(x => isValidIdOrCode(x)) : [];
+
+                            if (db[uid]) {
+                                db[uid].name = String(rawU.name).trim();
+                                if (rawU.pass && !db[uid].pass) db[uid].pass = String(rawU.pass);
+                                db[uid].following = Array.from(new Set([...(db[uid].following || []), ...cleanFollowing]));
+                                db[uid].followers = Array.from(new Set([...(db[uid].followers || []), ...cleanFollowers]));
+                                const activeU = getActiveUser();
+                                if (!activeU || uid !== activeU.id) {
+                                    db[uid].stats = cleanStats;
+                                }
+                            } else {
+                                db[uid] = {
+                                    id: uid,
+                                    name: String(rawU.name).trim(),
+                                    pass: typeof rawU.pass === 'string' ? rawU.pass : '',
+                                    following: cleanFollowing,
+                                    followers: cleanFollowers,
+                                    stats: cleanStats
+                                };
                             }
-                        } else {
-                            db[cleanUser.id] = cleanUser;
+                            changed = true;
                         }
-                        changed = true;
-                    });
+                    } catch (e) {}
+                });
 
-                    if (changed) {
-                        saveUsersDB(db);
-                        if (document.getElementById('friendsModal').classList.contains('active')) {
-                            renderFriendsModal();
+                if (purgedList.length > 0) {
+                    purgedList.forEach(pid => {
+                        if (pid !== ADMIN_ID && db[pid]) {
+                            delete db[pid];
+                            changed = true;
                         }
+                    });
+                }
+
+                if (changed) {
+                    saveUsersDB(db);
+                    if (document.getElementById('friendsModal').classList.contains('active')) {
+                        renderFriendsModal();
                     }
                 }
-                return data;
+                return true;
             } catch (err) {
                 return null;
             }
         }
 
-        async function pushCloudState(extraUpdates = {}) {
-            if (cloudSyncInProgress) return;
-            cloudSyncInProgress = true;
+        async function broadcastToCloud(payloadObj, force = false) {
             try {
-                let remoteData = {};
-                try {
-                    const getRes = await fetch(CLOUD_API_URL + '?t=' + Date.now());
-                    if (getRes.ok) {
-                        const parsed = await getRes.json();
-                        if (parsed && typeof parsed === 'object') remoteData = parsed;
-                    }
-                } catch (e) {}
+                const strPayload = JSON.stringify(payloadObj);
+                if (!force && strPayload === lastBroadcastHash) return;
+                lastBroadcastHash = strPayload;
 
-                const localDb = getUsersDB();
-                const mergedUsers = { ...(remoteData.users || {}) };
-                const purgedIds = Array.isArray(extraUpdates.purgedIds)
-                    ? extraUpdates.purgedIds
-                    : (Array.isArray(remoteData.purgedIds) ? remoteData.purgedIds : []);
-
-                purgedIds.forEach(pid => {
-                    if (pid !== ADMIN_ID) delete mergedUsers[pid];
-                });
-
-                Object.keys(localDb).forEach(uid => {
-                    if (purgedIds.includes(uid) && uid !== ADMIN_ID) return;
-                    const u = localDb[uid];
-                    const rem = mergedUsers[uid] || {};
-                    mergedUsers[uid] = {
-                        id: u.id,
-                        name: u.name,
-                        pass: u.pass || rem.pass || '',
-                        following: Array.from(new Set([...(rem.following || []), ...(u.following || [])])),
-                        followers: Array.from(new Set([...(rem.followers || []), ...(u.followers || [])])),
-                        stats: u.stats || rem.stats || { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
-                    };
-                });
-
-                if (extraUpdates.replaceAllUsersWithAdminOnly && localDb[ADMIN_ID]) {
-                    Object.keys(mergedUsers).forEach(k => {
-                        if (k !== ADMIN_ID) delete mergedUsers[k];
-                    });
-                    mergedUsers[ADMIN_ID] = localDb[ADMIN_ID];
-                }
-
-                const payload = {
-                    secretPasscode: extraUpdates.secretPasscode || currentSecretPasscode || remoteData.secretPasscode || DEFAULT_INVITE_CODE,
-                    users: mergedUsers,
-                    purgedIds: purgedIds,
-                    updatedAt: Date.now()
-                };
-
-                await fetch(CLOUD_API_URL, {
+                await fetch(CLOUD_TOPIC_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: strPayload
                 });
-            } catch (err) {
-            } finally {
-                cloudSyncInProgress = false;
-            }
+            } catch (err) {}
         }
 
-        // تحديث دوري كل 12 ثانية لضمان وصول طلبات المتابعة والتحديثات
+        async function pushMyUserToCloud(force = false) {
+            const user = getActiveUser();
+            if (!user) return;
+            const db = getUsersDB();
+            const u = db[user.id] || user;
+            await broadcastToCloud({
+                type: 'USER_SYNC',
+                ts: Date.now(),
+                user: {
+                    id: u.id,
+                    name: u.name,
+                    pass: u.pass || '',
+                    following: u.following || [],
+                    followers: u.followers || [],
+                    stats: u.stats || { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+                }
+            }, force);
+        }
+
         setInterval(() => {
             fetchCloudState();
-        }, 12000);
+        }, 10000);
 
         // توليد أيقونة التطبيق الاحترافية HD (PNG) للآيفون والأندرويد
         (function generateAppIcon() {
@@ -1515,7 +1541,7 @@
         })();
 
         // ==========================================
-        // 2. نظام الحسابات وكود الدعوة السري
+        // 3. نظام الحسابات وكود الدعوة السري
         // ==========================================
         const USERS_DB_KEY = 'amrDietUsersDB_v1';
         const ACTIVE_USER_KEY = 'amrDietActiveUser_v1';
@@ -1574,7 +1600,7 @@
                 weight: weightVal
             };
             saveUsersDB(db);
-            pushCloudState();
+            pushMyUserToCloud(false);
         }
 
         // فلترة فورية للحقول ضد الأكواد والرموز الضارة
@@ -1695,9 +1721,9 @@
                 db[ADMIN_ID].followers = Array.from(new Set([...(db[ADMIN_ID].followers || []), idVal]));
             }
             saveUsersDB(db);
-            await pushCloudState();
-
             localStorage.setItem(ACTIVE_USER_KEY, idVal);
+            await pushMyUserToCloud(true);
+
             authErrorBox.style.display = 'none';
             initAppForCurrentUser();
             showToast(`🎉 تم إنشاء حسابك بنجاح يا ${escapeHTML(nameVal)}!`);
@@ -1712,7 +1738,7 @@
         };
 
         // ==========================================
-        // 3. قاعدة بيانات الأطعمة والبدائل
+        // 4. قاعدة بيانات الأطعمة والبدائل
         // ==========================================
         const FOODS = {
             whole_egg: { name: 'بيض كامل', unit: 'بيضة', baseQty: 1, cal: 72, p: 6.3, c: 0.4, f: 4.8 },
@@ -1850,7 +1876,7 @@
         }
 
         // ==========================================
-        // 4. المتغيرات الأساسية وعرض الوجبات
+        // 5. المتغيرات الأساسية وعرض الوجبات
         // ==========================================
         const mealsContainer = document.getElementById('mealsContainer');
         const weightInput = document.getElementById('weightInput');
@@ -2069,7 +2095,7 @@
         }
 
         // ==========================================
-        // 5. تعديل الكمية وإضافة أصناف جديدة لأي وجبة
+        // 6. تعديل الكمية وإضافة أصناف جديدة لأي وجبة
         // ==========================================
         const qtyModal = document.getElementById('qtyModal');
         let editingQtyTarget = null;
@@ -2230,7 +2256,7 @@
         };
 
         // ==========================================
-        // 6. نافذة تبديل البدائل الذكية
+        // 7. نافذة تبديل البدائل الذكية
         // ==========================================
         window.openSwapModal = function(slotId, role, targetCal, targetPro, targetCarb, targetFat) {
             const options = ALTERNATIVE_GROUPS[role] || [];
@@ -2272,7 +2298,7 @@
         altModal.onclick = (e) => { if (e.target === altModal) altModal.classList.remove('active'); };
 
         // ==========================================
-        // 7. متتبع المياه والحفظ والسجل
+        // 8. متتبع المياه والحفظ والسجل
         // ==========================================
         function updateWaterUI() {
             waterText.innerText = `${waterLiters.toFixed(2)} لتر`;
@@ -2342,7 +2368,7 @@
                 secretCodeAdminBtn.style.display = 'none';
             }
 
-            fetchCloudState().then(() => pushCloudState());
+            fetchCloudState().then(() => pushMyUserToCloud(true));
 
             const savedPlan = JSON.parse(localStorage.getItem(getUserKey('plan')));
             if (!savedPlan) {
@@ -2385,6 +2411,7 @@
             history[todayISO] = { pct, weight: safeW || '--', water: waterLiters };
             localStorage.setItem(getUserKey('history'), JSON.stringify(history));
 
+            pushMyUserToCloud(true);
             renderHistory();
             showToast('✅ تم حفظ بيانات اليوم في سجل أدائك!');
         };
@@ -2400,7 +2427,7 @@
         };
 
         // ==========================================
-        // 8. شاشة إعداد الخطة الذكية (الطول / العمر / التمرين / البروتين)
+        // 9. شاشة إعداد الخطة الذكية (الطول / العمر / التمرين / البروتين)
         // ==========================================
         const onboardingScreen = document.getElementById('onboardingScreen');
         document.getElementById('onboardingForm').onsubmit = (e) => {
@@ -2436,7 +2463,7 @@
         };
 
         // ==========================================
-        // 9. تخصيص الخطة والسعرات
+        // 10. تخصيص الخطة والسعرات
         // ==========================================
         const planModal = document.getElementById('planModal');
         document.getElementById('customizePlanNavBtn').onclick = () => {
@@ -2488,7 +2515,7 @@
         };
 
         // ==========================================
-        // 10. المزامنة السحابية بين الأجهزة
+        // 11. المزامنة السحابية بين الأجهزة
         // ==========================================
         const syncModal = document.getElementById('syncModal');
         document.getElementById('syncNavBtn').onclick = () => {
@@ -2556,7 +2583,7 @@
         };
 
         // ==========================================
-        // 11. إدارة كود الدعوة السري (للأدمن فقط)
+        // 12. إدارة كود الدعوة السري (للأدمن فقط)
         // ==========================================
         const secretCodeModal = document.getElementById('secretCodeModal');
         document.getElementById('secretCodeAdminBtn').onclick = () => {
@@ -2577,7 +2604,7 @@
             localStorage.setItem(SECRET_CODE_KEY, newCode);
             document.getElementById('currentSecretCodeDisplay').innerText = newCode;
             document.getElementById('newSecretCodeInput').value = '';
-            await pushCloudState({ secretPasscode: newCode });
+            await broadcastToCloud({ type: 'SECRET_CODE', code: newCode, ts: Date.now() }, true);
             showToast(`🔑 تم تحديث كود الدعوة السري أونلاين إلى: ${newCode}`);
         };
 
@@ -2603,13 +2630,13 @@
                 db[ADMIN_ID].followers = [];
             }
             saveUsersDB(db);
-            await pushCloudState({ purgedIds: purged, replaceAllUsersWithAdminOnly: true });
+            await broadcastToCloud({ type: 'PURGE', purgedIds: purged, ts: Date.now() }, true);
             secretCodeModal.classList.remove('active');
             showToast('🧹 تم مسح كل الحسابات الأخرى أونلاين وإبقاء حسابك 3iid@001 فقط!');
         };
 
         // ==========================================
-        // 12. نظام الأصدقاء والمتابعة والتحدي (أونلاين REST API)
+        // 13. نظام الأصدقاء والمتابعة والتحدي (أونلاين ntfy.sh)
         // ==========================================
         const friendsModal = document.getElementById('friendsModal');
         const friendsListContainer = document.getElementById('friendsListContainer');
@@ -2620,6 +2647,7 @@
             if (u) document.getElementById('myShareIdText').innerText = u.id;
             renderFriendsModal();
             friendsModal.classList.add('active');
+            await pushMyUserToCloud(true);
             await fetchCloudState();
             renderFriendsModal();
         };
@@ -2628,6 +2656,7 @@
 
         document.getElementById('refreshFriendsBtn').onclick = async () => {
             showToast('🔄 جاري تحديث قائمة الأصدقاء...');
+            await pushMyUserToCloud(true);
             await fetchCloudState();
             renderFriendsModal();
             showToast('✅ تم التحديث!');
@@ -2679,7 +2708,7 @@
             }
             saveUsersDB(db);
             renderFriendsModal();
-            await pushCloudState();
+            await pushMyUserToCloud(true);
         };
 
         document.getElementById('addFriendByIdBtn').onclick = async () => {
