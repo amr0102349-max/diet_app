@@ -10,7 +10,6 @@
     <meta name="theme-color" content="#090d16">
     <title>تطبيق الدايت - عمرو</title>
     
-    <!-- روابط الأيقونات (يتم توليدها بصيغة PNG عالية الدقة تلقائياً لنظام iOS والأندرويد) -->
     <link id="dynamicFavicon" rel="icon" type="image/png" href="">
     <link id="dynamicAppleIcon" rel="apple-touch-icon" href="">
     <link id="pwaManifest" rel="manifest" href="">
@@ -61,7 +60,6 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Header */
         header {
             background: linear-gradient(135deg, #090d16 0%, #172554 50%, #000000 100%);
             color: #ffffff;
@@ -179,7 +177,6 @@
             border-bottom-color: #60a5fa;
         }
 
-        /* Cards */
         .card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -209,7 +206,6 @@
             font-weight: 900;
         }
 
-        /* Progress Bar */
         .progress-header {
             display: flex;
             justify-content: space-between;
@@ -241,7 +237,6 @@
             transition: width 0.4s ease;
         }
 
-        /* Macros Grid */
         .macros-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -270,7 +265,6 @@
             color: var(--accent-blue);
         }
 
-        /* Water Tracker */
         .water-controls {
             display: flex;
             align-items: center;
@@ -305,7 +299,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Checkboxes & Food Items */
         .meal-body {
             padding: 16px 18px;
             display: flex;
@@ -405,7 +398,6 @@
             font-weight: 600;
         }
 
-        /* Buttons */
         .btn {
             width: 100%;
             padding: 15px;
@@ -444,7 +436,6 @@
             font-size: 0.95rem;
         }
 
-        /* History */
         .history-title {
             font-size: 1rem;
             font-weight: 800;
@@ -482,7 +473,6 @@
         .badge-yellow { color: #eab308; }
         .badge-red { color: #ef4444; }
 
-        /* Modals */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -586,7 +576,6 @@
             white-space: nowrap;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             top: 20px;
@@ -599,12 +588,11 @@
             font-weight: 800;
             font-size: 0.9rem;
             box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
-            z-index: 2000;
+            z-index: 4000;
             animation: slideDown 0.3s ease;
             text-align: center;
         }
 
-        /* Auth & Pending Screens */
         .auth-screen {
             position: fixed;
             inset: 0;
@@ -615,17 +603,19 @@
             justify-content: center;
             padding: 20px;
             color: #ffffff;
+            overflow-y: auto;
         }
         .auth-screen.active { display: flex; }
         .auth-card {
-            background: rgba(13, 17, 23, 0.94);
+            background: rgba(13, 17, 23, 0.95);
             border: 1px solid rgba(59, 130, 246, 0.35);
             border-radius: 26px;
-            padding: 28px 22px;
+            padding: 24px 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 410px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(12px);
+            margin: auto;
         }
         .auth-tabs {
             display: flex;
@@ -653,22 +643,22 @@
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
         }
-        .auth-field { margin-bottom: 14px; }
+        .auth-field { margin-bottom: 12px; }
         .auth-field label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: #bfdbfe;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
         .auth-input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 11px 13px;
             border-radius: 12px;
             border: 1px solid rgba(59, 130, 246, 0.35);
             background: rgba(255, 255, 255, 0.07);
             color: #ffffff;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 700;
             outline: none;
         }
@@ -707,9 +697,9 @@
     <!-- شاشة تسجيل الدخول وإنشاء الحساب -->
     <div id="authScreen" class="auth-screen">
         <div class="auth-card">
-            <div style="text-align:center; margin-bottom:18px;">
-                <h2 style="font-size:1.55rem; font-weight:900; color:#fff; margin-bottom:4px;">بوابة الأبطال 💪</h2>
-                <p style="font-size:0.82rem; color:#93c5fd; font-weight:600;">سجل دخولك أو انضم لتحدي الأبطال وتابع صحابك</p>
+            <div style="text-align:center; margin-bottom:16px;">
+                <h2 style="font-size:1.5rem; font-weight:900; color:#fff; margin-bottom:4px;">بوابة الأبطال 💪</h2>
+                <p style="font-size:0.8rem; color:#93c5fd; font-weight:600;">سجل دخولك أو انضم لتحدي الأبطال وتابع صحابك</p>
             </div>
             
             <div class="auth-tabs">
@@ -728,7 +718,7 @@
                     <label>كلمة السر:</label>
                     <input type="password" id="loginPassword" class="auth-input" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-top:16px;">دخول لحسابي 🚀</button>
+                <button type="submit" class="btn btn-primary" style="margin-top:14px;">دخول لحسابي 🚀</button>
             </form>
 
             <!-- نموذج إنشاء حساب جديد -->
@@ -749,7 +739,7 @@
                     <label style="color:#fbbf24;">🔑 كود الدعوة السري (اطلبه من عمرو):</label>
                     <input type="text" id="regInviteCode" class="auth-input" placeholder="اكتب كود الدعوة السري هنا" style="border-color:rgba(251,191,36,0.5);" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-top:8px;">إنشاء الحساب والدخول فوراً ✨</button>
+                <button type="submit" class="btn btn-primary" style="margin-top:8px;">التالي: إعداد خطتك الذكية ✨</button>
             </form>
 
             <!-- نموذج استيراد الحساب من جهاز آخر -->
@@ -765,18 +755,53 @@
         </div>
     </div>
 
-    <!-- شاشة انتظار موافقة الأدمن -->
-    <div id="pendingScreen" class="auth-screen">
-        <div class="auth-card" style="text-align:center;">
-            <div style="font-size:3.2rem; margin-bottom:10px;">⏳🔒</div>
-            <h2 style="font-size:1.35rem; font-weight:900; color:#fbbf24; margin-bottom:8px;">في انتظار موافقة الأدمن</h2>
-            <p id="pendingUserInfo" style="font-size:0.88rem; color:#e2e8f0; line-height:1.6; margin-bottom:18px; font-weight:700;">
-                تم تسجيل طلبك بنجاح! يرجى انتظار موافقة <b>الأدمن (عمرو)</b> للسماح لك بالدخول واستخدام التطبيق.
-            </p>
-            <div style="display:flex; gap:10px;">
-                <button type="button" id="checkApprovalBtn" class="btn btn-primary" style="margin-top:0; flex:1;">🔄 تحديث الحالة</button>
-                <button type="button" id="pendingLogoutBtn" class="btn btn-secondary" style="margin-top:0; flex:1; background:rgba(239,68,68,0.2); color:#fca5a5; border-color:rgba(239,68,68,0.4);">🚪 خروج</button>
+    <!-- شاشة إعداد الخطة الذكية لأول مرة (Onboarding) -->
+    <div id="onboardingScreen" class="auth-screen">
+        <div class="auth-card">
+            <div style="text-align:center; margin-bottom:14px;">
+                <div style="font-size:2.4rem; margin-bottom:4px;">🎯📊</div>
+                <h2 style="font-size:1.35rem; font-weight:900; color:#fff; margin-bottom:4px;">تفصيل خطتك الغذائية</h2>
+                <p style="font-size:0.8rem; color:#93c5fd; font-weight:600;">اكتب بياناتك عشان التطبيق يحسب سعراتك ويفصّل كميات وجباتك بالجرام تلقائياً</p>
             </div>
+
+            <form id="onboardingForm">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="auth-field">
+                        <label>⚖️ الوزن الحالي (كجم):</label>
+                        <input type="number" id="obWeight" class="auth-input" placeholder="مثال: 75" min="30" max="250" step="0.1" required>
+                    </div>
+                    <div class="auth-field">
+                        <label>📏 الطول (سم):</label>
+                        <input type="number" id="obHeight" class="auth-input" placeholder="مثال: 178" min="120" max="230" required>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1.4fr; gap:10px;">
+                    <div class="auth-field">
+                        <label>🎂 العمر (سنة):</label>
+                        <input type="number" id="obAge" class="auth-input" placeholder="22" min="14" max="80" required>
+                    </div>
+                    <div class="auth-field">
+                        <label>🏃 مستوى النشاط:</label>
+                        <select id="obActivity" class="auth-input">
+                            <option value="1.375">خفيف (1-3 أيام تمرين)</option>
+                            <option value="1.55" selected>متوسط (3-5 أيام تمرين)</option>
+                            <option value="1.725">عالي (6-7 أيام تمرين)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label>🏆 هدفك الأساسي:</label>
+                    <select id="obGoal" class="auth-input">
+                        <option value="bulk">🔥 زيادة وزن وتضخيم عضلي (Bulking)</option>
+                        <option value="cut">✂️ تنشيف وحرق دهون (Cutting)</option>
+                        <option value="maintain">⚖️ ثبات وتناسق عضلي (Maintenance)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top:10px;">🚀 احسب سعراتي وابدأ الخطة الآن</button>
+            </form>
         </div>
     </div>
 
@@ -1124,6 +1149,11 @@
             return localStorage.getItem(INVITE_CODE_KEY) || '3iid2026';
         }
 
+        function getUserKey(suffix) {
+            const uid = currentUser ? currentUser.id.toLowerCase() : 'guest';
+            return `amrDiet_${uid}_${suffix}`;
+        }
+
         function getUserKeyByUid(uid, suffix) {
             return `amrDiet_${uid.toLowerCase()}_${suffix}`;
         }
@@ -1200,9 +1230,10 @@
         applyAppLogo(savedLogoPng);
 
         const authScreen = document.getElementById('authScreen');
-        const pendingScreen = document.getElementById('pendingScreen');
+        const onboardingScreen = document.getElementById('onboardingScreen');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
+        const onboardingForm = document.getElementById('onboardingForm');
         const importFormBox = document.getElementById('importFormBox');
         const tabLoginBtn = document.getElementById('tabLoginBtn');
         const tabRegisterBtn = document.getElementById('tabRegisterBtn');
@@ -1255,7 +1286,37 @@
             currentUser = { name, id };
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
             authScreen.classList.remove('active');
-            showToast(`🎉 أهلاً بيك يا ${name}! تم تفعيل حسابك فوراً`);
+            onboardingScreen.classList.add('active');
+        };
+
+        onboardingForm.onsubmit = (e) => {
+            e.preventDefault();
+            const w = parseFloat(document.getElementById('obWeight').value);
+            const h = parseFloat(document.getElementById('obHeight').value);
+            const age = parseInt(document.getElementById('obAge').value, 10);
+            const activity = parseFloat(document.getElementById('obActivity').value);
+            const goal = document.getElementById('obGoal').value;
+
+            if (!w || !h || !age) return;
+
+            // معادلة Mifflin-St Jeor لحساب السعرات بدقة
+            const bmr = (10 * w) + (6.25 * h) - (5 * age) + 5;
+            let tdee = bmr * activity;
+            if (goal === 'bulk') tdee += 500;
+            else if (goal === 'cut') tdee -= 500;
+
+            const finalCalories = Math.max(1400, Math.min(6000, Math.round(tdee / 50) * 50));
+
+            localStorage.setItem(getUserKey('weight'), w);
+            localStorage.setItem(getUserKey('planConfig'), JSON.stringify({
+                goal,
+                calories: finalCalories,
+                height: h,
+                age
+            }));
+
+            onboardingScreen.classList.remove('active');
+            showToast(`🎯 تم تفصيل خطتك على ${finalCalories} سعرة يومياً!`);
             loadData();
         };
 
@@ -1361,17 +1422,7 @@
 
         window.onCloudUsersUpdated = function() {
             updateAdminBadge();
-            if (adminModal.classList.contains('active')) renderAdminUsersList();
             if (friendsModal.classList.contains('active')) renderFriendsData();
-            if (currentUser && pendingScreen.classList.contains('active')) {
-                const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
-                const me = users.find(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
-                if (me && (me.approved || isUserAdmin(me))) {
-                    pendingScreen.classList.remove('active');
-                    showToast('🎉 تم تفعيل حسابك من الأدمن! أهلاً بيك');
-                    loadData();
-                }
-            }
         };
 
         window.onCloudStatsUpdated = function() {
@@ -1391,13 +1442,12 @@
             const query = friendSearchInput.value.trim().toLowerCase();
             const candidates = users.filter(u =>
                 u.id.toLowerCase() !== currentUser.id.toLowerCase() &&
-                (u.approved || isUserAdmin(u)) &&
                 (!query || u.name.toLowerCase().includes(query) || u.id.toLowerCase().includes(query))
             );
 
             const container = document.getElementById('friendsListContainer');
             if (candidates.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:700;">لا يوجد أصدقاء مطابقون للبحث حالياً.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:700;">لا يوجد أصدقاء مسجلون حالياً.</div>';
                 return;
             }
 
@@ -1509,7 +1559,7 @@
                     localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
                 }
                 authScreen.classList.remove('active');
-                pendingScreen.classList.remove('active');
+                onboardingScreen.classList.remove('active');
                 syncModal.classList.remove('active');
                 showToast('✅ تم استيراد حسابك وجميع بياناتك بنجاح!');
                 loadData();
@@ -1998,13 +2048,20 @@
                 return;
             }
 
+            const savedPlanRaw = localStorage.getItem(getUserKey('planConfig'));
+            if (!savedPlanRaw && currentUser.id.toLowerCase() !== ADMIN_ID.toLowerCase()) {
+                authScreen.classList.remove('active');
+                onboardingScreen.classList.add('active');
+                return;
+            }
+
             authScreen.classList.remove('active');
-            pendingScreen.classList.remove('active');
+            onboardingScreen.classList.remove('active');
             updateAdminBadge();
             syncMyStatsToCloud();
             document.getElementById('userHeaderTag').innerText = `👤 ${currentUser.name} | ID: ${currentUser.id}`;
 
-            userPlanConfig = JSON.parse(localStorage.getItem(getUserKey('planConfig'))) || { goal: 'bulk', calories: 3650 };
+            userPlanConfig = JSON.parse(savedPlanRaw) || { goal: 'bulk', calories: 3650 };
             buildDynamicMealsPlan();
 
             weightInput.value = localStorage.getItem(getUserKey('weight')) || '';
