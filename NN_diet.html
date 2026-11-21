@@ -14,6 +14,8 @@
     <link id="dynamicAppleIcon" rel="apple-touch-icon" href="">
     <link id="pwaManifest" rel="manifest" href="">
     
+    <!-- Gun.js Decentralized Realtime Cloud Sync (يعمل أونلاين على GitHub Pages مجاناً بدون سيرفر) -->
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
@@ -111,10 +113,23 @@
             font-size: 0.8rem;
             font-weight: 800;
             transition: background 0.2s;
+            position: relative;
         }
 
         .theme-btn:hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #090d16;
+            display: none;
         }
 
         .date-badge {
@@ -699,7 +714,7 @@
         <div class="auth-card">
             <div style="text-align:center; margin-bottom:16px;">
                 <h2 style="font-size:1.5rem; font-weight:900; color:#fff; margin-bottom:4px;">بوابة الأبطال 💪</h2>
-                <p style="font-size:0.8rem; color:#93c5fd; font-weight:600;">سجل دخولك أو انضم لتحدي الأبطال وتابع صحابك</p>
+                <p style="font-size:0.8rem; color:#93c5fd; font-weight:600;">سجل دخولك أو انضم لتحدي الأبطال وتابع صحابك أونلاين</p>
             </div>
             
             <div class="auth-tabs">
@@ -827,7 +842,10 @@
                 <div class="header-actions">
                     <button class="theme-btn" id="openPlanSettingsBtn" title="تخصيص سعراتك">⚙️ الخطة</button>
                     <button class="theme-btn" id="openSyncModalBtn" style="background:rgba(16,185,129,0.28); border-color:rgba(52,211,153,0.5);" title="نقل البيانات بين الموبايل واللاب">☁️ مزامنة</button>
-                    <button class="theme-btn" id="openFriendsModalBtn" style="background:rgba(245,158,11,0.28); border-color:rgba(251,191,36,0.5);" title="الأصدقاء والمتابعة والتحدي">👥 الأصدقاء</button>
+                    <button class="theme-btn" id="openFriendsModalBtn" style="background:rgba(245,158,11,0.28); border-color:rgba(251,191,36,0.5);" title="الأصدقاء والمتابعة والتحدي">
+                        👥 الأصدقاء
+                        <span id="friendsNotifDot" class="notif-dot"></span>
+                    </button>
                     <button class="theme-btn" id="openAdminModalBtn" style="display:none; background:rgba(168,85,247,0.3); border-color:rgba(192,132,252,0.6);" title="كود الدعوة السري">🔑 كود الدعوة</button>
                     <button class="theme-btn" id="installAppBtn" style="background:rgba(37,99,235,0.35); border-color:rgba(96,165,250,0.6);" title="تثبيت البرنامج واللوجو">📲 اللوجو والتثبيت</button>
                     <button class="theme-btn" id="themeToggle" title="تغيير المظهر">🌓</button>
@@ -983,11 +1001,11 @@
         </div>
     </div>
 
-    <!-- Modal for Friends & Following -->
+    <!-- Modal for Friends & Following (Realtime Online) -->
     <div class="modal-overlay" id="friendsModal">
         <div class="modal-box" style="gap: 12px;">
             <div class="modal-header" style="margin-bottom: 0;">
-                <div class="modal-title">👥 الأصدقاء والمتابعة والتحدي</div>
+                <div class="modal-title">👥 الأصدقاء والمتابعة أونلاين</div>
                 <button class="close-modal" id="closeFriendsModalBtn">✕</button>
             </div>
 
@@ -1003,8 +1021,9 @@
                 </div>
             </div>
 
-            <div class="auth-field" style="margin-bottom:0;">
-                <input type="text" id="friendSearchInput" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:10px 12px;" placeholder="🔍 ابحث عن صديق بالاسم أو الـ ID...">
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="friendSearchInput" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:10px 12px;" placeholder="🔍 ابحث بالاسم أو اكتب ID صديقك...">
+                <button type="button" id="addDirectFriendBtn" class="alt-badge" style="border:none; cursor:pointer; padding:0 12px;">+ إضافة ID</button>
             </div>
 
             <div class="alt-list" id="friendsListContainer" style="max-height: 290px;"></div>
@@ -1015,7 +1034,7 @@
     <div class="modal-overlay" id="adminModal">
         <div class="modal-box" style="gap: 12px;">
             <div class="modal-header" style="margin-bottom: 0;">
-                <div class="modal-title">🔑 كود الدعوة السري للتطبيق</div>
+                <div class="modal-title">🔑 إدارة التطبيق وكود الدعوة</div>
                 <button class="close-modal" id="closeAdminModalBtn">✕</button>
             </div>
             <div style="font-size:0.82rem; opacity:0.85; font-weight:700; line-height:1.5;">
@@ -1031,6 +1050,12 @@
                     <input type="text" id="newInviteCodeInput" class="auth-input" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:10px;" placeholder="اكتب الكود الجديد...">
                     <button type="button" id="saveInviteCodeBtn" class="alt-badge" style="border:none; cursor:pointer; padding:0 16px;">حفظ</button>
                 </div>
+            </div>
+
+            <div style="border-top:1px solid var(--border-color); padding-top:10px; margin-top:4px;">
+                <button type="button" id="purgeOtherUsersBtn" class="btn" style="background:#dc2626; color:#fff; padding:11px; font-size:0.85rem; margin-top:0;">
+                    🧹 مسح كل الحسابات الأخرى (إبقاء 3iid@001 فقط)
+                </button>
             </div>
         </div>
     </div>
@@ -1071,93 +1096,189 @@
         </div>
     </div>
 
-    <!-- Firebase Cloud Realtime Sync Engine -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'amr-diet-app-prod';
-        let db = null;
-        let auth = null;
-        let cloudReady = false;
-
-        async function initCloudSync() {
-            try {
-                if (typeof __firebase_config === 'undefined') return;
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                if (!auth.currentUser) return;
-                cloudReady = true;
-
-                const usersCol = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                onSnapshot(usersCol, (snapshot) => {
-                    const cloudUsers = [];
-                    snapshot.forEach(d => cloudUsers.push(d.data()));
-                    if (cloudUsers.length > 0) {
-                        localStorage.setItem('amrDiet_users_db_v1', JSON.stringify(cloudUsers));
-                        if (typeof window.onCloudUsersUpdated === 'function') {
-                            window.onCloudUsersUpdated();
-                        }
-                    }
-                }, (err) => console.warn('Cloud users sync warning:', err));
-
-                const statsCol = collection(db, 'artifacts', appId, 'public', 'data', 'stats');
-                onSnapshot(statsCol, (snapshot) => {
-                    const cloudStats = {};
-                    snapshot.forEach(d => { cloudStats[d.id] = d.data(); });
-                    window.CLOUD_LIVE_STATS = cloudStats;
-                    if (typeof window.onCloudStatsUpdated === 'function') {
-                        window.onCloudStatsUpdated();
-                    }
-                }, (err) => console.warn('Cloud stats sync warning:', err));
-            } catch (e) {
-                console.warn('Cloud init fallback to local:', e);
-            }
-        }
-
-        window.pushUserToCloud = async function(userObj) {
-            if (!cloudReady || !db || !auth?.currentUser || !userObj?.id) return;
-            try {
-                const safeId = userObj.id.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', safeId), userObj, { merge: true });
-            } catch (e) { console.warn('Push user error:', e); }
-        };
-
-        window.pushStatsToCloud = async function(uid, statsObj) {
-            if (!cloudReady || !db || !auth?.currentUser || !uid) return;
-            try {
-                const safeId = uid.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'stats', safeId), {
-                    uid,
-                    ...statsObj,
-                    updatedAt: Date.now()
-                }, { merge: true });
-            } catch (e) { console.warn('Push stats error:', e); }
-        };
-
-        initCloudSync();
-    </script>
-
     <script>
         // ==========================================
-        // 1. إدارة الحسابات وكود الدعوة السري والأصدقاء والمزامنة
+        // 1. محرك المزامنة السحابية اللامركزية (Gun.js Cloud) للعمل على GitHub Pages
         // ==========================================
         const USERS_DB_KEY = 'amrDiet_users_db_v1';
         const ACTIVE_USER_KEY = 'amrDiet_active_user_v1';
         const INVITE_CODE_KEY = 'amrDiet_secret_invite_code_v1';
+        const PURGE_TIME_KEY = 'amrDiet_purge_ts_v1';
         const ADMIN_ID = '3iid@001';
         let currentUser = JSON.parse(localStorage.getItem(ACTIVE_USER_KEY)) || null;
         window.CLOUD_LIVE_STATS = {};
 
+        function getPurgeTimestamp() {
+            return parseInt(localStorage.getItem(PURGE_TIME_KEY) || '0', 10);
+        }
+
+        let gun = null;
+        let gunRoom = null;
+        try {
+            if (typeof Gun !== 'undefined') {
+                gun = Gun({
+                    peers: [
+                        'https://gun-manhattan.herokuapp.com/gun',
+                        'https://relay.peer.ooo/gun',
+                        'https://peer.wallie.io/gun'
+                    ],
+                    localStorage: false
+                });
+                gunRoom = gun.get('amr_diet_champions_club_v2026');
+
+                // استقبال أمر تصفير الحسابات إن وُجد
+                gunRoom.get('meta').get('purgeTs').on((ts) => {
+                    if (ts && Number(ts) > getPurgeTimestamp()) {
+                        localStorage.setItem(PURGE_TIME_KEY, String(ts));
+                        cleanNonOwnerAccountsLocally();
+                    }
+                });
+
+                // استقبال جميع المستخدمين المسجلين أونلاين
+                gunRoom.get('users').map().on((userData, key) => {
+                    if (!userData || !userData.id || !userData.name) return;
+                    const isOwner = userData.id.toLowerCase() === ADMIN_ID.toLowerCase();
+                    if (!isOwner && (userData.deleted || (userData.updatedAt && Number(userData.updatedAt) < getPurgeTimestamp()))) {
+                        return;
+                    }
+                    const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+                    const idx = users.findIndex(u => u.id.toLowerCase() === userData.id.toLowerCase());
+                    const parsedUser = {
+                        name: userData.name,
+                        id: userData.id,
+                        password: userData.password || '',
+                        approved: true,
+                        role: userData.role || 'user',
+                        following: userData.followingJson ? JSON.parse(userData.followingJson) : [],
+                        followers: userData.followersJson ? JSON.parse(userData.followersJson) : []
+                    };
+                    if (idx >= 0) {
+                        users[idx] = { ...users[idx], ...parsedUser };
+                    } else {
+                        users.push(parsedUser);
+                    }
+                    localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+                    updateFriendsNotifDot();
+                    if (document.getElementById('friendsModal').classList.contains('active')) {
+                        renderFriendsData();
+                    }
+                });
+
+                // استقبال إحصائيات الأصدقاء الحية أونلاين
+                gunRoom.get('stats').map().on((statData, key) => {
+                    if (!statData || !statData.uid) return;
+                    const safeId = statData.uid.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
+                    window.CLOUD_LIVE_STATS[safeId] = {
+                        uid: statData.uid,
+                        pct: statData.pct || 0,
+                        water: statData.water || '0.00',
+                        weight: statData.weight || '--',
+                        calories: statData.calories || 0
+                    };
+                    if (document.getElementById('friendsModal').classList.contains('active')) {
+                        renderFriendsData();
+                    }
+                });
+            }
+        } catch (err) {
+            console.warn('Gun cloud init fallback:', err);
+        }
+
+        function cleanNonOwnerAccountsLocally() {
+            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+            const ownerOnly = users.filter(u => u.id.toLowerCase() === ADMIN_ID.toLowerCase()).map(u => ({
+                ...u,
+                following: [],
+                followers: []
+            }));
+            localStorage.setItem(USERS_DB_KEY, JSON.stringify(ownerOnly));
+
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('amrDiet_') &&
+                    !k.startsWith(`amrDiet_${ADMIN_ID.toLowerCase()}_`) &&
+                    k !== USERS_DB_KEY &&
+                    k !== ACTIVE_USER_KEY &&
+                    k !== INVITE_CODE_KEY &&
+                    k !== PURGE_TIME_KEY &&
+                    k !== LOGO_STORAGE_KEY &&
+                    k !== 'amrDietThemeV4') {
+                    keysToRemove.push(k);
+                }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+        }
+
+        function purgeAllOtherUsers() {
+            const nowTs = Date.now();
+            localStorage.setItem(PURGE_TIME_KEY, String(nowTs));
+            if (gunRoom) {
+                gunRoom.get('meta').get('purgeTs').put(nowTs);
+                const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+                users.forEach(u => {
+                    if (u.id.toLowerCase() !== ADMIN_ID.toLowerCase()) {
+                        const safeId = u.id.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
+                        gunRoom.get('users').get(safeId).put({ id: u.id, name: '', deleted: true, updatedAt: nowTs });
+                    }
+                });
+            }
+            cleanNonOwnerAccountsLocally();
+            const remaining = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+            if (remaining[0]) pushUserToCloud(remaining[0]);
+            window.CLOUD_LIVE_STATS = {};
+            if (document.getElementById('friendsModal').classList.contains('active')) {
+                renderFriendsData();
+            }
+            showToast('🧹 تم مسح جميع الحسابات الأخرى والإبقاء على 3iid@001 فقط!');
+        }
+
+        function pushUserToCloud(userObj) {
+            if (!gunRoom || !userObj || !userObj.id) return;
+            const safeId = userObj.id.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
+            gunRoom.get('users').get(safeId).put({
+                name: userObj.name,
+                id: userObj.id,
+                password: userObj.password || '',
+                role: userObj.role || 'user',
+                followingJson: JSON.stringify(userObj.following || []),
+                followersJson: JSON.stringify(userObj.followers || []),
+                deleted: false,
+                updatedAt: Date.now()
+            });
+        }
+
+        function syncMyStatsToCloud() {
+            if (!currentUser || !gunRoom) return;
+            const checks = JSON.parse(localStorage.getItem(getUserKey('checks'))) || {};
+            const water = parseFloat(localStorage.getItem(getUserKey('water'))) || 0;
+            const weight = localStorage.getItem(getUserKey('weight')) || '--';
+            const checkedCount = Object.values(checks).filter(v => v === true).length;
+            const totalKeys = Object.keys(checks).length || 12;
+            const livePct = Math.min(100, Math.round((checkedCount / totalKeys) * 100));
+            const safeId = currentUser.id.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
+            gunRoom.get('stats').get(safeId).put({
+                uid: currentUser.id,
+                pct: livePct,
+                water: water.toFixed(2),
+                weight: String(weight),
+                updatedAt: Date.now()
+            });
+        }
+
+        function updateFriendsNotifDot() {
+            if (!currentUser) return;
+            const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+            const me = users.find(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
+            const dot = document.getElementById('friendsNotifDot');
+            if (me && me.followers && me.followers.length > 0 && dot) {
+                dot.style.display = 'block';
+            }
+        }
+
+        // ==========================================
+        // 2. إدارة الحسابات وكود الدعوة السري والأصدقاء والمزامنة
+        // ==========================================
         function getSecretInviteCode() {
             return localStorage.getItem(INVITE_CODE_KEY) || '3iid2026';
         }
@@ -1296,7 +1417,7 @@
             };
             users.push(newUser);
             localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-            if (window.pushUserToCloud) window.pushUserToCloud(newUser);
+            pushUserToCloud(newUser);
             currentUser = { name, id };
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
             authScreen.classList.remove('active');
@@ -1357,13 +1478,13 @@
                 matchedUser = { name: 'Amr', id: ADMIN_ID, password, approved: true, role: 'admin', following: [], followers: [] };
                 users.push(matchedUser);
                 localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-                if (window.pushUserToCloud) window.pushUserToCloud(matchedUser);
             }
 
             if (!matchedUser) {
                 showToast('❌ الاسم/الـ ID أو كلمة السر غير صحيحة!');
                 return;
             }
+            pushUserToCloud(matchedUser);
             currentUser = { name: matchedUser.name, id: matchedUser.id };
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
             authScreen.classList.remove('active');
@@ -1371,7 +1492,7 @@
             loadData();
         };
 
-        // إدارة كود الدعوة السري (يظهر لحسابك فقط)
+        // إدارة كود الدعوة السري وتنظيف الحسابات (يظهر لحسابك فقط)
         const adminModal = document.getElementById('adminModal');
         const openAdminModalBtn = document.getElementById('openAdminModalBtn');
         const closeAdminModalBtn = document.getElementById('closeAdminModalBtn');
@@ -1406,7 +1527,12 @@
             showToast(`✅ تم تحديث كود الدعوة السري إلى: ${newCode}`);
         };
 
-        // نظام الأصدقاء والمتابعة والتتبع المباشر
+        document.getElementById('purgeOtherUsersBtn').onclick = () => {
+            purgeAllOtherUsers();
+            adminModal.classList.remove('active');
+        };
+
+        // نظام الأصدقاء والمتابعة والتتبع المباشر أونلاين
         const friendsModal = document.getElementById('friendsModal');
         const openFriendsModalBtn = document.getElementById('openFriendsModalBtn');
         const closeFriendsModalBtn = document.getElementById('closeFriendsModalBtn');
@@ -1428,30 +1554,6 @@
             return { pct: livePct, water: water.toFixed(2), weight };
         }
 
-        function syncMyStatsToCloud() {
-            if (!currentUser || !window.pushStatsToCloud) return;
-            const checks = JSON.parse(localStorage.getItem(getUserKey('checks'))) || {};
-            const water = parseFloat(localStorage.getItem(getUserKey('water'))) || 0;
-            const weight = localStorage.getItem(getUserKey('weight')) || '--';
-            const checkedCount = Object.values(checks).filter(v => v === true).length;
-            const totalKeys = Object.keys(checks).length || 12;
-            const livePct = Math.min(100, Math.round((checkedCount / totalKeys) * 100));
-            window.pushStatsToCloud(currentUser.id, {
-                pct: livePct,
-                water: water.toFixed(2),
-                weight
-            });
-        }
-
-        window.onCloudUsersUpdated = function() {
-            updateAdminBadge();
-            if (friendsModal.classList.contains('active')) renderFriendsData();
-        };
-
-        window.onCloudStatsUpdated = function() {
-            if (friendsModal.classList.contains('active')) renderFriendsData();
-        };
-
         function renderFriendsData() {
             if (!currentUser) return;
             const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
@@ -1470,13 +1572,13 @@
 
             const container = document.getElementById('friendsListContainer');
             if (candidates.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:700;">لا يوجد أصدقاء مسجلون حالياً.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:700;">لا يوجد أصدقاء مطابقون للبحث. اكتب ID صديقك واضغط (+ إضافة ID).</div>';
                 return;
             }
 
             container.innerHTML = candidates.map(friend => {
-                const isFollowing = myFollowing.includes(friend.id);
-                const isFollower = myFollowers.includes(friend.id);
+                const isFollowing = myFollowing.some(id => id.toLowerCase() === friend.id.toLowerCase());
+                const isFollower = myFollowers.some(id => id.toLowerCase() === friend.id.toLowerCase());
                 const stats = getUserLiveStats(friend.id);
 
                 return `
@@ -1485,7 +1587,7 @@
                             <div>
                                 <div class="alt-name">
                                     ${friend.name}
-                                    ${isFollower ? '<span style="font-size:0.68rem; background:rgba(16,185,129,0.18); color:#10b981; padding:2px 6px; border-radius:6px; margin-right:4px;">يتابعك</span>' : ''}
+                                    ${isFollower ? '<span style="font-size:0.68rem; background:rgba(16,185,129,0.18); color:#10b981; padding:2px 6px; border-radius:6px; margin-right:4px;">يتابعك 🤝</span>' : ''}
                                 </div>
                                 <div class="alt-desc">ID: ${friend.id}</div>
                             </div>
@@ -1508,33 +1610,53 @@
         window.toggleFollowUser = function(targetId) {
             if (!currentUser) return;
             const users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
-            const meIdx = users.findIndex(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
-            const targetIdx = users.findIndex(u => u.id.toLowerCase() === targetId.toLowerCase());
-            if (meIdx < 0 || targetIdx < 0) return;
+            let meIdx = users.findIndex(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
+            if (meIdx < 0) {
+                users.push({ name: currentUser.name, id: currentUser.id, password: '', role: 'user', following: [], followers: [] });
+                meIdx = users.length - 1;
+            }
+            let targetIdx = users.findIndex(u => u.id.toLowerCase() === targetId.toLowerCase());
+            if (targetIdx < 0) {
+                users.push({ name: targetId, id: targetId, password: '', role: 'user', following: [], followers: [] });
+                targetIdx = users.length - 1;
+            }
 
             users[meIdx].following = users[meIdx].following || [];
             users[targetIdx].followers = users[targetIdx].followers || [];
 
-            const isFollowing = users[meIdx].following.includes(users[targetIdx].id);
+            const isFollowing = users[meIdx].following.some(id => id.toLowerCase() === users[targetIdx].id.toLowerCase());
             if (isFollowing) {
-                users[meIdx].following = users[meIdx].following.filter(id => id !== users[targetIdx].id);
-                users[targetIdx].followers = users[targetIdx].followers.filter(id => id !== users[meIdx].id);
+                users[meIdx].following = users[meIdx].following.filter(id => id.toLowerCase() !== users[targetIdx].id.toLowerCase());
+                users[targetIdx].followers = users[targetIdx].followers.filter(id => id.toLowerCase() !== users[meIdx].id.toLowerCase());
                 showToast('تم إلغاء المتابعة');
             } else {
                 users[meIdx].following.push(users[targetIdx].id);
                 users[targetIdx].followers.push(users[meIdx].id);
-                showToast(`✅ تتابع الآن ${users[targetIdx].name}`);
+                showToast(`✅ تتابع الآن ${users[targetIdx].name} أونلاين!`);
             }
 
             localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-            if (window.pushUserToCloud) {
-                window.pushUserToCloud(users[meIdx]);
-                window.pushUserToCloud(users[targetIdx]);
-            }
+            pushUserToCloud(users[meIdx]);
+            pushUserToCloud(users[targetIdx]);
             renderFriendsData();
         };
 
+        document.getElementById('addDirectFriendBtn').onclick = () => {
+            const directId = friendSearchInput.value.trim();
+            if (!directId) {
+                showToast('⚠️ اكتب ID صديقك أولاً في مربع البحث');
+                return;
+            }
+            if (currentUser && directId.toLowerCase() === currentUser.id.toLowerCase()) {
+                showToast('⚠️ لا يمكنك متابعة حسابك الشخصي');
+                return;
+            }
+            window.toggleFollowUser(directId);
+            friendSearchInput.value = '';
+        };
+
         openFriendsModalBtn.onclick = () => {
+            document.getElementById('friendsNotifDot').style.display = 'none';
             friendSearchInput.value = '';
             renderFriendsData();
             friendsModal.classList.add('active');
@@ -1687,7 +1809,7 @@
         };
 
         // ==========================================
-        // 2. قاعدة بيانات الأطعمة والبدائل
+        // 3. قاعدة بيانات الأطعمة والبدائل
         // ==========================================
         const FOODS = {
             whole_eggs: { name: 'بيض كامل', unit: 'بيضة', baseQty: 1, cal: 72, p: 6.3, c: 0.4, f: 4.8 },
@@ -1807,7 +1929,7 @@
         }
 
         // ==========================================
-        // 3. المتغيرات الأساسية وعرض الوجبات
+        // 4. المتغيرات الأساسية وعرض الوجبات
         // ==========================================
         const mealsContainer = document.getElementById('mealsContainer');
         const weightInput = document.getElementById('weightInput');
@@ -1856,7 +1978,6 @@
                     targetFat: item.targetFat ? Math.round(item.targetFat * calScale) : undefined
                 }))
             }));
-            document.getElementById('targetCaloriesDisplay').innerText = userPlanConfig.calories;
             document.getElementById('goalModeLabel').innerText = goalNamesMap[userPlanConfig.goal] || 'الهدف اليومي';
         }
 
@@ -2007,6 +2128,8 @@
             progressBar.style.width = pct + '%';
             progressText.innerText = pct + '%';
 
+            // توحيد رقم السعرات في الهيدر مع مجموع سعرات الوجبات الفعلية بالمللي
+            document.getElementById('targetCaloriesDisplay').innerText = planCal;
             calCounter.innerText = `${eatenCal} / ${planCal}`;
             proCounter.innerText = `${eatenPro} / ${planPro} جم`;
             carbCounter.innerText = `${eatenCarb} / ${planCarb} جم`;
@@ -2092,6 +2215,7 @@
             authScreen.classList.remove('active');
             onboardingScreen.classList.remove('active');
             updateAdminBadge();
+            updateFriendsNotifDot();
             syncMyStatsToCloud();
             document.getElementById('userHeaderTag').innerText = `👤 ${currentUser.name} | ID: ${currentUser.id}`;
 
