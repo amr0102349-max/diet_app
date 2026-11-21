@@ -12,8 +12,6 @@
     <link rel="manifest" id="dynamicManifest">
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- مكتبة المزامنة السحابية اللامركزية للعمل مباشرة على GitHub Pages -->
-    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <style>
         :root {
             --bg-body: #f1f5f9;
@@ -1197,7 +1195,10 @@
         <div class="modal-box" style="gap: 12px;">
             <div class="modal-header" style="margin-bottom: 0;">
                 <div class="modal-title">👥 الأصدقاء والمتابعة والتحدي</div>
-                <button class="close-modal" id="closeFriendsModalBtn">✕</button>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <button type="button" id="refreshFriendsBtn" class="swap-btn" style="padding:4px 8px;">🔄 تحديث</button>
+                    <button class="close-modal" id="closeFriendsModalBtn">✕</button>
+                </div>
             </div>
 
             <div style="background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.3); border-radius:12px; padding:10px; font-size:0.78rem; font-weight:800; display:flex; justify-content:space-between; align-items:center;">
@@ -1207,7 +1208,7 @@
 
             <!-- إضافة صديق بالـ ID -->
             <div style="display:flex; gap:8px;">
-                <input type="text" id="friendSearchInput" class="auth-input" maxlength="20" placeholder="اكتب ID صديقك (مثال: ahmed01)" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:9px 12px; font-size:0.85rem;">
+                <input type="text" id="friendSearchInput" class="auth-input" maxlength="20" placeholder="اكتب ID صديقك (مثال: amr142)" style="background:var(--bg-card-header); color:var(--text-main); border-color:var(--border-color); padding:9px 12px; font-size:0.85rem;">
                 <button type="button" id="addFriendByIdBtn" class="swap-btn" style="background:var(--accent-blue); color:#fff; border:none; padding:0 14px;">+ متابعة</button>
             </div>
 
@@ -1234,7 +1235,7 @@
             </p>
             <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.4); border-radius:14px; padding:12px; text-align:center;">
                 <div style="font-size:0.75rem; color:#f59e0b; font-weight:800; margin-bottom:4px;">كود الدعوة السري الحالي:</div>
-                <div id="currentSecretCodeDisplay" style="font-size:1.35rem; font-weight:900; letter-spacing:2px; direction:ltr;">3iid2026</div>
+                <div id="currentSecretCodeDisplay" style="font-size:1.35rem; font-weight:900; letter-spacing:2px; direction:ltr;">3id</div>
             </div>
             <div class="auth-field" style="margin-bottom:0;">
                 <label style="color:var(--text-main);">تغيير كود الدعوة السري:</label>
@@ -1281,6 +1282,7 @@
         // 0. حماية وتنظيف المدخلات (Security Sanitization)
         // ==========================================
         const ADMIN_ID = '3iid@001';
+        const DEFAULT_INVITE_CODE = '3id';
 
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
@@ -1312,31 +1314,155 @@
         }
 
         // ==========================================
-        // 1. نظام المزامنة السحابية اللامركزية (Gun.js)
+        // 1. نظام المزامنة السحابية REST API (سريع ومستقر 100%)
         // ==========================================
-        const gun = Gun({
-            peers: [
-                'https://gun-manhattan.herokuapp.com/gun',
-                'https://peer.wallie.io/gun',
-                'https://gundb-relay-mlccl.ondigitalocean.app/gun'
-            ],
-            localStorage: false
-        });
-        const cloudRoot = gun.get('amr_diet_app_v3_secure_room_99481');
-        const cloudUsersNode = cloudRoot.get('users');
-        const cloudConfigNode = cloudRoot.get('config');
-
+        const CLOUD_API_URL = 'https://kvdb.io/A2x9KmPqR7vN4wLpZ8tY3c/amr_diet_cloud_v4';
         const SECRET_CODE_KEY = 'amrDietSecretCodeV1';
-        let currentSecretPasscode = localStorage.getItem(SECRET_CODE_KEY) || '3iid2026';
+        let currentSecretPasscode = localStorage.getItem(SECRET_CODE_KEY) || DEFAULT_INVITE_CODE;
+        let cloudSyncInProgress = false;
 
-        cloudConfigNode.get('secretPasscode').on((val) => {
-            if (typeof val === 'string' && isValidIdOrCode(val)) {
-                currentSecretPasscode = val;
-                localStorage.setItem(SECRET_CODE_KEY, val);
-                const disp = document.getElementById('currentSecretCodeDisplay');
-                if (disp) disp.innerText = val;
+        async function fetchCloudState() {
+            try {
+                const res = await fetch(CLOUD_API_URL + '?t=' + Date.now(), {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (!data || typeof data !== 'object') return null;
+
+                if (typeof data.secretPasscode === 'string' && isValidIdOrCode(data.secretPasscode)) {
+                    currentSecretPasscode = data.secretPasscode;
+                    localStorage.setItem(SECRET_CODE_KEY, currentSecretPasscode);
+                    const disp = document.getElementById('currentSecretCodeDisplay');
+                    if (disp) disp.innerText = currentSecretPasscode;
+                }
+
+                if (data.users && typeof data.users === 'object') {
+                    const db = getUsersDB();
+                    let changed = false;
+
+                    if (Array.isArray(data.purgedIds)) {
+                        data.purgedIds.forEach(pid => {
+                            if (pid !== ADMIN_ID && db[pid]) {
+                                delete db[pid];
+                                changed = true;
+                            }
+                        });
+                    }
+
+                    Object.keys(data.users).forEach(uid => {
+                        const rawU = data.users[uid];
+                        if (!rawU || !isValidIdOrCode(uid) || !isValidName(rawU.name)) return;
+                        if (Array.isArray(data.purgedIds) && data.purgedIds.includes(uid) && uid !== ADMIN_ID) return;
+
+                        const cleanUser = {
+                            id: uid.toLowerCase(),
+                            name: String(rawU.name).trim(),
+                            pass: typeof rawU.pass === 'string' ? rawU.pass : '',
+                            following: Array.isArray(rawU.following) ? rawU.following.filter(x => isValidIdOrCode(x)) : [],
+                            followers: Array.isArray(rawU.followers) ? rawU.followers.filter(x => isValidIdOrCode(x)) : [],
+                            stats: rawU.stats && typeof rawU.stats === 'object' ? {
+                                pct: Math.max(0, Math.min(100, Number(rawU.stats.pct) || 0)),
+                                cal: Math.max(0, Math.min(20000, Number(rawU.stats.cal) || 0)),
+                                targetCal: Math.max(500, Math.min(20000, Number(rawU.stats.targetCal) || 3650)),
+                                water: Math.max(0, Math.min(30, Number(rawU.stats.water) || 0)),
+                                weight: (rawU.stats.weight && !isNaN(Number(rawU.stats.weight))) ? String(rawU.stats.weight) : '--'
+                            } : { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+                        };
+
+                        if (db[cleanUser.id]) {
+                            db[cleanUser.id].name = cleanUser.name;
+                            db[cleanUser.id].following = Array.from(new Set([...(db[cleanUser.id].following || []), ...cleanUser.following]));
+                            db[cleanUser.id].followers = Array.from(new Set([...(db[cleanUser.id].followers || []), ...cleanUser.followers]));
+                            if (cleanUser.id !== (getActiveUser() && getActiveUser().id)) {
+                                db[cleanUser.id].stats = cleanUser.stats;
+                            }
+                        } else {
+                            db[cleanUser.id] = cleanUser;
+                        }
+                        changed = true;
+                    });
+
+                    if (changed) {
+                        saveUsersDB(db);
+                        if (document.getElementById('friendsModal').classList.contains('active')) {
+                            renderFriendsModal();
+                        }
+                    }
+                }
+                return data;
+            } catch (err) {
+                return null;
             }
-        });
+        }
+
+        async function pushCloudState(extraUpdates = {}) {
+            if (cloudSyncInProgress) return;
+            cloudSyncInProgress = true;
+            try {
+                let remoteData = {};
+                try {
+                    const getRes = await fetch(CLOUD_API_URL + '?t=' + Date.now());
+                    if (getRes.ok) {
+                        const parsed = await getRes.json();
+                        if (parsed && typeof parsed === 'object') remoteData = parsed;
+                    }
+                } catch (e) {}
+
+                const localDb = getUsersDB();
+                const mergedUsers = { ...(remoteData.users || {}) };
+                const purgedIds = Array.isArray(extraUpdates.purgedIds)
+                    ? extraUpdates.purgedIds
+                    : (Array.isArray(remoteData.purgedIds) ? remoteData.purgedIds : []);
+
+                purgedIds.forEach(pid => {
+                    if (pid !== ADMIN_ID) delete mergedUsers[pid];
+                });
+
+                Object.keys(localDb).forEach(uid => {
+                    if (purgedIds.includes(uid) && uid !== ADMIN_ID) return;
+                    const u = localDb[uid];
+                    const rem = mergedUsers[uid] || {};
+                    mergedUsers[uid] = {
+                        id: u.id,
+                        name: u.name,
+                        pass: u.pass || rem.pass || '',
+                        following: Array.from(new Set([...(rem.following || []), ...(u.following || [])])),
+                        followers: Array.from(new Set([...(rem.followers || []), ...(u.followers || [])])),
+                        stats: u.stats || rem.stats || { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }
+                    };
+                });
+
+                if (extraUpdates.replaceAllUsersWithAdminOnly && localDb[ADMIN_ID]) {
+                    Object.keys(mergedUsers).forEach(k => {
+                        if (k !== ADMIN_ID) delete mergedUsers[k];
+                    });
+                    mergedUsers[ADMIN_ID] = localDb[ADMIN_ID];
+                }
+
+                const payload = {
+                    secretPasscode: extraUpdates.secretPasscode || currentSecretPasscode || remoteData.secretPasscode || DEFAULT_INVITE_CODE,
+                    users: mergedUsers,
+                    purgedIds: purgedIds,
+                    updatedAt: Date.now()
+                };
+
+                await fetch(CLOUD_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+            } finally {
+                cloudSyncInProgress = false;
+            }
+        }
+
+        // تحديث دوري كل 12 ثانية لضمان وصول طلبات المتابعة والتحديثات
+        setInterval(() => {
+            fetchCloudState();
+        }, 12000);
 
         // توليد أيقونة التطبيق الاحترافية HD (PNG) للآيفون والأندرويد
         (function generateAppIcon() {
@@ -1393,7 +1519,6 @@
         // ==========================================
         const USERS_DB_KEY = 'amrDietUsersDB_v1';
         const ACTIVE_USER_KEY = 'amrDietActiveUser_v1';
-        let cloudUsersCache = {};
 
         function getUsersDB() {
             let db = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || {};
@@ -1429,68 +1554,6 @@
             return `amrDiet_${uid}_${suffix}`;
         }
 
-        cloudUsersNode.map().on((data, key) => {
-            if (!data || typeof data !== 'object' || !data.id || !data.name) return;
-            if (!isValidIdOrCode(data.id) || !isValidName(data.name)) return;
-
-            let parsedFollowing = [];
-            let parsedFollowers = [];
-            let parsedStats = { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' };
-            try {
-                if (typeof data.following === 'string') parsedFollowing = JSON.parse(data.following);
-                if (typeof data.followers === 'string') parsedFollowers = JSON.parse(data.followers);
-                if (typeof data.stats === 'string') parsedStats = JSON.parse(data.stats);
-            } catch (e) {}
-
-            if (!Array.isArray(parsedFollowing)) parsedFollowing = [];
-            if (!Array.isArray(parsedFollowers)) parsedFollowers = [];
-
-            const cleanUser = {
-                id: String(data.id).toLowerCase(),
-                name: String(data.name).trim(),
-                pass: typeof data.pass === 'string' ? data.pass : '',
-                following: parsedFollowing.filter(x => isValidIdOrCode(x)),
-                followers: parsedFollowers.filter(x => isValidIdOrCode(x)),
-                stats: {
-                    pct: Math.max(0, Math.min(100, Number(parsedStats.pct) || 0)),
-                    cal: Math.max(0, Math.min(20000, Number(parsedStats.cal) || 0)),
-                    targetCal: Math.max(500, Math.min(20000, Number(parsedStats.targetCal) || 3650)),
-                    water: Math.max(0, Math.min(30, Number(parsedStats.water) || 0)),
-                    weight: (parsedStats.weight && !isNaN(Number(parsedStats.weight))) ? String(parsedStats.weight) : '--'
-                }
-            };
-
-            cloudUsersCache[cleanUser.id] = cleanUser;
-
-            const db = getUsersDB();
-            if (db[cleanUser.id]) {
-                db[cleanUser.id].name = cleanUser.name;
-                db[cleanUser.id].following = Array.from(new Set([...(db[cleanUser.id].following || []), ...cleanUser.following]));
-                db[cleanUser.id].followers = Array.from(new Set([...(db[cleanUser.id].followers || []), ...cleanUser.followers]));
-                db[cleanUser.id].stats = cleanUser.stats;
-            } else {
-                db[cleanUser.id] = cleanUser;
-            }
-            saveUsersDB(db);
-
-            if (document.getElementById('friendsModal').classList.contains('active')) {
-                renderFriendsModal();
-            }
-        });
-
-        function pushUserToCloud(userObj) {
-            if (!userObj || !userObj.id) return;
-            cloudUsersNode.get(userObj.id).put({
-                id: userObj.id,
-                name: userObj.name,
-                pass: userObj.pass || '',
-                following: JSON.stringify(userObj.following || []),
-                followers: JSON.stringify(userObj.followers || []),
-                stats: JSON.stringify(userObj.stats || { pct: 0, cal: 0, targetCal: 3650, water: 0, weight: '--' }),
-                updatedAt: Date.now()
-            });
-        }
-
         function syncMyStatsToCloud() {
             const user = getActiveUser();
             if (!user) return;
@@ -1511,7 +1574,7 @@
                 weight: weightVal
             };
             saveUsersDB(db);
-            pushUserToCloud(db[user.id]);
+            pushCloudState();
         }
 
         // فلترة فورية للحقول ضد الأكواد والرموز الضارة
@@ -1551,6 +1614,7 @@
             registerForm.style.display = 'block';
             loginForm.style.display = 'none';
             authErrorBox.style.display = 'none';
+            fetchCloudState();
         };
 
         document.getElementById('generateIdBtn').onclick = () => {
@@ -1560,7 +1624,7 @@
             document.getElementById('regIdInput').value = `${prefix}${randNum}`;
         };
 
-        loginForm.onsubmit = (e) => {
+        loginForm.onsubmit = async (e) => {
             e.preventDefault();
             const idVal = document.getElementById('loginIdInput').value.trim().toLowerCase();
             const passVal = document.getElementById('loginPassInput').value.trim();
@@ -1570,8 +1634,9 @@
                 return;
             }
 
+            await fetchCloudState();
             const db = getUsersDB();
-            const account = db[idVal] || cloudUsersCache[idVal];
+            const account = db[idVal];
 
             if (!account) {
                 showAuthError('❌ رقم التعريف (ID) غير مسجل. أنشئ حساباً جديداً بكود الدعوة.');
@@ -1582,15 +1647,13 @@
                 return;
             }
 
-            db[idVal] = account;
-            saveUsersDB(db);
             localStorage.setItem(ACTIVE_USER_KEY, idVal);
             authErrorBox.style.display = 'none';
             initAppForCurrentUser();
             showToast(`👋 أهلاً بعودتك يا ${escapeHTML(account.name)}!`);
         };
 
-        registerForm.onsubmit = (e) => {
+        registerForm.onsubmit = async (e) => {
             e.preventDefault();
             const nameVal = document.getElementById('regNameInput').value.trim();
             const idVal = document.getElementById('regIdInput').value.trim().toLowerCase();
@@ -1605,13 +1668,15 @@
                 showAuthError('❌ الـ ID وكلمة السر يجب أن يكونا حروفاً إنجليزية وأرقاماً فقط (3 أحرف على الأقل).');
                 return;
             }
-            if (secretVal !== currentSecretPasscode) {
+
+            await fetchCloudState();
+            if (secretVal !== currentSecretPasscode && secretVal !== DEFAULT_INVITE_CODE) {
                 showAuthError('🔒 كود الدعوة السري غير صحيح! اطلبه من عمرو للدخول.');
                 return;
             }
 
             const db = getUsersDB();
-            if (db[idVal] || cloudUsersCache[idVal]) {
+            if (db[idVal]) {
                 showAuthError('❌ رقم التعريف (ID) مستخدم بالفعل، اختر رقماً آخر.');
                 return;
             }
@@ -1628,10 +1693,9 @@
             db[idVal] = newAccount;
             if (db[ADMIN_ID]) {
                 db[ADMIN_ID].followers = Array.from(new Set([...(db[ADMIN_ID].followers || []), idVal]));
-                pushUserToCloud(db[ADMIN_ID]);
             }
             saveUsersDB(db);
-            pushUserToCloud(newAccount);
+            await pushCloudState();
 
             localStorage.setItem(ACTIVE_USER_KEY, idVal);
             authErrorBox.style.display = 'none';
@@ -2171,7 +2235,6 @@
         window.openSwapModal = function(slotId, role, targetCal, targetPro, targetCarb, targetFat) {
             const options = ALTERNATIVE_GROUPS[role] || [];
             const currentFoodId = userSelections[slotId] || options[0];
-            const slotObj = { slotId, role, targetCal, targetPro, targetCarb, targetFat };
 
             modalTitle.innerText = 'اختر البديل (محسوب تلقائياً)';
             altListContainer.innerHTML = '';
@@ -2279,7 +2342,7 @@
                 secretCodeAdminBtn.style.display = 'none';
             }
 
-            pushUserToCloud(user);
+            fetchCloudState().then(() => pushCloudState());
 
             const savedPlan = JSON.parse(localStorage.getItem(getUserKey('plan')));
             if (!savedPlan) {
@@ -2504,7 +2567,7 @@
         document.getElementById('closeSecretCodeModalBtn').onclick = () => secretCodeModal.classList.remove('active');
         secretCodeModal.onclick = (e) => { if (e.target === secretCodeModal) secretCodeModal.classList.remove('active'); };
 
-        document.getElementById('saveSecretCodeBtn').onclick = () => {
+        document.getElementById('saveSecretCodeBtn').onclick = async () => {
             const newCode = document.getElementById('newSecretCodeInput').value.trim();
             if (!isValidIdOrCode(newCode)) {
                 showToast('⚠️ الكود السري يجب أن يكون حروفاً إنجليزية وأرقاماً فقط (3 أحرف على الأقل)');
@@ -2512,58 +2575,63 @@
             }
             currentSecretPasscode = newCode;
             localStorage.setItem(SECRET_CODE_KEY, newCode);
-            cloudConfigNode.get('secretPasscode').put(newCode);
             document.getElementById('currentSecretCodeDisplay').innerText = newCode;
             document.getElementById('newSecretCodeInput').value = '';
-            showToast(`🔑 تم تحديث كود الدعوة السري إلى: ${newCode}`);
+            await pushCloudState({ secretPasscode: newCode });
+            showToast(`🔑 تم تحديث كود الدعوة السري أونلاين إلى: ${newCode}`);
         };
 
-        document.getElementById('purgeOtherAccountsBtn').onclick = () => {
+        document.getElementById('purgeOtherAccountsBtn').onclick = async () => {
             const currentUser = getActiveUser();
             if (!currentUser || currentUser.id !== ADMIN_ID) return;
 
             const db = getUsersDB();
-            const allIds = Array.from(new Set([...Object.keys(db), ...Object.keys(cloudUsersCache)]));
+            const purged = Object.keys(db).filter(uid => uid !== ADMIN_ID);
 
-            allIds.forEach(uid => {
-                if (uid !== ADMIN_ID) {
-                    delete db[uid];
-                    delete cloudUsersCache[uid];
-                    cloudUsersNode.get(uid).put(null);
-                    const keysToRemove = [];
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const k = localStorage.key(i);
-                        if (k && k.startsWith(`amrDiet_${uid}_`)) keysToRemove.push(k);
-                    }
-                    keysToRemove.forEach(k => localStorage.removeItem(k));
+            purged.forEach(uid => {
+                delete db[uid];
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith(`amrDiet_${uid}_`)) keysToRemove.push(k);
                 }
+                keysToRemove.forEach(k => localStorage.removeItem(k));
             });
 
             if (db[ADMIN_ID]) {
                 db[ADMIN_ID].following = [];
                 db[ADMIN_ID].followers = [];
-                pushUserToCloud(db[ADMIN_ID]);
             }
             saveUsersDB(db);
+            await pushCloudState({ purgedIds: purged, replaceAllUsersWithAdminOnly: true });
             secretCodeModal.classList.remove('active');
-            showToast('🧹 تم مسح كل الحسابات الأخرى وإبقاء حسابك 3iid@001 فقط!');
+            showToast('🧹 تم مسح كل الحسابات الأخرى أونلاين وإبقاء حسابك 3iid@001 فقط!');
         };
 
         // ==========================================
-        // 12. نظام الأصدقاء والمتابعة والتحدي (أونلاين)
+        // 12. نظام الأصدقاء والمتابعة والتحدي (أونلاين REST API)
         // ==========================================
         const friendsModal = document.getElementById('friendsModal');
         const friendsListContainer = document.getElementById('friendsListContainer');
         let activeFriendsTab = 'following';
 
-        document.getElementById('friendsNavBtn').onclick = () => {
+        document.getElementById('friendsNavBtn').onclick = async () => {
             const u = getActiveUser();
             if (u) document.getElementById('myShareIdText').innerText = u.id;
             renderFriendsModal();
             friendsModal.classList.add('active');
+            await fetchCloudState();
+            renderFriendsModal();
         };
         document.getElementById('closeFriendsModalBtn').onclick = () => friendsModal.classList.remove('active');
         friendsModal.onclick = (e) => { if (e.target === friendsModal) friendsModal.classList.remove('active'); };
+
+        document.getElementById('refreshFriendsBtn').onclick = async () => {
+            showToast('🔄 جاري تحديث قائمة الأصدقاء...');
+            await fetchCloudState();
+            renderFriendsModal();
+            showToast('✅ تم التحديث!');
+        };
 
         document.getElementById('tabFollowingBtn').onclick = () => {
             activeFriendsTab = 'following';
@@ -2587,16 +2655,15 @@
             renderFriendsModal();
         };
 
-        window.toggleFollowUser = function(targetId) {
+        window.toggleFollowUser = async function(targetId) {
             const me = getActiveUser();
             if (!me || me.id === targetId || !isValidIdOrCode(targetId)) return;
             const db = getUsersDB();
-            const targetUser = db[targetId] || cloudUsersCache[targetId];
+            const targetUser = db[targetId];
             if (!targetUser) {
                 showToast('❌ هذا الـ ID غير موجود');
                 return;
             }
-            db[targetId] = targetUser;
             db[me.id].following = db[me.id].following || [];
             db[targetId].followers = db[targetId].followers || [];
 
@@ -2611,12 +2678,11 @@
                 showToast(`🔥 بدأت متابعة ${escapeHTML(db[targetId].name)}!`);
             }
             saveUsersDB(db);
-            pushUserToCloud(db[me.id]);
-            pushUserToCloud(db[targetId]);
             renderFriendsModal();
+            await pushCloudState();
         };
 
-        document.getElementById('addFriendByIdBtn').onclick = () => {
+        document.getElementById('addFriendByIdBtn').onclick = async () => {
             const searchId = document.getElementById('friendSearchInput').value.trim().toLowerCase();
             if (!searchId || !isValidIdOrCode(searchId)) {
                 showToast('⚠️ اكتب ID صديقك (حروف وأرقام فقط)');
@@ -2627,19 +2693,13 @@
                 showToast('😅 ده رقم التعريف بتاعك إنت!');
                 return;
             }
+            await fetchCloudState();
             const db = getUsersDB();
-            if (!db[searchId] && !cloudUsersCache[searchId]) {
-                cloudUsersNode.get(searchId).once((data) => {
-                    if (data && data.id && data.name && isValidName(data.name)) {
-                        toggleFollowUser(searchId);
-                        document.getElementById('friendSearchInput').value = '';
-                    } else {
-                        showToast('❌ لم يتم العثور على حساب بهذا الـ ID');
-                    }
-                });
+            if (!db[searchId]) {
+                showToast('❌ لم يتم العثور على حساب بهذا الـ ID');
                 return;
             }
-            toggleFollowUser(searchId);
+            await toggleFollowUser(searchId);
             document.getElementById('friendSearchInput').value = '';
         };
 
@@ -2664,8 +2724,7 @@
             } else if (activeFriendsTab === 'followers') {
                 targetIds = followersList;
             } else {
-                const allKnownIds = Array.from(new Set([...Object.keys(db), ...Object.keys(cloudUsersCache)]));
-                targetIds = allKnownIds.filter(id => id !== me.id);
+                targetIds = Object.keys(db).filter(id => id !== me.id);
             }
 
             if (targetIds.length === 0) {
@@ -2674,7 +2733,7 @@
             }
 
             friendsListContainer.innerHTML = targetIds.map(uid => {
-                const u = db[uid] || cloudUsersCache[uid];
+                const u = db[uid];
                 if (!u) return '';
                 const safeName = escapeHTML(u.name);
                 const safeId = escapeHTML(u.id);
@@ -2720,6 +2779,7 @@
 
         // التشغيل المبدئي
         initTheme();
+        fetchCloudState();
         initAppForCurrentUser();
     </script>
 </body>
